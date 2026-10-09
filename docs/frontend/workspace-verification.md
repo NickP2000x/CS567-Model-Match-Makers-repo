@@ -15,8 +15,10 @@ views can stack the panels without dropping controls or state.
 
 All data/operations use `ExperimentService`. There is no backend request, database,
 real model call, participant allocation selector, or research export. Refresh
-restarts the demonstration. Experimental routing is #12; full two-task timing,
-surveys, and completion are #16. Task 1 is a handoff, not a started experimental task.
+restarts the demonstration. The #12 routing controls and integration requirements
+are documented in [`routing-verification.md`](routing-verification.md); full
+two-task timing, survey connections, and completion are #16. Task 1 remains a
+handoff, not a started experimental task.
 
 ## Repeatable browser checklist
 

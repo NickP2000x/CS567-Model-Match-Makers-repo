@@ -309,6 +309,39 @@ th, td {
   font-size: 0.9rem;
 }
 
+.routing-status h4, .routing-status h5 {
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.routing-status legend {
+  margin: 0.75rem 0 0.25rem;
+}
+
+.routing-status button {
+  margin-top: 0.5rem;
+}
+
+.model-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+}
+
+.model-option input {
+  width: auto;
+  flex-shrink: 0;
+  margin-top: 0.3rem;
+}
+
+.recommendation-details {
+  border-top: 1px solid #818b96;
+  padding-top: 0.25rem;
+  margin-top: 0.75rem;
+}
+
 .conversation-log {
   min-height: 5rem;
   max-height: 12rem;
