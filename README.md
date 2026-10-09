@@ -1,8 +1,10 @@
 # Model Matchmakers
 
-A frontend research demonstration for event planning with simulated AI assistance.
-Use synthetic information only; this prototype is not ready for real participant
-data collection.
+A frontend research demonstration for **Human Override in Automatic LLM Routing:
+A User Study**. The study compares automatic model routing with participant
+override of router recommendations during an event-planning task. This prototype
+uses simulated router and model behavior and synthetic information only; it is
+not ready for real participant data collection.
 
 ## Run the frontend
 
