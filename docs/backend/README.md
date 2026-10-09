@@ -16,7 +16,8 @@ orders the work:
 
 1. [#31 — API contract](https://github.com/NickP2000x/CS567-Model-Match-Makers-repo/issues/31):
    jointly review operations, IDs, units, payload/error shapes, and transitions with
-   the frontend owner. The shared contract stays at `docs/experiment-service-contract.md`.
+   the frontend owner. The shared contract stays at `docs/experiment-service-contract.md`;
+   the proposed HTTP mapping is [`docs/experiment-api-http-draft.md`](../experiment-api-http-draft.md).
 2. [#32 — Backend setup and guidance](https://github.com/NickP2000x/CS567-Model-Match-Makers-repo/issues/32):
    update root guidance to authorize explicit backend tasks, add `backend/AGENTS.md`,
    and document pinned Python/FastAPI setup and key-free mock startup.

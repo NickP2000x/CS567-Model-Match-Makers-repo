@@ -41,6 +41,7 @@ scripts/
 docs/
   project-structure.md     Repository boundaries
   experiment-service-contract.md Shared frontend/backend contract and decisions
+  experiment-api-http-draft.md   #31 HTTP mapping proposal for that contract
   frontend/
     development-setup.md   Frontend installation and preview instructions
     introduction-verification.md Introduction checks and recorded results
