@@ -64,7 +64,7 @@ export function App({ service }: { service: ExperimentService }) {
           <Tutorial pending={pending} onContinue={() => { void perform(() => service.completeTutorial()); }} />
         )}
         {state.step === 'practice' && (
-          <PlanningWorkspace service={service} taskId="practice" perform={perform} />
+          <PlanningWorkspace service={service} taskId="practice" pending={pending} perform={perform} />
         )}
         {state.step === 'task-1' && (
           <>

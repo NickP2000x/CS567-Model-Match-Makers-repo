@@ -20,6 +20,7 @@ frontend/
     styles.css            Basic shared styles
     features/introduction/ Consent, synthetic demographics, and tutorial screens
     features/planning/    Catalog/details, stage/conversation, plan and practice
+    features/routing/     Simulated automatic/override checkpoint interactions
     services/             Typed in-memory experiment service and React subscription
     mocks/                Synthetic scenario/catalog and simulated response fixtures
   tests/
@@ -39,6 +40,7 @@ docs/
     development-setup.md   Frontend installation and preview instructions
     introduction-verification.md Introduction checks and recorded results
     workspace-verification.md Practice/Sprint 1 checks and recorded results
+    routing-verification.md Routing checks and #16 integration handoff
   backend/
     README.md              Backend work/documentation handoff; setup pending #32
 backend/                  Reserved location for future backend work; not created yet
@@ -53,7 +55,8 @@ maintains a duplicate protocol/API contract. The main README links to both areas
 
 Frontend entry points: [setup](frontend/development-setup.md),
 [introduction checks](frontend/introduction-verification.md), and
-[workspace checks](frontend/workspace-verification.md).
+[workspace checks](frontend/workspace-verification.md), and
+[routing checks/integration handoff](frontend/routing-verification.md).
 [Backend handoff](backend/README.md) identifies the planned setup/verification files
 to add during backend work. Component `AGENTS.md` files should point to their own
 documentation and the shared contract; root research rules remain canonical.

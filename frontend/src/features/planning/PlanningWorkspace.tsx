@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CatalogItem, CatalogSummary, Category, ExperimentService, Scenario, TaskId } from '../../services/experiment.types';
 import { useExperiment } from '../../services/useExperiment';
+import { RoutingPanel } from '../routing/RoutingPanel';
 import { CatalogPanel } from './CatalogPanel';
 import { ConversationPanel } from './ConversationPanel';
 import { PlanPanel } from './PlanPanel';
@@ -9,10 +10,11 @@ import { money } from './format';
 interface WorkspaceProps {
   service: ExperimentService;
   taskId: TaskId;
+  pending: boolean;
   perform: (operation: () => Promise<void>) => Promise<boolean>;
 }
 
-export function PlanningWorkspace({ service, taskId, perform }: WorkspaceProps) {
+export function PlanningWorkspace({ service, taskId, pending: actionPending, perform }: WorkspaceProps) {
   const state = useExperiment(service);
   const scenarioId = taskId === 'practice' ? 'practice' : state.assignments[taskId === 'task-1' ? 0 : 1].scenarioId;
   const [data, setData] = useState<{ scenario: Scenario; catalog: CatalogSummary[] } | null>(null);
@@ -22,7 +24,7 @@ export function PlanningWorkspace({ service, taskId, perform }: WorkspaceProps) 
   const [loadFailed, setLoadFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const task = state.tasks[taskId];
-  const pending = state.pendingOperations > 0;
+  const pending = actionPending || state.pendingOperations > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -112,6 +114,8 @@ export function PlanningWorkspace({ service, taskId, perform }: WorkspaceProps) 
             setExpandedItem(null);
           })} />
         <ConversationPanel task={task} pending={pending}
+          routing={<RoutingPanel key={`${task.id}-${task.checkpoint}`} task={task}
+            service={service} pending={pending} perform={perform} />}
           onSend={text => perform(() => service.sendMessage(text))}
           onAdvance={() => { void perform(() => service.advanceCheckpoint()); }} />
         <PlanPanel task={task} catalog={data.catalog} pending={pending}

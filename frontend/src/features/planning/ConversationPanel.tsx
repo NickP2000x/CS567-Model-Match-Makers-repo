@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { checkpoints } from '../../services/experiment.types';
 import type { Task } from '../../services/experiment.types';
 
 interface ConversationProps {
   task: Task;
   pending: boolean;
+  routing: ReactNode;
   onSend: (text: string) => Promise<boolean>;
   onAdvance: () => void;
 }
 
-export function ConversationPanel({ task, pending, onSend, onAdvance }: ConversationProps) {
+export function ConversationPanel({ task, pending, routing, onSend, onAdvance }: ConversationProps) {
   const [message, setMessage] = useState('');
   const checkpointTitle = useRef<HTMLHeadingElement>(null);
   const previousCheckpoint = useRef(task.checkpoint);
@@ -45,13 +46,7 @@ export function ConversationPanel({ task, pending, onSend, onAdvance }: Conversa
         ))}
       </ol>
       <h4 id="checkpoint-title" ref={checkpointTitle} tabIndex={-1}>Current stage: {task.checkpoint}</h4>
-      <div className="routing-status">
-        {task.condition === 'practice' ? (
-          <p>Simulated small model — fixed for this stage. Provisional practice treatment; no router recommendation.</p>
-        ) : (
-          <p>Experimental model selection will be connected through the routing controls.</p>
-        )}
-      </div>
+      {routing}
       <h4>Conversation</h4>
       <div ref={log} className="conversation-log" role="log" aria-label="Simulated conversation" aria-live="polite" aria-relevant="additions">
         {task.messages.length === 0 && <p>Ask for help comparing catalog options. Use synthetic information only.</p>}

@@ -285,3 +285,52 @@ test('practice and experimental catalogs have distinct vendor labels and service
     assert.ok(items.every(item => !('details' in item) && !('capacity' in item) && !('dietaryCoverage' in item)));
   }
 });
+
+test('override guards preserve concealment and separately locked initial/recommended/final records', async () => {
+  for (const initial of ['small', 'large']) {
+    let clock = 1000;
+    const service = createMockExperimentService({ sequenceId: 3, now: () => ++clock });
+    await practice(service); await service.beginTask();
+    await assert.rejects(service.sendMessage('Premature agent work'), { code: 'MODEL_REQUIRED' });
+    await assert.rejects(service.advanceCheckpoint(), { code: 'MODEL_REQUIRED' });
+    await assert.rejects(service.confirmModel(initial), { code: 'INVALID_ROUTING_PHASE' });
+    await service.lockInitialChoice(initial);
+    const locked = service.getSnapshot().tasks['task-1'].decisions.Venue;
+    assert.equal(locked.recommendedModel, null);
+    assert.equal(locked.reason, null);
+    assert.equal(locked.recommendationShownAt, null);
+    await assert.rejects(service.lockInitialChoice(initial === 'small' ? 'large' : 'small'), { code: 'INVALID_ROUTING_PHASE' });
+    const recommended = await service.requestRecommendation();
+    assert.equal(recommended.initialModel, initial);
+    assert.equal(recommended.initialLockedAt, locked.initialLockedAt);
+    assert.ok(recommended.initialLockedAt < recommended.recommendationShownAt);
+    await assert.rejects(service.sendMessage('Still not confirmed'), { code: 'MODEL_REQUIRED' });
+    await service.confirmModel(initial);
+    const committed = service.getSnapshot().tasks['task-1'].decisions.Venue;
+    assert.equal(committed.finalModel, initial);
+    assert.ok(committed.recommendationShownAt < committed.finalCommittedAt);
+    await assert.rejects(service.confirmModel(initial === 'small' ? 'large' : 'small'), { code: 'INVALID_ROUTING_PHASE' });
+    assert.deepEqual(await service.requestRecommendation(), committed);
+    assert.deepEqual(service.getSnapshot().tasks['task-1'].decisions.Venue, committed);
+    assert.deepEqual(service.getSnapshot().tasks['task-1'].messages, []);
+  }
+});
+
+test('concurrent automatic recommendation calls commit one decision without a participant choice', async () => {
+  let clock = 2000;
+  const service = createMockExperimentService({ now: () => ++clock });
+  await practice(service); await service.beginTask();
+  const [first, second] = await Promise.all([service.requestRecommendation(), service.requestRecommendation()]);
+  assert.deepEqual(first, second);
+  assert.equal(first.phase, 'committed');
+  assert.equal(first.initialModel, null);
+  assert.equal(first.initialLockedAt, null);
+  assert.equal(first.finalModel, first.recommendedModel);
+  await assert.rejects(service.confirmModel('large'), { code: 'INVALID_ROUTING_PHASE' });
+  const returned = await service.requestRecommendation();
+  returned.reason = 'Changed outside the service';
+  assert.deepEqual(service.getSnapshot().tasks['task-1'].decisions.Venue, first);
+  await service.finishTask();
+  await assert.rejects(service.requestRecommendation(), { code: 'NO_ACTIVE_TASK' });
+  assert.deepEqual(service.getSnapshot().tasks['task-1'].decisions.Venue, first);
+});

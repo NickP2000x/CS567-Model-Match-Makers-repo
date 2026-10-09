@@ -94,9 +94,26 @@ distinct fictional vendor labels, with stable item IDs and unchanged feasible to
   or invalid work and unvisited checkpoints. It proceeds directly to the Task 1
   handoff; no survey or experimental task/deadline is created there.
 - `PlanningWorkspace` accepts a task ID and derives its scenario from service
-  assignments. Experimental routing UI is #12; experimental countdown, survey
-  connections, and two-task orchestration are #16. The current app mounts only
+  assignments. #12 adds the routing UI to the reusable workspace; experimental
+  countdown, survey connections, and two-task orchestration are #16. The current app mounts only
   practice, so the participant cannot enter an experimental stage without routing.
+
+## Routing UI in #12
+
+The center panel renders service-owned decisions through `RoutingPanel`, keyed by
+task/checkpoint. Automatic requests/reveals/applies directly. Override has no
+preselected initial model and never requests/displays a recommendation before lock;
+after reveal, explicit retain/change and confirmation commit the final model.
+The stage model then stays fixed and enables agent work/Next. Practice bypasses
+recommendations and retains the existing fixed-small-model treatment.
+
+The parent passes its action `pending` flag to `PlanningWorkspace`, which combines
+it with service pending operations. A per-panel request guard prevents effect replay
+from duplicating a request; failures wait for explicit retry. These are UI guards,
+not a replacement for service transition validation or future server enforcement.
+The API/service interface and record fields are unchanged. See the
+[frontend routing handoff](frontend/routing-verification.md) for #16 integration,
+focused browser checks, and actual results.
 
 ## Synthetic contract walkthroughs for #31 review
 

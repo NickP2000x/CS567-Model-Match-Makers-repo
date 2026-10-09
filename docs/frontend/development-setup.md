@@ -111,6 +111,8 @@ For the current consent/demographics/tutorial screens, see
 [`introduction-verification.md`](introduction-verification.md) for the focused
 browser checklist and recorded results. For the three-panel practice workspace and
 Sprint 1 flow, see [`workspace-verification.md`](workspace-verification.md).
+For automatic/override routing checks and the full-flow integration handoff, see
+[`routing-verification.md`](routing-verification.md).
 
 ## AI-assisted work
 
