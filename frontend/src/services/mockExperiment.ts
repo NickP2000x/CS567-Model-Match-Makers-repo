@@ -1,6 +1,7 @@
 import { catalog, scenarios } from '../mocks/scenarios.ts';
 import { cannedResponse, recommendations } from '../mocks/responses.ts';
 import { checkpoints, surveyDimensions } from './experiment.types.ts';
+import { calculateWorkloadMean, isSurveyResponse, workloadSurveyDefinition } from './workloadSurvey.ts';
 import type { Assignment, Decision, ExperimentService, Model, SequenceId, StudyState, Task, TaskId } from './experiment.types.ts';
 
 const sequences: Record<SequenceId, [Assignment, Assignment]> = {
@@ -125,7 +126,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         checkpoint: 'Venue', decisions: {}, messages: [], inspectedItems: [],
         plan: { venue: null, catering: null, supplies: [] }, totalCostCents: 0,
         constraints: { budget: true, capacity: false, dietary: false, accessibility: false },
-        survey: { answers: {}, submittedAt: null } };
+        survey: { answers: {}, metadata: id === 'practice' ? null : structuredClone(workloadSurveyDefinition), rawScore: null, submittedAt: null } };
       task.decisions.Venue = newDecision(task, start); draft.tasks[id] = task;
     }),
     updatePlan: plan => run(draft => {
@@ -183,17 +184,21 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     saveSurveyAnswers: (id, answers) => run(draft => {
       const task = draft.tasks[id];
       if (!task || id === 'practice' || task.status === 'active' || task.survey.submittedAt !== null
-        || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')) fail('INVALID_SURVEY', 'Survey is unavailable for this task.');
+        || !task.survey.metadata || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')) fail('INVALID_SURVEY', 'Survey is unavailable for this task.');
       for (const [key, value] of Object.entries(answers)) {
-        if (!surveyDimensions.includes(key as typeof surveyDimensions[number]) || !Number.isFinite(value) || value < 0 || value > 100)
-          fail('INVALID_SURVEY', 'Use provisional demo responses between 0 and 100.');
+        if (!surveyDimensions.includes(key as typeof surveyDimensions[number]) || !isSurveyResponse(value, task.survey.metadata))
+          fail('INVALID_SURVEY', 'Choose a provisional demo response from 0 to 100 in steps of 5.');
       }
       Object.assign(task.survey.answers, answers);
     }),
     submitSurvey: id => run(draft => {
       const task = draft.tasks[id];
-      if (!task || id === 'practice' || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')
+      if (!task || id === 'practice' || task.status === 'active' || !task.survey.metadata || task.survey.submittedAt !== null
+        || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')
         || surveyDimensions.some(key => task.survey.answers[key] === undefined)) fail('INCOMPLETE_SURVEY', 'Answer all six dimensions for the current task.');
+      const score = calculateWorkloadMean(task.survey.answers, task.survey.metadata);
+      if (score === null) fail('INVALID_SURVEY', 'Choose a valid response for all six dimensions.');
+      task.survey.rawScore = score;
       task.survey.submittedAt = now(); draft.step = id === 'task-1' ? 'task-2' : 'completion';
     }),
   };

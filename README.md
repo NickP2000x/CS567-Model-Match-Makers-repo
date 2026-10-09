@@ -41,8 +41,8 @@ Consent → Demographics → Tutorial → Practice → Task 1 handoff
 
 Practice includes catalog inspection, plan editing, four constraint checks,
 four stages, and simulated conversation. Simulated automatic/override routing
-controls are implemented in the reusable workspace. Survey screens and the
-complete experimental two-task flow follow in the remaining Sprint 2 issues.
+controls and the reusable word-anchored NASA-TLX survey are implemented. Issue #16
+connects the experimental two-task flow, surveys, timers, and completion.
 
 The frontend currently uses an in-memory mock service. No backend, database,
 API keys, or `.env` file are required. Refreshing restarts the demonstration.
@@ -65,6 +65,7 @@ For browser checklists and recorded results, see:
 - [Introduction verification](docs/frontend/introduction-verification.md)
 - [Practice workspace verification](docs/frontend/workspace-verification.md)
 - [Routing verification and integration handoff](docs/frontend/routing-verification.md)
+- [Workload survey verification and integration handoff](docs/frontend/workload-verification.md)
 
 ## Frontend and backend setup
 

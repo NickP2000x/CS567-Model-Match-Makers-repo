@@ -10,6 +10,14 @@ export type StudyStep = 'consent' | 'demographics' | 'tutorial' | TaskId | 'tlx-
 export const surveyDimensions = ['mentalDemand', 'physicalDemand', 'temporalDemand', 'performance', 'effort', 'frustration'] as const;
 export type SurveyDimension = (typeof surveyDimensions)[number];
 export type SurveyAnswers = Partial<Record<SurveyDimension, number>>;
+export interface SurveyItemDefinition {
+  label: string; question: string; leftAnchor: string; rightAnchor: string;
+  orientation: 'higher-is-more-workload' | 'lower-is-more-workload';
+}
+export interface SurveyMetadata {
+  version: string; provisional: true; min: number; max: number; increment: number;
+  items: Record<SurveyDimension, SurveyItemDefinition>;
+}
 
 export interface Assignment { scenarioId: 'A' | 'B'; condition: Condition }
 export interface Scenario {
@@ -41,7 +49,7 @@ export interface Task {
   status: 'active' | 'submitted' | 'timed-out'; startedAt: number; deadline: number | null; endedAt: number | null;
   checkpoint: Checkpoint; decisions: Partial<Record<Checkpoint, Decision>>;
   messages: Message[]; inspectedItems: string[]; plan: Plan; totalCostCents: number; constraints: Constraints;
-  survey: { answers: SurveyAnswers; submittedAt: number | null };
+  survey: { answers: SurveyAnswers; metadata: SurveyMetadata | null; rawScore: number | null; submittedAt: number | null };
 }
 export interface StudyState {
   participantId: string; sequenceId: SequenceId; assignments: [Assignment, Assignment]; step: StudyStep;
