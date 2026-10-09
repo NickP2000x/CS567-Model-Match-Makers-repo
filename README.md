@@ -30,7 +30,7 @@ Stop the server with **Ctrl+C**.
 - Setup can be rerun. For subsequent development sessions, use
   `bash scripts/frontend.sh dev`.
 
-See [Development setup](docs/development-setup.md) for full prerequisites,
+See [Frontend development setup](docs/frontend/development-setup.md) for full prerequisites,
 platform instructions, and troubleshooting.
 
 ### Current demonstration
@@ -61,8 +61,8 @@ Build before previewing. Preview normally uses **http://localhost:4173** and ser
 the production assets generated in `frontend/dist/`.
 
 For browser checklists and recorded results, see:
-- [Introduction verification](docs/introduction-verification.md)
-- [Practice workspace verification](docs/workspace-verification.md)
+- [Introduction verification](docs/frontend/introduction-verification.md)
+- [Practice workspace verification](docs/frontend/workspace-verification.md)
 
 ## Frontend and backend setup
 
@@ -74,7 +74,9 @@ Frontend and backend development use separate runtimes and dependencies:
 | Planned backend | Python, FastAPI, SQLite | API, sessions, catalogs, and stored study state |
 
 The current setup scripts prepare the frontend only. Backend setup and startup
-commands will be documented when backend issue #32 is implemented.
+commands will be documented when backend issue #32 is implemented. See the
+[backend documentation handoff](docs/backend/README.md) for the planned work and
+documentation locations.
 
 After API integration, local backend mode will normally require the frontend
 and backend servers running in separate terminals. Standalone frontend mock mode

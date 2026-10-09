@@ -144,7 +144,7 @@ test('missing Node check-only explains automatic setup rather than requiring man
   const result = run(project({ TEST_RELEASE: 'microsoft-standard-WSL2' }, false));
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Run bash scripts\/setup\.sh/);
-  assert.match(result.stderr, /development-setup\.md#wsl2-ubuntu/);
+  assert.match(result.stderr, /docs\/frontend\/development-setup\.md#wsl2-ubuntu/);
 });
 
 test('setup downloads, verifies, installs and reuses a local runtime', () => {

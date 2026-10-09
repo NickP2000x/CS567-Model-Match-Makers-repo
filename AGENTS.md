@@ -10,7 +10,11 @@ This file owns shared project and research rules. Before editing frontend code,
 configuration, tests, or related setup tooling, also read `frontend/AGENTS.md`.
 Tools do not all discover nested instructions automatically; read that file
 explicitly. Local instructions supplement these rules, not replace them.
-See `docs/project-structure.md` for layout and `docs/development-setup.md` for setup.
+See `docs/project-structure.md` for layout and
+`docs/frontend/development-setup.md` for frontend setup. Shared documents stay in
+`docs/`; frontend setup/verification handoffs live in `docs/frontend/`. The planned
+backend documentation handoff is `docs/backend/README.md`; backend issue #32 owns
+backend authorization, `backend/AGENTS.md`, and setup/verification documentation.
 Preserve unrelated work. The repository owner approves PRs and handles merges;
 never approve or merge a PR. Only commit, push, or create a PR when requested.
 
