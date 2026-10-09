@@ -1,0 +1,46 @@
+name: Frontend checks
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Test and build frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up pinned Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Check setup script syntax
+        working-directory: .
+        run: |
+          bash -n scripts/runtime.sh
+          bash -n scripts/setup.sh
+          bash -n scripts/frontend.sh
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run focused tests
+        run: npm test
+
+      - name: Type-check and build
+        run: npm run build

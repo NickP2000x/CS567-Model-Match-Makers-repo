@@ -1,0 +1,30 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #182332;
+  background: #f5f7fa;
+  line-height: 1.6;
+  font-synthesis: none;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 44rem;
+  margin: 4rem auto;
+  padding: 1.5rem;
+}
+
+h1 {
+  line-height: 1.2;
+}
+
+.prototype-label {
+  font-weight: 600;
+}
+
+:focus-visible {
+  outline: 3px solid #2459a9;
+  outline-offset: 3px;
+}
