@@ -39,9 +39,9 @@ selections; a subsequent edit or Continue can retry. A failed save does not loop
 Accepted partial responses survive a component remount within the service session;
 refresh still restarts the demonstration. Unsaved local drafts are not recovery.
 
-No score/results dashboard is displayed. Normal participant navigation still ends
-at the Task 1 handoff until #16 mounts experimental tasks and their surveys. Survey
-and routing were checked in isolated fixtures outside the participant build.
+No score/results dashboard is displayed. #16 now mounts both task-linked surveys
+in the normal flow. See [study-flow verification](study-flow-verification.md) for
+current integrated results; the component checks below also used isolated fixtures.
 
 ## Repeatable focused checks
 
@@ -61,6 +61,9 @@ and routing were checked in isolated fixtures outside the participant build.
    horizontal page overflow. Check the normal introduction/practice flow too.
 
 ## Recorded results — 2026-10-09
+
+These #15 results describe the component-only build; current full-flow results
+are recorded in [study-flow verification](study-flow-verification.md).
 
 - WSL Linux, project-local Node 24.14.0/npm 11.9.0.
 - Type-check, production build, and all 30 tests passed (15 existing service,

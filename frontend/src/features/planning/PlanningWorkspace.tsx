@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CatalogItem, CatalogSummary, Category, ExperimentService, Scenario, TaskId } from '../../services/experiment.types';
 import { useExperiment } from '../../services/useExperiment';
 import { RoutingPanel } from '../routing/RoutingPanel';
+import { TaskCountdown } from '../study/TaskCountdown';
 import { CatalogPanel } from './CatalogPanel';
 import { ConversationPanel } from './ConversationPanel';
 import { PlanPanel } from './PlanPanel';
@@ -12,9 +13,10 @@ interface WorkspaceProps {
   taskId: TaskId;
   pending: boolean;
   perform: (operation: () => Promise<void>) => Promise<boolean>;
+  onFinish: (taskId: TaskId, reason?: 'submitted' | 'timed-out') => Promise<boolean>;
 }
 
-export function PlanningWorkspace({ service, taskId, pending: actionPending, perform }: WorkspaceProps) {
+export function PlanningWorkspace({ service, taskId, pending: actionPending, perform, onFinish }: WorkspaceProps) {
   const state = useExperiment(service);
   const scenarioId = taskId === 'practice' ? 'practice' : state.assignments[taskId === 'task-1' ? 0 : 1].scenarioId;
   const [data, setData] = useState<{ scenario: Scenario; catalog: CatalogSummary[] } | null>(null);
@@ -23,6 +25,7 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const starting = useRef(false);
   const task = state.tasks[taskId];
   const pending = actionPending || state.pendingOperations > 0;
 
@@ -35,9 +38,6 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
         if (cancelled) return;
         const catalog = await service.searchCatalog(scenarioId);
         if (cancelled) return;
-        // The workspace/requirements become available with this task snapshot.
-        await service.beginTask();
-        if (cancelled) return;
         setData({ scenario, catalog });
         setResults(catalog);
       } catch {
@@ -48,7 +48,14 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
     return () => { cancelled = true; };
   }, [service, scenarioId, taskId, attempt]);
 
-  if (!data || !task) {
+  useEffect(() => {
+    // Start only after the requirements header has been committed to the screen.
+    if (!data || task || starting.current || service.getSnapshot().step !== taskId) return;
+    starting.current = true;
+    void service.beginTask().catch(() => setLoadFailed(true)).finally(() => { starting.current = false; });
+  }, [data, task, service, taskId, attempt]);
+
+  if (!data || (loadFailed && !task)) {
     return loadFailed ? (
       <>
         <p>Could not load the workspace. Your current demo state is retained.</p>
@@ -99,13 +106,15 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
             {' '}Wheelchair access {requirements.wheelchairRequired ? 'required' : 'not required'}
           </p>
         </div>
-        <p className="time-remaining">{task.condition === 'practice' ? 'Time: untimed practice' : 'Time limit: 15 minutes'}</p>
+        {task ? <TaskCountdown task={task} onTimeout={() => onFinish(taskId, 'timed-out')} />
+          : <p className="time-remaining">{taskId === 'practice' ? 'Time: untimed practice' : 'Time remaining: 15:00'}</p>}
       </header>
       <p className="workspace-notice">
         Provisional demonstration: fictional catalog and prices (USD), live constraint feedback.
-        {task.condition === 'practice' && ' Practice is excluded from experimental records and uses a fixed simulated small model. No survey follows practice.'}
+        {taskId === 'practice' ? ' Practice is excluded from experimental records and uses a fixed simulated small model. No survey follows practice.'
+          : ` Scenario ${scenarioId} · ${state.assignments[taskId === 'task-1' ? 0 : 1].condition === 'automatic' ? 'Automatic' : 'Override'} routing.`}
       </p>
-      <div className="workspace-panels">
+      {!task ? <p role="status">Preparing the planning task…</p> : <div className="workspace-panels">
         <CatalogPanel results={results} details={details} expandedItem={expandedItem}
           plan={task.plan} pending={pending} onInspect={inspectItem} onSelect={selectItem}
           onSearch={(query, category) => perform(async () => {
@@ -120,8 +129,8 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
           onAdvance={() => { void perform(() => service.advanceCheckpoint()); }} />
         <PlanPanel task={task} catalog={data.catalog} pending={pending}
           budgetCents={requirements.budgetCents} onRemove={removeItem}
-          onSubmit={() => { void perform(() => service.finishTask()); }} />
-      </div>
+          onSubmit={() => { void onFinish(taskId); }} />
+      </div>}
     </>
   );
 }

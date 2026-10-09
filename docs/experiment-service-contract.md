@@ -31,7 +31,9 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 - `advanceCheckpoint` creates a fresh decision record; previous records are kept.
 - `finishTask` accepts incomplete/invalid plans. Submission at/after deadline is
   recorded as timeout; explicit timeout supports later developer controls. The
-  countdown/deadline trigger is UI work in #16, not an authoritative enforcement service.
+  #16 countdown triggers timeout and planning mutations reject expiry before writes;
+  this is still browser/mock timing, not authoritative backend enforcement. At/after
+  deadline, `endedAt` is the deadline rather than a delayed callback's clock time.
 - `saveSurveyAnswers` permits partial 0–100 demo responses in steps of 5 for the current ended
   experimental task. `submitSurvey` requires all six and advances the flow. Raw
   scoring is the mean of six correctly oriented common-scale values, retained in
@@ -94,11 +96,31 @@ distinct fictional vendor labels, with stable item IDs and unchanged feasible to
   guarded while an operation is pending; failed messages keep the current draft.
 - Practice submission at any checkpoint uses `finishTask`, preserving incomplete
   or invalid work and unvisited checkpoints. It proceeds directly to the Task 1
-  handoff; no survey or experimental task/deadline is created there.
+  workspace with no practice survey. Task 1's deadline is created only when its
+  requirements header is rendered, not by practice submission itself.
 - `PlanningWorkspace` accepts a task ID and derives its scenario from service
   assignments. #12 adds the routing UI to the reusable workspace; experimental
-  countdown, survey connections, and two-task orchestration are #16. The current app mounts only
-  practice, so the participant cannot enter an experimental stage without routing.
+  countdown, survey connections, and two-task orchestration are now connected by
+  #16. The app mounts each workspace/survey with a task-specific key.
+
+## Full-flow behavior in #16
+
+The app follows the complete consent-through-completion flow using the four
+service assignments. Developer-only sequence/reset/timeout controls do not exist
+in the participant production UI. Standalone default assignment is still mock
+sequence 1, not real randomized recruitment allocation.
+
+`beginTask` runs after requirements are rendered; repeated calls retain the existing
+deadline. Termination bypasses the parent action lock for timeout but rejects
+duplicates. Queued planning operations are checked against their original task,
+checkpoint, and session generation. New errors include `TASK_EXPIRED` (work preserved,
+timeout-to-survey) and `STALE_OPERATION` (old checkpoint/reset session); obsolete
+operations do not overwrite current-screen error state. The public methods/record
+shape remain unchanged. System-clock/browser throttling and refresh-restarts-demo
+limitations remain; authoritative enforcement is future backend work.
+
+See [study-flow verification](frontend/study-flow-verification.md) for current
+developer commands, integration checks/results, and #22 handoff.
 
 ## Routing UI in #12
 
@@ -231,7 +253,8 @@ The experiment tests exercise the service directly, inspect pending/error and
 task snapshots, verify every sequence and feasible plan, and check concealment,
 stage locking, partial submission, and task/survey linkage without any API calls.
 The #3 service verification is independent of UI. Issue #5 now connects the
-consent/demographics/tutorial screens; #7 connects practice and its Task 1 handoff.
+consent/demographics/tutorial screens; #7 connects practice, #12/#15 provide routing
+and workload components, and #16 connects both experimental tasks through completion.
 
 ### Local verification — 2026-10-08
 

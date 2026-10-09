@@ -2,6 +2,7 @@ import { catalog, scenarios } from '../mocks/scenarios.ts';
 import { cannedResponse, recommendations } from '../mocks/responses.ts';
 import { checkpoints, surveyDimensions } from './experiment.types.ts';
 import { calculateWorkloadMean, isSurveyResponse, workloadSurveyDefinition } from './workloadSurvey.ts';
+import { EXPERIMENTAL_TASK_MS } from './taskTiming.ts';
 import type { Assignment, Decision, ExperimentService, Model, SequenceId, StudyState, Task, TaskId } from './experiment.types.ts';
 
 const sequences: Record<SequenceId, [Assignment, Assignment]> = {
@@ -58,23 +59,62 @@ function evaluate(task: Task) {
     accessibility: !r.wheelchairRequired || venue?.wheelchairAccessible === true };
 }
 
+function endTask(state: StudyState, task: Task, reason: 'submitted' | 'timed-out', at: number) {
+  const expired = task.deadline !== null && at >= task.deadline;
+  task.status = expired ? 'timed-out' : reason;
+  task.endedAt = expired ? task.deadline : at;
+  evaluate(task);
+  state.step = task.id === 'practice' ? 'task-1' : task.id === 'task-1' ? 'tlx-1' : 'tlx-2';
+}
+
 export function createMockExperimentService(options: { sequenceId?: SequenceId; now?: () => number } = {}): ExperimentService {
   const now = options.now ?? Date.now;
   let state = freeze(initial(options.sequenceId ?? 1));
+  let sessionGeneration = 0;
   const listeners = new Set<() => void>();
   const publish = (next: StudyState) => { state = freeze(next); listeners.forEach(listener => listener()); };
-  async function run<T>(operation: (draft: StudyState) => T): Promise<T> {
+  async function run<T>(operation: (draft: StudyState) => T, mode: 'planning' | 'termination' | 'begin' | 'other' = 'other'): Promise<T> {
+    const generation = sessionGeneration;
+    const step = state.step;
+    const origin = state.tasks[step as TaskId];
+    let superseded = false;
     publish({ ...state, pendingOperations: state.pendingOperations + 1, error: null });
     // Expose a real pending state without a network, timer, or provider dependency.
     await Promise.resolve();
     try {
+      if (generation !== sessionGeneration) {
+        superseded = true;
+        fail('STALE_OPERATION', 'This operation belongs to an earlier demo session.');
+      }
+      if (mode === 'begin' && state.step !== step) {
+        superseded = true;
+        fail('INVALID_STEP', 'The planning step is no longer current.');
+      }
+      if ((mode === 'planning' || mode === 'termination') && origin) {
+        const current = state.tasks[origin.id];
+        if (state.step !== origin.id || current?.status !== 'active') {
+          superseded = true;
+          fail('NO_ACTIVE_TASK', 'The original task has ended.');
+        }
+        if (mode === 'planning' && current.checkpoint !== origin.checkpoint) {
+          superseded = true;
+          fail('STALE_OPERATION', 'The original checkpoint has ended.');
+        }
+        if (mode === 'planning' && current.deadline !== null && now() >= current.deadline) {
+          const expired = structuredClone(state);
+          endTask(expired, expired.tasks[origin.id]!, 'timed-out', current.deadline);
+          publish(expired);
+          superseded = true;
+          fail('TASK_EXPIRED', 'The task deadline has passed.');
+        }
+      }
       const draft = structuredClone(state);
       const result = operation(draft);
       publish(draft);
       return structuredClone(result);
     } catch (error) {
       const failure = error instanceof ExperimentError ? error : new ExperimentError('MOCK_ERROR', 'Mock operation failed.');
-      publish({ ...state, error: { code: failure.code, message: failure.message } });
+      if (!superseded) publish({ ...state, error: { code: failure.code, message: failure.message } });
       throw failure;
     } finally { publish({ ...state, pendingOperations: state.pendingOperations - 1 }); }
   }
@@ -84,6 +124,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     reset: sequenceId => run(draft => {
       const next = initial(sequenceId ?? draft.sequenceId);
       Object.assign(draft, next, { pendingOperations: draft.pendingOperations });
+      sessionGeneration++;
     }),
     recordConsent: accepted => run(draft => {
       if (draft.step !== 'consent') fail('INVALID_STEP', 'Consent is the first step.');
@@ -113,7 +154,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         ?? fail('NOT_FOUND', 'Item not found in this task.');
       if (!task.inspectedItems.includes(id)) task.inspectedItems.push(id);
       return item;
-    }),
+    }, 'planning'),
     beginTask: () => run(draft => {
       if (!['practice', 'task-1', 'task-2'].includes(draft.step)) fail('INVALID_STEP', 'Reach a planning step first.');
       const id = draft.step as TaskId;
@@ -122,13 +163,13 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         : draft.assignments[id === 'task-1' ? 0 : 1];
       const start = now();
       const task: Task = { id, ...assignment, excludedFromResults: id === 'practice', status: 'active',
-        startedAt: start, deadline: id === 'practice' ? null : start + 15 * 60 * 1000, endedAt: null,
+        startedAt: start, deadline: id === 'practice' ? null : start + EXPERIMENTAL_TASK_MS, endedAt: null,
         checkpoint: 'Venue', decisions: {}, messages: [], inspectedItems: [],
         plan: { venue: null, catering: null, supplies: [] }, totalCostCents: 0,
         constraints: { budget: true, capacity: false, dietary: false, accessibility: false },
         survey: { answers: {}, metadata: id === 'practice' ? null : structuredClone(workloadSurveyDefinition), rawScore: null, submittedAt: null } };
       task.decisions.Venue = newDecision(task, start); draft.tasks[id] = task;
-    }),
+    }, 'begin'),
     updatePlan: plan => run(draft => {
       const task = active(draft);
       const entries = [['venue', plan.venue], ['catering', plan.catering], ...plan.supplies.map(id => ['supplies', id])];
@@ -137,12 +178,12 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
           fail('INVALID_PLAN', 'Plan items must belong to the task and correct category.');
       }
       task.plan = { ...plan, supplies: [...new Set(plan.supplies)] }; evaluate(task);
-    }),
+    }, 'planning'),
     lockInitialChoice: model => run(draft => {
       modelCheck(model); const task = active(draft); const d = decision(task);
       if (task.condition !== 'override' || d.phase !== 'choose') fail('INVALID_ROUTING_PHASE', 'Initial choice is unavailable.');
       d.initialModel = model; d.initialLockedAt = now(); d.phase = 'locked';
-    }),
+    }, 'planning'),
     requestRecommendation: () => run(draft => {
       const task = active(draft); const d = decision(task);
       if (task.condition === 'practice' || (task.condition === 'override' && d.phase === 'choose'))
@@ -154,12 +195,12 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         if (task.condition === 'automatic') { d.finalModel = recommendation.model; d.finalCommittedAt = now(); }
       }
       return d;
-    }),
+    }, 'planning'),
     confirmModel: model => run(draft => {
       modelCheck(model); const task = active(draft); const d = decision(task);
       if (task.condition !== 'override' || d.phase !== 'recommended') fail('INVALID_ROUTING_PHASE', 'Model choice is unavailable or already fixed.');
       d.finalModel = model; d.finalCommittedAt = now(); d.phase = 'committed';
-    }),
+    }, 'planning'),
     sendMessage: text => run(draft => {
       const task = active(draft); const model = decision(task).finalModel;
       if (!model) fail('MODEL_REQUIRED', 'Complete routing before agent work.');
@@ -167,20 +208,17 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
       const stamp = now(); const index = task.messages.length;
       task.messages.push({ id: `${task.id}-message-${index}`, role: 'user', text: text.trim(), checkpoint: task.checkpoint, model: null, createdAt: stamp, simulated: false },
         { id: `${task.id}-message-${index + 1}`, role: 'assistant', text: cannedResponse(model, task.checkpoint), checkpoint: task.checkpoint, model, createdAt: stamp, simulated: true });
-    }),
+    }, 'planning'),
     advanceCheckpoint: () => run(draft => {
       const task = active(draft);
       if (!decision(task).finalModel) fail('MODEL_REQUIRED', 'Complete routing before advancing.');
       const next = checkpoints[checkpoints.indexOf(task.checkpoint) + 1];
       if (!next) fail('FINAL_CHECKPOINT', 'Submit the current plan.');
       task.checkpoint = next; task.decisions[next] = newDecision(task, now());
-    }),
+    }, 'planning'),
     finishTask: (reason = 'submitted') => run(draft => {
-      const task = active(draft); const end = now();
-      task.status = task.deadline !== null && end >= task.deadline ? 'timed-out' : reason;
-      task.endedAt = end; evaluate(task);
-      draft.step = task.id === 'practice' ? 'task-1' : task.id === 'task-1' ? 'tlx-1' : 'tlx-2';
-    }),
+      endTask(draft, active(draft), reason, now());
+    }, 'termination'),
     saveSurveyAnswers: (id, answers) => run(draft => {
       const task = draft.tasks[id];
       if (!task || id === 'practice' || task.status === 'active' || task.survey.submittedAt !== null
