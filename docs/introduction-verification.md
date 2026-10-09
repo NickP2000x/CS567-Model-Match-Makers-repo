@@ -2,9 +2,10 @@
 
 ## Scope and reference
 
-Consent → synthetic demographics → tutorial → practice handoff. The practice
-workspace is #7; the handoff does not create a task or start a timer. Screens use
-one app-boundary experiment service, with no direct response-fixture imports.
+Consent → synthetic demographics → tutorial → practice. Screens use one
+app-boundary experiment service, with no direct response-fixture imports. The
+original #5 handoff is now the #7 practice workspace; see
+[`workspace-verification.md`](workspace-verification.md) for Sprint 1 completion checks.
 
 Visual reference: `event-planning-mockup-small.png` in the
 [Overleaf project](https://www.overleaf.com/read/yjwtghwfqtqp#635087). The introduction
@@ -33,11 +34,14 @@ Use synthetic answers only.
    No actual A/B recommendation, reason, or reference plan is displayed.
 6. At a laptop viewport and 200% zoom, verify readable content/table, visible focus,
    no horizontal page overflow, and access to Continue to practice.
-7. Use Tab/Enter on Continue to practice: the practice handoff receives focus.
-   It explains the workspace is not yet available. Refresh returns to consent and
-   clears the previously entered demographic answers.
+7. Use Tab/Enter on Continue to practice: practice receives heading focus and the
+   workspace loads, labeled untimed and provisional. Refresh returns to consent
+   and clears the previously entered demographic answers.
 
 ## Recorded results — 2026-10-08
+
+These #5 results refer to the original introduction-only build. The #7 results
+include rechecking these introduction behaviors against the working workspace.
 
 - WSL Linux, project-local Node 24.14.0/npm 11.9.0.
 - Type-check, all 21 existing service/setup tests, and production build passed.

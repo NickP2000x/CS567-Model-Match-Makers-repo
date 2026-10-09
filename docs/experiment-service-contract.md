@@ -47,9 +47,9 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 |---|---|---|
 | Consent | #5 shows draft demo-only consent; accept advances, decline leaves a stop message on the consent step | Approved consent wording, risks, withdrawal/data-handling and exit copy |
 | Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
-| Practice | Untimed; fixed small model for each stage | Practice treatment/instructions |
+| Practice | #7 uses a separate untimed lunch scenario; fixed simulated small model for each stage, no router recommendation or survey | Practice treatment/instructions |
 | Catalog | Fictional packages; feasible totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
-| Feedback | Four live booleans after selection; servings included in dietary coverage | What to reveal, when; supplies completeness policy |
+| Feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
 | Routing | Fixed stage fixtures, identical across A/B; simulated reasons | Recommendation balance/reasons; future router threshold |
 | NASA-TLX | Store six 0–100 answers; no score yet | Wording, anchors, increments, orientation |
 
@@ -57,8 +57,9 @@ The #5 tutorial uses a standalone fictional $290 plan (a $90 venue, $160 meal,
 and $40 supplies package) against a $350 budget for 20 attendees. It illustrates
 capacity, vegetarian coverage, and step-free access without showing practice/A/B
 answers or checkpoint recommendation fixtures. Completing it changes the service
-step to practice, but the #7 workspace is not implemented yet and no task/timer is
-started at that placeholder. Questionnaire inputs are retained on failed attempts;
+step to practice. The #7 workspace loads requirements/catalog summaries through the
+service and begins the separate practice task as the workspace becomes available.
+Practice has no deadline. Questionnaire inputs are retained on failed attempts;
 accepted responses live in service memory. All introduction copy/options are
 provisional and must be reviewed before real participant collection.
 
@@ -72,7 +73,30 @@ summaries do not explicitly announce hidden capacity, dietary, or access failure
 Prices remain visible: the premium supplies package fits the budget alone but
 exceeds it when combined with the reference venue and catering. Budget is therefore
 a combined-plan check, not a concealed price. This presentation and the live
-constraint feedback remain provisional for #7/researcher review.
+constraint feedback remain provisional for researcher review. Practice/A/B now use
+distinct fictional vendor labels, with stable item IDs and unchanged feasible totals.
+
+## Workspace behavior in #7
+
+- The mockup-aligned three-panel workspace uses only the experiment service.
+  Initial catalog summaries populate both search results and selected-item labels;
+  hidden details are loaded only by `inspectItem`. Reopening cached details does
+  not duplicate the service's inspected-item record.
+- A submitted search uses `searchCatalog`; an empty query shows the selected
+  category's full list. Filtering never removes selected items from the plan.
+- Venue/catering selections replace the previous item. Supplies selections add
+  distinct packages. Remove actions retain other selections; the service recomputes
+  integer-cent costs and the same four constraints used at submission.
+- Next-stage controls use `advanceCheckpoint`; conversation uses `sendMessage`.
+  Stage-linked history and inspected items remain in service memory. Mutations are
+  guarded while an operation is pending; failed messages keep the current draft.
+- Practice submission at any checkpoint uses `finishTask`, preserving incomplete
+  or invalid work and unvisited checkpoints. It proceeds directly to the Task 1
+  handoff; no survey or experimental task/deadline is created there.
+- `PlanningWorkspace` accepts a task ID and derives its scenario from service
+  assignments. Experimental routing UI is #12; experimental countdown, survey
+  connections, and two-task orchestration are #16. The current app mounts only
+  practice, so the participant cannot enter an experimental stage without routing.
 
 ## Synthetic contract walkthroughs for #31 review
 
@@ -179,7 +203,7 @@ The experiment tests exercise the service directly, inspect pending/error and
 task snapshots, verify every sequence and feasible plan, and check concealment,
 stage locking, partial submission, and task/survey linkage without any API calls.
 The #3 service verification is independent of UI. Issue #5 now connects the
-consent/demographics/tutorial screens; the practice workspace follows in #7.
+consent/demographics/tutorial screens; #7 connects practice and its Task 1 handoff.
 
 ### Local verification — 2026-10-08
 
