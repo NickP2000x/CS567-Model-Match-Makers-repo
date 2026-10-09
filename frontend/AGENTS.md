@@ -24,7 +24,7 @@ and documentation when a change affects frontend development.
 - Support WSL2 Ubuntu, native Linux, and macOS. OS detection belongs only in setup
   tooling; browser behavior and generated static assets remain OS-independent.
 - From the repository root, run `bash scripts/setup.sh`, then
-  `bash scripts/frontend.sh dev`. See `../docs/development-setup.md` for details.
+  `bash scripts/frontend.sh dev`. See `../docs/frontend/development-setup.md` for details.
 - Setup selects pinned native Node/npm or prepares them under ignored `.tools/`.
   The launcher selects that runtime each time; never rely on Windows npm in WSL.
 - Do not install system packages or modify shell profiles through project tooling.
@@ -34,6 +34,13 @@ and documentation when a change affects frontend development.
   files ignored by Git. Preserve the lockfile for reproducible installation.
 
 ## UI and verification
+
+- Before continuing frontend work, read the relevant handoffs in
+  `../docs/frontend/introduction-verification.md` and
+  `../docs/frontend/workspace-verification.md`, plus the shared
+  `../docs/experiment-service-contract.md` and `../docs/project-structure.md`.
+  Verify the current issue/code/Git state; recorded results describe the tested
+  version, not automatic approval of subsequent changes.
 
 - Apply the root research invariants to every screen and state transition.
 - Use semantic controls, labels, visible focus, keyboard access, and readable

@@ -27,7 +27,7 @@ mm_detect() {
 }
 
 mm_guidance() {
-  printf 'See %s/docs/development-setup.md#%s\n' "$MM_ROOT" "$MM_DOC" >&2
+  printf 'See %s/docs/frontend/development-setup.md#%s\n' "$MM_ROOT" "$MM_DOC" >&2
 }
 
 mm_use_node() {

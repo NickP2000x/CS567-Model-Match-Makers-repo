@@ -33,10 +33,33 @@ scripts/
   frontend.sh             Dev/check/build launcher using the selected runtime
 .tools/                   Local runtimes/downloads, ignored by Git
 docs/
-  development-setup.md     Installation and preview instructions
   project-structure.md     Repository boundaries
+  experiment-service-contract.md Shared frontend/backend contract and decisions
+  frontend/
+    development-setup.md   Frontend installation and preview instructions
+    introduction-verification.md Introduction checks and recorded results
+    workspace-verification.md Practice/Sprint 1 checks and recorded results
+  backend/
+    README.md              Backend work/documentation handoff; setup pending #32
 backend/                  Reserved location for future backend work; not created yet
 ```
+
+## Documentation ownership
+
+Use `docs/frontend/` for frontend setup and verification handoffs and
+`docs/backend/` for backend-specific documentation. Keep the shared repository
+layout and experiment service contract directly in `docs/` so neither component
+maintains a duplicate protocol/API contract. The main README links to both areas.
+
+Frontend entry points: [setup](frontend/development-setup.md),
+[introduction checks](frontend/introduction-verification.md), and
+[workspace checks](frontend/workspace-verification.md).
+[Backend handoff](backend/README.md) identifies the planned setup/verification files
+to add during backend work. Component `AGENTS.md` files should point to their own
+documentation and the shared contract; root research rules remain canonical.
+
+The three earlier root-level frontend documents remain as legacy copies pending
+manual cleanup. Their canonical versions are now under `docs/frontend/`.
 
 ## As frontend issues are implemented
 
@@ -80,7 +103,8 @@ with dev/build/preview/type-check/test. Backend dependencies must not be needed 
 prototype. Do not place server code, private configuration, or credentials in
 `frontend/src/`, browser assets, or `VITE_*` variables.
 
-The experiment service contract will be defined in issue #3. A future network
+The experiment service contract draft from issue #3 lives in
+`docs/experiment-service-contract.md`; joint API review is #31. A future network
 adapter can implement that contract without making UI components aware of Python,
 database tables, or provider credentials. Mock and real modes must be explicit,
 not silently mixed. Authoritative assignment, deadlines, persistence, real model
