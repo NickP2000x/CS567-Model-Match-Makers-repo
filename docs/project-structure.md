@@ -16,18 +16,20 @@ frontend/
   tsconfig.json           Frontend TypeScript configuration
   src/
     main.tsx              Browser bootstrap
-    App.tsx               Introduction, practice workspace, and Task 1 handoff
+    App.tsx               Complete study screen composition and action/termination guards
     styles.css            Basic shared styles
     features/introduction/ Consent, synthetic demographics, and tutorial screens
     features/planning/    Catalog/details, stage/conversation, plan and practice
     features/routing/     Simulated automatic/override checkpoint interactions
     features/workload/    Reusable word-anchored NASA-TLX survey
+    features/study/       Absolute-deadline countdown and development-only controls
     services/             Typed in-memory experiment service and React subscription
     mocks/                Synthetic scenario/catalog and simulated response fixtures
   tests/
     setup.test.mjs        Focused setup verification
     experiment.test.mjs   Offline mock service and contract verification
     workload.test.mjs     Survey scoring, metadata, validation, and task linkage
+    timing.test.mjs       Deadline/termination and stale-operation checks
   node_modules/           Installed dependencies, ignored by Git
   dist/                   Generated static assets, ignored by Git
 scripts/
@@ -44,6 +46,7 @@ docs/
     workspace-verification.md Practice/Sprint 1 checks and recorded results
     routing-verification.md Routing checks and #16 integration handoff
     workload-verification.md Survey/scoring checks and #16 integration handoff
+    study-flow-verification.md Complete flow/results and #22 handoff
   backend/
     README.md              Backend work/documentation handoff; setup pending #32
 backend/                  Reserved location for future backend work; not created yet
@@ -60,7 +63,8 @@ Frontend entry points: [setup](frontend/development-setup.md),
 [introduction checks](frontend/introduction-verification.md), and
 [workspace checks](frontend/workspace-verification.md), and
 [routing checks/integration handoff](frontend/routing-verification.md), and
-[workload survey handoff](frontend/workload-verification.md).
+[workload survey handoff](frontend/workload-verification.md), and
+[full study flow / #22 handoff](frontend/study-flow-verification.md).
 [Backend handoff](backend/README.md) identifies the planned setup/verification files
 to add during backend work. Component `AGENTS.md` files should point to their own
 documentation and the shared contract; root research rules remain canonical.

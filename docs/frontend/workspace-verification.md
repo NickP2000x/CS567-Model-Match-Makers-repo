@@ -2,8 +2,9 @@
 
 ## Scope and reference
 
-The current demo runs Consent → Demographics → Tutorial → Practice → Task 1
-handoff. Practice is distinct, excluded from experimental records, untimed, and
+Issue #7 introduced the practice workspace; #16 now connects the complete flow
+described in [study-flow verification](study-flow-verification.md).
+Practice is distinct, excluded from experimental records, untimed, and
 uses a fixed simulated small model in each of its four stages. Its treatment,
 catalog, prices, and live feedback are provisional, pending researcher approval.
 
@@ -17,8 +18,7 @@ All data/operations use `ExperimentService`. There is no backend request, databa
 real model call, participant allocation selector, or research export. Refresh
 restarts the demonstration. The #12 routing controls and integration requirements
 are documented in [`routing-verification.md`](routing-verification.md); full
-two-task timing, survey connections, and completion are #16. Task 1 remains a
-handoff, not a started experimental task.
+two-task timing, survey connections, and completion are connected by #16.
 
 ## Repeatable browser checklist
 
@@ -50,7 +50,7 @@ Use invented demographic responses only.
    Stage changes move focus to the stage heading; repeated Next must not skip a stage.
 7. Submit the valid plan: go directly to Task 1 with no practice survey. In separate
    refreshed runs, submit an empty plan at Venue and an invalid Cedar Room plan:
-   both proceed to the same handoff without requiring repair. Repeated Submit must
+   both proceed to the assigned Task 1 without requiring repair. Repeated Submit must
    not create another task or survey.
 8. Check keyboard controls/focus, laptop readability, 200% enlargement, and no
    horizontal overflow or clipped item details. Submit remains accessible. Refresh
@@ -58,9 +58,12 @@ Use invented demographic responses only.
 
 Service tests verify the preserved practice plan, inspected IDs, per-stage model
 records/messages, lack of practice survey, unvisited decisions, and absent Task 1
-deadline at the handoff; the browser checklist verifies rendered behavior.
+deadline before its requirements appear; the browser checklist verifies rendered behavior.
 
 ## Recorded results — 2026-10-08
+
+These #7 results describe the practice-only build; current integration checks and
+results are in [study-flow verification](study-flow-verification.md).
 
 - Environment: WSL Linux, project-local Node 24.14.0/npm 11.9.0.
 - `bash scripts/frontend.sh type-check`: passed.

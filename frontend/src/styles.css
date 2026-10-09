@@ -138,6 +138,18 @@ th, td {
   min-height: 1.6em;
 }
 
+.developer-controls {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border: 1px dashed #818b96;
+  background: #2b3036;
+}
+
+.developer-controls summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .workload-question {
   margin: 1.5rem 0;
   padding: 0.75rem;

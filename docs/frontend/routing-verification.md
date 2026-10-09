@@ -23,11 +23,10 @@ reason wording is provisional, pending researcher approval.
 - Practice retains its untimed, fixed-small-model provisional treatment. It does
   not request/display a router recommendation.
 
-The normal participant app still runs consent → demographics → tutorial → practice
-→ Task 1 handoff. Experimental workspace mounting, absolute-deadline/countdown
-behavior, survey links, and full two-task orchestration remain #16. The survey is
-#15. No testing fixture, assignment selector, or bypass is added to the participant
-build to expose unfinished experimental flow.
+The normal app now mounts the experimental workspaces, timers, surveys, and
+completion through #16. See [study-flow verification](study-flow-verification.md)
+for integrated checks/results. Participant builds have no developer assignment
+selector or testing bypass.
 
 ## Integration requirements for #16
 
@@ -72,6 +71,9 @@ fixture outside the participant app with the same service and parent action guar
    leaks into the tutorial/practice, and practice still goes to Task 1 without a survey.
 
 ## Recorded results — 2026-10-09
+
+These #12 results describe the earlier component-only build; current integrated
+results are in [study-flow verification](study-flow-verification.md).
 
 - Environment: WSL Linux, project-local Node 24.14.0/npm 11.9.0.
 - Documented type-check, tests (25 passed: 15 service tests and 10 setup tests),

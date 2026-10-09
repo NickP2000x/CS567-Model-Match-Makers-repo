@@ -38,8 +38,9 @@ and documentation when a change affects frontend development.
 - Before continuing frontend work, read the relevant handoffs in
   `../docs/frontend/introduction-verification.md`,
   `../docs/frontend/workspace-verification.md`,
-  `../docs/frontend/routing-verification.md`, and
-  `../docs/frontend/workload-verification.md`, plus the shared
+  `../docs/frontend/routing-verification.md`,
+  `../docs/frontend/workload-verification.md`, and
+  `../docs/frontend/study-flow-verification.md`, plus the shared
   `../docs/experiment-service-contract.md` and `../docs/project-structure.md`.
   Verify the current issue/code/Git state; recorded results describe the tested
   version, not automatic approval of subsequent changes.

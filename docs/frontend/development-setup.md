@@ -115,6 +115,9 @@ For automatic/override routing checks and the full-flow integration handoff, see
 [`routing-verification.md`](routing-verification.md).
 For the word-anchored NASA-TLX component and scoring, see
 [`workload-verification.md`](workload-verification.md).
+For the now-connected two-task flow, timers, development-only sequence/reset/timeout
+controls, production guard, and Sprint 3 handoff, see
+[`study-flow-verification.md`](study-flow-verification.md).
 
 ## AI-assisted work
 
