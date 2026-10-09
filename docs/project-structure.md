@@ -16,10 +16,14 @@ frontend/
   tsconfig.json           Frontend TypeScript configuration
   src/
     main.tsx              Browser bootstrap
-    App.tsx               Current placeholder; later study composition
+    App.tsx               Service-backed introduction screen composition
     styles.css            Basic shared styles
+    features/introduction/ Consent, synthetic demographics, and tutorial screens
+    services/             Typed in-memory experiment service and React subscription
+    mocks/                Synthetic scenario/catalog and simulated response fixtures
   tests/
     setup.test.mjs        Focused setup verification
+    experiment.test.mjs   Offline mock service and contract verification
   node_modules/           Installed dependencies, ignored by Git
   dist/                   Generated static assets, ignored by Git
 scripts/
@@ -53,6 +57,18 @@ Add directories only when actual code needs them:
 Do not add empty directory trees, barrel-file frameworks, or a generic utilities
 layer before there is a concrete need. The root app composes screens; it should
 not grow into the mock service or contain catalog/response fixtures.
+
+## Interface visual reference
+
+The intended planning interface is `event-planning-mockup-small.png` in the
+[Overleaf paper project](https://www.overleaf.com/read/yjwtghwfqtqp#635087).
+Use its dark neutral panels, restrained blue highlights, and bordered controls.
+The workspace in #7 should follow its three-column arrangement: Catalog on the
+left, AI planning agent in the middle, Current event plan on the right; requirements
+and time remaining across the top, Submit at the bottom right. Introduction screens
+use the same palette with a plain single-column form/tutorial layout. Apply the
+root research rules to interactions; the visual mockup does not override initial
+choice concealment, the four checkpoints, or the four research constraints.
 
 ## Future backend boundary
 

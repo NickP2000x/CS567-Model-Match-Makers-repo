@@ -45,13 +45,22 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 
 | Topic | Current mock choice | Researcher decision |
 |---|---|---|
-| Consent | No text in service; acceptance gates progression | Approved wording/exit copy in #5 |
-| Demographics | Nonnegative integer age; nonempty free-text gender/LLM usage | Options, optionality, eligible ages |
+| Consent | #5 shows draft demo-only consent; accept advances, decline leaves a stop message on the consent step | Approved consent wording, risks, withdrawal/data-handling and exit copy |
+| Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
 | Practice | Untimed; fixed small model for each stage | Practice treatment/instructions |
 | Catalog | Fictional packages; feasible totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
 | Feedback | Four live booleans after selection; servings included in dietary coverage | What to reveal, when; supplies completeness policy |
 | Routing | Fixed stage fixtures, identical across A/B; simulated reasons | Recommendation balance/reasons; future router threshold |
 | NASA-TLX | Store six 0–100 answers; no score yet | Wording, anchors, increments, orientation |
+
+The #5 tutorial uses a standalone fictional $290 plan (a $90 venue, $160 meal,
+and $40 supplies package) against a $350 budget for 20 attendees. It illustrates
+capacity, vegetarian coverage, and step-free access without showing practice/A/B
+answers or checkpoint recommendation fixtures. Completing it changes the service
+step to practice, but the #7 workspace is not implemented yet and no task/timer is
+started at that placeholder. Questionnaire inputs are retained on failed attempts;
+accepted responses live in service memory. All introduction copy/options are
+provisional and must be reviewed before real participant collection.
 
 These choices are for a demonstration, not real research findings. Paper §§4–5.4
 confirms four checkpoints, stage locking, recommendation ordering, timing, and
@@ -169,7 +178,8 @@ Run `bash scripts/frontend.sh test` and `bash scripts/frontend.sh build`.
 The experiment tests exercise the service directly, inspect pending/error and
 task snapshots, verify every sequence and feasible plan, and check concealment,
 stage locking, partial submission, and task/survey linkage without any API calls.
-No new participant screens are part of this issue. The existing placeholder remains.
+The #3 service verification is independent of UI. Issue #5 now connects the
+consent/demographics/tutorial screens; the practice workspace follows in #7.
 
 ### Local verification — 2026-10-08
 

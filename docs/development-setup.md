@@ -107,6 +107,11 @@ failure, download failure, check-only behavior, runtime reuse, and launcher argu
 with isolated fixtures. They do **not** substitute for a
 real macOS/browser smoke check. Keep actual platform verification results explicit.
 
+For the current consent/demographics/tutorial screens, see
+[`introduction-verification.md`](introduction-verification.md) for the focused
+browser checklist and recorded results. Practice workspace implementation follows
+in issue #7.
+
 ## AI-assisted work
 
 Read `AGENTS.md` and the selected GitHub issue before editing. `CLAUDE.md` points
