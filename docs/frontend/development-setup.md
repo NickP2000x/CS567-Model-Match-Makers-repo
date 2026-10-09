@@ -113,6 +113,8 @@ browser checklist and recorded results. For the three-panel practice workspace a
 Sprint 1 flow, see [`workspace-verification.md`](workspace-verification.md).
 For automatic/override routing checks and the full-flow integration handoff, see
 [`routing-verification.md`](routing-verification.md).
+For the word-anchored NASA-TLX component and scoring, see
+[`workload-verification.md`](workload-verification.md).
 
 ## AI-assisted work
 

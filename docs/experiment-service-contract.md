@@ -32,9 +32,11 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 - `finishTask` accepts incomplete/invalid plans. Submission at/after deadline is
   recorded as timeout; explicit timeout supports later developer controls. The
   countdown/deadline trigger is UI work in #16, not an authoritative enforcement service.
-- `saveSurveyAnswers` permits partial 0–100 demo responses for the current ended
+- `saveSurveyAnswers` permits partial 0–100 demo responses in steps of 5 for the current ended
   experimental task. `submitSurvey` requires all six and advances the flow. Raw
-  scoring/approved anchors are #15, not implemented here. Practice has no survey.
+  scoring is the mean of six correctly oriented common-scale values, retained in
+  `survey.rawScore`. `survey.metadata` retains the provisional version, wording,
+  anchors, scale, and per-item orientation. Practice has no survey/metadata/score.
 - Methods return promises. Snapshots are frozen and stable until an update;
   `pendingOperations` and typed `error` expose loading/failure. Failed validation
   preserves previous task data. Errors contain code/message, no credentials.
@@ -51,7 +53,7 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 | Catalog | Fictional packages; feasible totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
 | Feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
 | Routing | Fixed stage fixtures, identical across A/B; simulated reasons | Recommendation balance/reasons; future router threshold |
-| NASA-TLX | Store six 0–100 answers; no score yet | Wording, anchors, increments, orientation |
+| NASA-TLX | #15 uses 21 word-anchored circles, 0–100 in steps of 5; performance Perfect performance → Failure, higher means more workload. Retain raw answers, definition/orientation metadata, and unweighted mean. | Wording, anchors, increments, orientation and presentation approval |
 
 The #5 tutorial uses a standalone fictional $290 plan (a $90 venue, $160 meal,
 and $40 supplies package) against a $350 budget for 20 attendees. It illustrates
@@ -116,6 +118,14 @@ The API/service interface and record fields are unchanged. See the
 focused browser checks, and actual results.
 
 ## Synthetic contract walkthroughs for #31 review
+
+The #15 survey record adds `metadata` and `rawScore` to the prior `answers` /
+`submittedAt` fields. Experimental tasks capture the provisional definition at
+creation; practice keeps metadata/score null. The mean is null before submission.
+Joint #31/backend review must account for these fields and discrete allowed values;
+method names/arguments remain unchanged. See the
+[workload handoff](frontend/workload-verification.md) for presentation, scoring,
+failure behavior, and #16 integration.
 
 These are TypeScript service calls and snapshot examples, **not agreed HTTP routes
 or payload envelopes**. A backend adapter may replace the implementation while
@@ -193,6 +203,7 @@ await service.saveSurveyAnswers('task-1', {
   performance: 60, effort: 30, frustration: 10,
 });
 await service.submitSurvey('task-1'); // step 'task-2'; raw values unchanged
+// survey.rawScore: 160 / 6; metadata retains the explicit perfect-to-failure anchors.
 ```
 
 Instead of submission, `finishTask('timed-out')` preserves the same current work
@@ -209,7 +220,7 @@ only its survey can be submitted, advancing from `tlx-2` to `completion`.
 - Agree authoritative requirements-visible/deadline and late-response behavior;
   the mock has no autonomous timeout trigger or server enforcement.
 - Review catalog/feedback policy and all provisional materials above. NASA-TLX
-  orientation/scoring is intentionally deferred to #15 and joint survey review.
+  presentation/orientation/scoring in #15 are provisional and still require joint survey review.
 - Record frontend/backend agreement in #31 before finalizing #3. This document
   does not substitute for that approval.
 
