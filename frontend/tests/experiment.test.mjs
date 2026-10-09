@@ -229,3 +229,59 @@ test('expired incomplete task preserves work and rejects late updates; fresh ins
   assert.equal(service.getSnapshot().step, 'tlx-1');
   assert.equal(createMockExperimentService().getSnapshot().step, 'consent');
 });
+
+test('practice supports inspection, editing, four fixed-model stages, and direct Task 1 handoff', async () => {
+  const service = createMockExperimentService();
+  await intro(service);
+  const task = service.getSnapshot().tasks.practice;
+  assert.equal(task.deadline, null);
+  const venues = await service.searchCatalog('practice', 'Meadow', 'venue');
+  assert.equal(venues.length, 1);
+  assert.equal(venues[0].id, feasiblePlans.practice.venue);
+  assert.deepEqual(await service.searchCatalog('practice', 'nonexistent option'), []);
+  await service.inspectItem(venues[0].id);
+  await service.updatePlan(feasiblePlans.practice);
+  assert.equal(service.getSnapshot().tasks.practice.totalCostCents, 35000);
+  await service.updatePlan({ ...feasiblePlans.practice, catering: null });
+  assert.equal(service.getSnapshot().tasks.practice.totalCostCents, 15000);
+  assert.equal(service.getSnapshot().tasks.practice.constraints.dietary, false);
+  await service.updatePlan(feasiblePlans.practice);
+  for (const checkpoint of checkpoints) {
+    await assert.rejects(service.requestRecommendation(), { code: 'INVALID_ROUTING_PHASE' });
+    await assert.rejects(service.confirmModel('large'), { code: 'INVALID_ROUTING_PHASE' });
+    await service.sendMessage('Compare options for this stage');
+    const current = service.getSnapshot().tasks.practice;
+    assert.equal(current.messages.at(-1).checkpoint, checkpoint);
+    assert.equal(current.messages.at(-1).model, 'small');
+    assert.equal(current.messages.at(-1).simulated, true);
+    assert.deepEqual(current.inspectedItems, [venues[0].id]);
+    assert.deepEqual(current.plan, feasiblePlans.practice);
+    if (checkpoint !== checkpoints.at(-1)) await service.advanceCheckpoint();
+  }
+  await service.finishTask();
+  const ended = service.getSnapshot().tasks.practice;
+  assert.equal(ended.excludedFromResults, true);
+  assert.equal(ended.status, 'submitted');
+  assert.equal(ended.messages.length, 8);
+  assert.ok(Object.values(ended.constraints).every(Boolean));
+  for (const choice of Object.values(ended.decisions)) {
+    assert.equal(choice.finalModel, 'small');
+    assert.equal(choice.initialModel, null);
+    assert.equal(choice.recommendedModel, null);
+  }
+  assert.deepEqual(ended.survey.answers, {});
+  assert.equal(service.getSnapshot().step, 'task-1');
+  assert.equal(service.getSnapshot().tasks['task-1'], undefined);
+});
+
+test('practice and experimental catalogs have distinct vendor labels and service-owned summaries', async () => {
+  const service = createMockExperimentService();
+  const catalogs = await Promise.all(['practice', 'A', 'B'].map(id => service.searchCatalog(id)));
+  const names = catalogs.flatMap(items => items.map(item => item.name));
+  assert.equal(new Set(names).size, names.length);
+  for (const items of catalogs) {
+    assert.equal(items.length, 8);
+    assert.deepEqual(new Set(items.map(item => item.category)), new Set(['venue', 'catering', 'supplies']));
+    assert.ok(items.every(item => !('details' in item) && !('capacity' in item) && !('dietaryCoverage' in item)));
+  }
+});

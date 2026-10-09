@@ -109,8 +109,8 @@ real macOS/browser smoke check. Keep actual platform verification results explic
 
 For the current consent/demographics/tutorial screens, see
 [`introduction-verification.md`](introduction-verification.md) for the focused
-browser checklist and recorded results. Practice workspace implementation follows
-in issue #7.
+browser checklist and recorded results. For the three-panel practice workspace and
+Sprint 1 flow, see [`workspace-verification.md`](workspace-verification.md).
 
 ## AI-assisted work
 

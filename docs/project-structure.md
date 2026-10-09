@@ -16,9 +16,10 @@ frontend/
   tsconfig.json           Frontend TypeScript configuration
   src/
     main.tsx              Browser bootstrap
-    App.tsx               Service-backed introduction screen composition
+    App.tsx               Introduction, practice workspace, and Task 1 handoff
     styles.css            Basic shared styles
     features/introduction/ Consent, synthetic demographics, and tutorial screens
+    features/planning/    Catalog/details, stage/conversation, plan and practice
     services/             Typed in-memory experiment service and React subscription
     mocks/                Synthetic scenario/catalog and simulated response fixtures
   tests/
@@ -63,7 +64,7 @@ not grow into the mock service or contain catalog/response fixtures.
 The intended planning interface is `event-planning-mockup-small.png` in the
 [Overleaf paper project](https://www.overleaf.com/read/yjwtghwfqtqp#635087).
 Use its dark neutral panels, restrained blue highlights, and bordered controls.
-The workspace in #7 should follow its three-column arrangement: Catalog on the
+The workspace in #7 follows its three-column arrangement: Catalog on the
 left, AI planning agent in the middle, Current event plan on the right; requirements
 and time remaining across the top, Submit at the bottom right. Introduction screens
 use the same palette with a plain single-column form/tutorial layout. Apply the

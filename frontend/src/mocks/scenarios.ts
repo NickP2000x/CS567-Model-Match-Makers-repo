@@ -7,22 +7,29 @@ export const scenarios: Scenario[] = [
 ];
 
 // Synthetic, fixed-price packages; quantities are not editable in this demo.
+const vendorNames: Record<ScenarioId, string[]> = {
+  practice: ['Meadow Hall', 'Garden Room', 'Cedar Room', 'Harvest Kitchen', 'Classic Kitchen', 'Riverside Kitchen', 'Basic Supplies', 'Premium Supplies'],
+  A: ['Willow Conference Hall', 'Birch Meeting Room', 'Maple Suite', 'Orchard Catering', 'Market Table', 'Lakeside Catering', 'Workshop Essentials', 'Workshop Plus'],
+  B: ['Harbor Events Hall', 'Beacon Room', 'Seabreeze Suite', 'Coastline Catering', 'Bay Table', 'Pier Kitchen', 'Celebration Essentials', 'Celebration Plus'],
+};
+
 export const catalog: CatalogItem[] = scenarios.flatMap((scenario, index) => {
   const { id, requirements: r } = scenario;
+  const names = vendorNames[id];
   const venuePrice = [10000, 30000, 50000][index];
   const cateringPrice = [20000, 40000, 60000][index];
   const supplyPrice = index === 0 ? 5000 : 10000;
   const venue = { scenarioId: id, category: 'venue' as const, priceCents: venuePrice, summary: 'A welcoming event space.', capacity: r.attendees, wheelchairAccessible: true };
   const food = { scenarioId: id, category: 'catering' as const, priceCents: cateringPrice, summary: 'A shared meal package.', servings: r.attendees, dietaryCoverage: r.dietaryNeeds };
   return [
-    { ...venue, id: `${id}-venue-good`, name: `${id} Meadow Hall`, details: 'Capacity covers the guest list. Step-free entrance and accessible event room.' },
-    { ...venue, id: `${id}-venue-capacity`, name: `${id} Garden Room`, capacity: r.attendees - 5, details: `Maximum event capacity: ${r.attendees - 5}.` },
-    { ...venue, id: `${id}-venue-access`, name: `${id} Loft Room`, wheelchairAccessible: false, details: 'Event room is upstairs; no lift or step-free route.' },
-    { ...food, id: `${id}-food-good`, name: `${id} Harvest Kitchen`, details: `Serves ${r.attendees}; covers ${r.dietaryNeeds.join(', ')} requirements.` },
-    { ...food, id: `${id}-food-diet`, name: `${id} Classic Kitchen`, dietaryCoverage: [], details: 'Standard menu; the required dietary alternatives are not included.' },
-    { ...food, id: `${id}-food-servings`, name: `${id} Riverside Kitchen`, servings: r.attendees - 5, details: `Package serves only ${r.attendees - 5} guests.` },
-    { id: `${id}-supplies-good`, scenarioId: id, category: 'supplies' as const, name: `${id} Basic Supplies`, summary: 'Event essentials.', priceCents: supplyPrice, details: 'Complete fixed-price supplies package.' },
-    { id: `${id}-supplies-cost`, scenarioId: id, category: 'supplies' as const, name: `${id} Premium Supplies`, summary: 'Premium event essentials.', priceCents: r.budgetCents - venuePrice - cateringPrice + 10000, details: 'Complete fixed-price supplies package. Check the combined venue, catering, and supplies cost against the budget.' },
+    { ...venue, id: `${id}-venue-good`, name: names[0], details: 'Capacity covers the guest list. Step-free entrance and accessible event room.' },
+    { ...venue, id: `${id}-venue-capacity`, name: names[1], capacity: r.attendees - 5, details: `Maximum event capacity: ${r.attendees - 5}.` },
+    { ...venue, id: `${id}-venue-access`, name: names[2], wheelchairAccessible: false, details: 'Event room is upstairs; no lift or step-free route.' },
+    { ...food, id: `${id}-food-good`, name: names[3], details: `Serves ${r.attendees}; covers ${r.dietaryNeeds.join(', ')} requirements.` },
+    { ...food, id: `${id}-food-diet`, name: names[4], dietaryCoverage: [], details: 'Standard menu; the required dietary alternatives are not included.' },
+    { ...food, id: `${id}-food-servings`, name: names[5], servings: r.attendees - 5, details: `Package serves only ${r.attendees - 5} guests.` },
+    { id: `${id}-supplies-good`, scenarioId: id, category: 'supplies' as const, name: names[6], summary: 'Event essentials.', priceCents: supplyPrice, details: 'Complete fixed-price supplies package.' },
+    { id: `${id}-supplies-cost`, scenarioId: id, category: 'supplies' as const, name: names[7], summary: 'Premium event essentials.', priceCents: r.budgetCents - venuePrice - cateringPrice + 10000, details: 'Complete fixed-price supplies package. Check the combined venue, catering, and supplies cost against the budget.' },
   ];
 });
 
