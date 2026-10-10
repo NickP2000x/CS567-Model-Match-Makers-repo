@@ -122,7 +122,7 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
             setResults(found);
             setExpandedItem(null);
           })} />
-        <ConversationPanel task={task} pending={pending}
+        <ConversationPanel task={task} pending={pending} simulated={state.simulated}
           routing={<RoutingPanel key={`${task.id}-${task.checkpoint}`} task={task}
             service={service} pending={pending} perform={perform} />}
           onSend={text => perform(() => service.sendMessage(text))}

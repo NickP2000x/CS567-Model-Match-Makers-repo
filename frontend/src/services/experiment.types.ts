@@ -64,7 +64,10 @@ export interface StudyState {
   preparations: Partial<Record<PreparationId, PreparationRecord>>;
   feedback: (FeedbackAnswers & { version: string; submittedAt: number }) | null;
   pendingOperations: number; error: { code: string; message: string } | null;
-  simulated: true; refreshRestartsDemo: true;
+  // The in-memory mock is always simulated and restarts on refresh; the API adapter (#39)
+  // resumes the backend session, whose agent is real when the backend runs real models.
+  simulated: boolean; refreshRestartsDemo: boolean;
+  sessionId?: string;
 }
 export interface ExperimentService {
   getSnapshot(): StudyState;

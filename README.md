@@ -91,8 +91,10 @@ Frontend and backend development use separate runtimes and dependencies:
 
 The `scripts/` setup prepares the frontend only. The backend runs the complete study
 flow in mock mode (catalog, sessions with balanced allocation, routing, timing,
-surveys, feedback) using the same simulated responses as the frontend mock; the
-frontend does not call it yet (#39). It needs Python 3.12 but no `.env` or keys.
+surveys, feedback) using the same simulated responses as the frontend mock. Set
+`VITE_API_BASE_URL=http://127.0.0.1:8000` to run the frontend against it; see
+[Backend (API) mode](docs/frontend/development-setup.md#backend-api-mode). It needs
+Python 3.12 but no `.env` or keys.
 From the repository root:
 
 ```bash

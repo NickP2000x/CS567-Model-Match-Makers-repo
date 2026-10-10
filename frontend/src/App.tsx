@@ -121,7 +121,7 @@ export function App({ service }: { service: ExperimentService }) {
           if (state.step === 'task-1' || state.step === 'task-2') void finishTask(state.step, 'timed-out');
         }} />}
       <p role="status" className="operation-status">{pending ? 'Updating the demonstration…' : ''}</p>
-      <p className="field-help">Refreshing restarts this demonstration.</p>
+      <p className="field-help">{state.refreshRestartsDemo ? 'Refreshing restarts this demonstration.' : 'Refreshing resumes your current session.'}</p>
     </main>
   );
 }

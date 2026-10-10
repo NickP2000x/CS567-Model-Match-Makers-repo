@@ -122,6 +122,37 @@ For the current #51 preparation/start gates, visual guide, five-point ratings,
 optional feedback and #22 checks, see
 [`study-refinements-verification.md`](study-refinements-verification.md).
 
+## Backend (API) mode
+
+By default the frontend uses the in-memory mock and needs no backend. To run it
+against the backend instead (#39), start the backend first (see
+[backend setup](../backend/development-setup.md)), then set `VITE_API_BASE_URL`:
+
+```bash
+# Terminal 1 (from backend/, .venv active). DEV_CONTROLS is needed for the dev server.
+DEV_CONTROLS=true python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# Terminal 2 (repository root)
+VITE_API_BASE_URL=http://127.0.0.1:8000 bash scripts/frontend.sh dev
+```
+
+Or copy `frontend/.env.example` to `frontend/.env.local` (ignored by Git) and uncomment
+the variable. In API mode:
+
+- The development server creates development sessions (sequence 1, `dev-…` IDs) and
+  the Development controls reset through the backend. The backend must run with
+  `DEV_CONTROLS=true`, otherwise a "could not start a study session" screen explains it.
+- A production build (`VITE_API_BASE_URL=… bash scripts/frontend.sh build`, then
+  `preview`) takes one of the twelve balanced allocation slots per new browser
+  session and hides the development controls. Delete the backend database file to
+  reset the slots.
+- The session ID is kept in `sessionStorage`, so a refresh resumes the same session
+  and deadline; closing the tab starts a new one.
+- `VITE_*` values are public. Never put keys there; model keys stay in `backend/.env`.
+
+Optional contract check against a running backend (mock mode, `DEV_CONTROLS=true`):
+`MM_API_URL=http://127.0.0.1:8000 bash scripts/frontend.sh test`. Without
+`MM_API_URL` those integration tests are skipped.
+
 ## AI-assisted work
 
 Read [root `AGENTS.md`](../../AGENTS.md),

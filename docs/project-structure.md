@@ -23,7 +23,7 @@ frontend/
     features/routing/     Simulated automatic/override checkpoint interactions
     features/workload/    Reusable word-anchored NASA-TLX survey
     features/study/       Progress, optional feedback, countdown, development-only controls
-    services/             Typed in-memory experiment service and React subscription
+    services/             Experiment service contract, in-memory mock, API adapter (#39), React subscription
     mocks/                Synthetic scenario/catalog and simulated response fixtures
   tests/
     setup.test.mjs        Focused setup verification
@@ -31,6 +31,8 @@ frontend/
     workload.test.mjs     Survey scoring, metadata, validation, and task linkage
     timing.test.mjs       Deadline/termination and stale-operation checks
     refinements.test.mjs  Acknowledgement/start gates and optional feedback checks
+    api-adapter.test.mjs  Offline API adapter checks with a scripted fetch
+    api-integration.test.mjs Opt-in adapter run against a live backend (MM_API_URL)
   node_modules/           Installed dependencies, ignored by Git
   dist/                   Generated static assets, ignored by Git
 scripts/
