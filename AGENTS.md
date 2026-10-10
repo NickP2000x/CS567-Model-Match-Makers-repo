@@ -2,27 +2,36 @@
 
 ## Scope and workflow
 
-This is a basic **frontend research demonstration**, not the final experiment.
+This is a basic **frontend research demonstration** with a minimal mock-mode
+backend scaffold, not the final experiment.
 Read the selected GitHub issue, its dependencies, and relevant code before editing.
-Use the nine active tasks in sprint trackers #24–#26; Sprint 3 orders #51 before #22. Closed superseded issues are
+Frontend work uses the nine active tasks in sprint trackers #24–#26; Sprint 3 orders #51 before #22.
+Backend work uses sprint trackers #28–#30 and only the explicitly selected backend
+issue (#31–#41). Closed superseded issues are
 historical, and `later-experiment` issues are deferred. Keep changes scoped and plain.
 This file owns shared project and research rules. Before editing frontend code,
 configuration, tests, or related setup tooling, also read `frontend/AGENTS.md`.
-Tools do not all discover nested instructions automatically; read that file
+Before editing backend code, configuration, tests, or CI, also read `backend/AGENTS.md`.
+Tools do not all discover nested instructions automatically; read those files
 explicitly. Local instructions supplement these rules, not replace them.
-See `docs/project-structure.md` for layout and
-`docs/frontend/development-setup.md` for frontend setup. Shared documents stay in
-`docs/`; frontend setup/verification handoffs live in `docs/frontend/`. The planned
-backend documentation handoff is `docs/backend/README.md`; backend issue #32 owns
-backend authorization, `backend/AGENTS.md`, and setup/verification documentation.
+See `docs/project-structure.md` for layout,
+`docs/frontend/development-setup.md` for frontend setup, and
+`docs/backend/development-setup.md` for backend setup. Shared documents stay in
+`docs/`; frontend setup/verification handoffs live in `docs/frontend/` and backend
+setup/verification in `docs/backend/` (overview: `docs/backend/README.md`).
 Preserve unrelated work. The repository owner approves PRs and handles merges;
 never approve or merge a PR. Only commit, push, or create a PR when requested.
 
-There is no backend, database, authentication, real router/model call, deployment,
-oracle evaluator, token accounting, statistical analysis, or research-data export
-in this phase. Use synthetic participant information and clearly label simulated
-router/agent behavior. Implementation details and frontend verification commands
-belong in `frontend/AGENTS.md`; keep shared research rules here rather than duplicating them.
+The frontend prototype remains mock-only: it uses the in-memory service and makes
+no backend calls until the API adapter issue (#39). Backend code is limited to what
+the selected backend issue requires (for example SQLite in #33, sessions in #34);
+it runs in mock mode by default, and real router/model calls require explicit
+server-side configuration in their own issues. There is no deployment,
+authentication, statistical analysis, or research-data export in this phase. Use
+synthetic participant information and clearly label simulated router/agent
+behavior. Implementation details and verification commands belong in
+`frontend/AGENTS.md` and `backend/AGENTS.md`; keep shared research rules here
+rather than duplicating them.
 
 ## Git branch and publishing safeguards
 

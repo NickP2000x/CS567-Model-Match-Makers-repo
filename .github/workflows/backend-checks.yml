@@ -1,0 +1,53 @@
+name: Backend checks
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Test and smoke-check backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up pinned Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version-file: backend/.python-version
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip check
+
+      - name: Run focused tests
+        run: python -m pytest
+
+      # No .env or provider secrets exist in CI; this confirms key-free mock startup.
+      - name: Start in mock mode and check health
+        run: |
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          server=$!
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/api/health > health.json; then break; fi
+            sleep 1
+          done
+          cat health.json
+          grep -q '"mode":"mock"' health.json
+          kill "$server"

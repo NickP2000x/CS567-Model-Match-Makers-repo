@@ -1,7 +1,7 @@
 # Project structure
 
-The repository currently contains the frontend prototype only. Keep its structure
-small and leave a clear boundary for a backend later.
+The repository contains the frontend prototype and a minimal mock-mode backend
+scaffold. Keep both small, with a clear boundary between them.
 
 ```text
 AGENTS.md                 Shared project/research rules and local-guidance pointers
@@ -50,8 +50,22 @@ docs/
     study-flow-verification.md Complete flow/results and #22 handoff
     study-refinements-verification.md #51 gates/visual guide/scale/feedback and #22 handoff
   backend/
-    README.md              Backend work/documentation handoff; setup pending #32
-backend/                  Reserved location for future backend work; not created yet
+    README.md              Backend work/documentation handoff
+    development-setup.md   Python environment, mock-mode startup, and configuration
+    verification.md        Backend checks and recorded results
+backend/
+  AGENTS.md               Backend stack, API/secret rules, commands, and checks
+  .python-version         Pinned Python version (3.12)
+  requirements.txt        Pinned runtime dependencies
+  requirements-dev.txt    Pinned test dependencies
+  .env.example            Safe placeholders; real .env files are ignored by Git
+  pytest.ini              Test configuration
+  app/
+    main.py               FastAPI app factory and /api routes
+    config.py             Server-only settings with mock-mode defaults
+    errors.py             Shared {"error": {code, message}} envelope
+  tests/                  Focused key-free backend tests
+  .venv/                  Local virtual environment, ignored by Git
 ```
 
 ## Documentation ownership
@@ -68,8 +82,8 @@ Frontend entry points: [setup](frontend/development-setup.md),
 [workload survey handoff](frontend/workload-verification.md), and
 [full study flow](frontend/study-flow-verification.md), and
 [current refinements / #22 handoff](frontend/study-refinements-verification.md).
-[Backend handoff](backend/README.md) identifies the planned setup/verification files
-to add during backend work. Component `AGENTS.md` files should point to their own
+Backend entry points: [handoff](backend/README.md),
+[setup](backend/development-setup.md), and [verification](backend/verification.md). Component `AGENTS.md` files should point to their own
 documentation and the shared contract; root research rules remain canonical.
 
 The three earlier root-level frontend documents remain as legacy copies pending
@@ -108,10 +122,11 @@ use the same palette with a plain single-column form/tutorial layout. Apply the
 root research rules to interactions; the visual mockup does not override initial
 choice concealment, the four checkpoints, or the four research constraints.
 
-## Future backend boundary
+## Backend boundary
 
-When backend work is separately authorized, place it under `backend/` with its own
-dependencies, configuration, tests, and documentation. Frontend npm commands live
+Backend work for an explicitly selected backend issue stays under `backend/` with its
+own dependencies, configuration, tests, and `backend/AGENTS.md`. Add backend modules
+only when an issue needs them (catalog/SQLite in #33, sessions in #34). Frontend npm commands live
 in `frontend/package.json`; from the repository root use `bash scripts/frontend.sh`
 with dev/build/preview/type-check/test. Backend dependencies must not be needed to start the mock
 prototype. Do not place server code, private configuration, or credentials in

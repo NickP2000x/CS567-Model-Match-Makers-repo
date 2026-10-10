@@ -87,12 +87,25 @@ Frontend and backend development use separate runtimes and dependencies:
 | Component | Stack | Purpose |
 |---|---|---|
 | Frontend | React, TypeScript, Vite, Node/npm | Browser interface |
-| Planned backend | Python, FastAPI, SQLite | API, sessions, catalogs, and stored study state |
+| Backend (scaffold) | Python 3.12, FastAPI, Uvicorn; SQLite planned | API, sessions, catalogs, and stored study state |
 
-The current setup scripts prepare the frontend only. Backend setup and startup
-commands will be documented when backend issue #32 is implemented. See the
-[backend documentation handoff](docs/backend/README.md) for the planned work and
-documentation locations.
+The `scripts/` setup prepares the frontend only. The backend currently provides a
+mock-mode health check; catalog, sessions, and study endpoints follow in later
+backend issues. It needs Python 3.12 but no `.env` or keys. From the repository root:
+
+```bash
+cd backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Then open **http://127.0.0.1:8000/api/health**. See
+[Backend development setup](docs/backend/development-setup.md) for platform notes
+and configuration, and the [backend documentation handoff](docs/backend/README.md)
+for the planned work.
 
 After API integration, local backend mode will normally require the frontend
 and backend servers running in separate terminals. Standalone frontend mock mode

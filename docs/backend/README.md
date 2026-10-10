@@ -1,8 +1,9 @@
 # Backend documentation handoff
 
-Backend implementation and startup instructions are not present yet. This page
-identifies the planned work and documentation locations; it does not authorize
-backend code under the current frontend-only root guidance.
+The backend scaffold from #32 runs a key-free mock-mode FastAPI service under
+`backend/`. This page identifies the planned work and documentation locations.
+Backend work is authorized only for an explicitly selected backend issue, following
+root `AGENTS.md` and [`backend/AGENTS.md`](../../backend/AGENTS.md).
 
 ## Start Backend Sprint 1
 
@@ -26,16 +27,17 @@ orders the work:
    persist synthetic sessions and assignments, enforce legal transitions, and verify
    balanced allocation and reopening without reassignment.
 
-## Documentation to add with implementation
+## Backend documentation
 
-- `docs/backend/development-setup.md`: supported Python version, virtual environment,
-  dependencies, mock-mode startup, health check, SQLite setup, and verification commands.
-- `docs/backend/verification.md`: repeatable checks, actual results, platform/model
-  checks not performed, and unresolved decisions as backend issues are completed.
-- `backend/AGENTS.md`: backend-specific instructions and links to those documents.
+- [Development setup](development-setup.md): Python 3.12, virtual environment,
+  pinned dependencies, mock-mode startup, health check, and configuration. Add
+  SQLite setup with #33.
+- [Verification](verification.md): repeatable checks, actual results, platform/model
+  checks not performed, and unresolved decisions, extended as backend issues land.
+- [`backend/AGENTS.md`](../../backend/AGENTS.md): backend-specific instructions.
 - [Main README](../../README.md): backend quick start linked to the detailed setup.
 
-These setup/verification files should be written from the implemented commands,
-not invented in advance. Keep shared protocol rules in root `AGENTS.md` and shared
+Update these files from the implemented commands as each issue lands; do not
+document behavior in advance. Keep shared protocol rules in root `AGENTS.md` and shared
 API decisions in the existing contract. Frontend-specific documentation is under
 `docs/frontend/`; standalone frontend mock mode must remain independently runnable.
