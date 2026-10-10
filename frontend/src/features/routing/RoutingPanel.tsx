@@ -85,7 +85,7 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
         </form>
       )}
       {task.condition === 'override' && decision.phase !== 'choose' && (
-        <p>Initial choice (locked): <strong>{decision.initialModel}</strong></p>
+        <p>Your initial choice: <strong>{decision.initialModel}</strong> (locked)</p>
       )}
       {needsRecommendation && (
         requestFailed ? (
@@ -99,6 +99,7 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
         <div className="recommendation-details">
           <h5 ref={recommendationTitle} tabIndex={-1}>Simulated router recommendation</h5>
           <p>Recommended model: <strong>{decision.recommendedModel}</strong></p>
+          {task.condition === 'override' && decision.initialModel === decision.recommendedModel && <p>Your choice matches the recommendation.</p>}
           <p>{decision.reason}</p>
           <p className="field-help">Provisional recommendation reason — pending researcher approval.</p>
         </div>
@@ -110,12 +111,12 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
             <label className="model-option">
               <input type="radio" name="final-model" required checked={finalSelection === decision.initialModel}
                 onChange={() => setFinalSelection(decision.initialModel!)} />
-              Retain initial choice ({decision.initialModel})
+              Keep my choice: {decision.initialModel}{decision.initialModel === decision.recommendedModel ? ' (recommended)' : ''}
             </label>
             <label className="model-option">
               <input type="radio" name="final-model" required checked={finalSelection === alternative}
                 onChange={() => setFinalSelection(alternative)} />
-              Change to {alternative}
+              {alternative === decision.recommendedModel ? `Use recommended model: ${alternative}` : `Change to ${alternative}`}
             </label>
             <button type="submit" disabled={!finalSelection}>Confirm final choice</button>
           </fieldset>

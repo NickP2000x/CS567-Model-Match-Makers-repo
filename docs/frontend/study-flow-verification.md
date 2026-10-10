@@ -3,7 +3,9 @@
 ## Current flow
 
 Consent → Demographics → Tutorial → Practice → Task 1 → NASA-TLX 1 →
-Task 2 → NASA-TLX 2 → Completion.
+Task 2 → NASA-TLX 2 → Optional feedback → Completion. #51 adds acknowledgement /
+explicit-start preparation substates and a visual guide, described in the
+[current refinement handoff](study-refinements-verification.md).
 
 Practice is separate, untimed, excluded from experimental records, and has no
 survey. Its fixed-small-model treatment remains provisional. Experimental
@@ -39,7 +41,7 @@ recruitment allocation; backend #34 owns that future behavior and persistence.
 
 ## Timing, submission, and late operations
 
-Requirements/catalog data load first. `beginTask` runs after the requirements
+After the explicit Start gate is confirmed, requirements/catalog data load. `beginTask` runs after the requirements
 header is rendered, setting one absolute 15-minute deadline. Remounts/repeated
 start calls preserve it. `TaskCountdown` derives remaining time from the deadline,
 checks every second and on focus/visibility changes, and avoids continuous live
@@ -47,7 +49,7 @@ announcements. There is no countdown or deadline for practice or surveys.
 
 Submission accepts any plan at any checkpoint, including incomplete/invalid work
 and unconfirmed choices. Submission/timeout goes to that task's survey; practice
-goes directly to Task 1. Termination can bypass a pending action lock and is guarded
+goes to Task 1 preparation. Termination can bypass a pending action lock and is guarded
 against duplicate calls. At/after deadline, submission is timeout and `endedAt`
 is clamped to the deadline. An early developer-triggered timeout records its actual
 trigger time; it is a simulation, not a changed experiment duration.
@@ -85,6 +87,10 @@ owns authoritative deadline/persistence behavior in its phase.
    including with URL parameters. Refresh must return to fresh consent.
 
 ## Recorded results — 2026-10-09
+
+These #16 results describe the original integration build. Current #51 results,
+including start gates, adapted ratings and optional feedback, are in the
+[refinement handoff](study-refinements-verification.md).
 
 - WSL Linux, project-local Node 24.14.0/npm 11.9.0; type-check, production build,
   and all 34 tests passed (15 service, 4 timing/race, 5 workload, 10 setup).

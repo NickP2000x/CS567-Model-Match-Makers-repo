@@ -3,13 +3,15 @@ import test from 'node:test';
 import { createMockExperimentService } from '../src/services/mockExperiment.ts';
 import { checkpoints, surveyDimensions } from '../src/services/experiment.types.ts';
 import { feasiblePlans } from '../src/mocks/scenarios.ts';
+import { acknowledge, finishFeedback, startTask } from './study-helpers.mjs';
 
 const answers = Object.fromEntries(surveyDimensions.map(key => [key, 50]));
 async function intro(service) {
   await service.recordConsent(true);
   await service.saveDemographics({ age: 25, gender: 'synthetic example', priorLlmUsage: 'occasional' });
+  await acknowledge(service, 'before-start');
   await service.completeTutorial();
-  await service.beginTask();
+  await startTask(service);
 }
 async function practice(service) {
   await intro(service);
@@ -37,7 +39,7 @@ test('all catalogs have feasible plans and detail-only violations; summaries omi
   for (const scenarioId of ['practice', 'A', 'B']) {
     const service = createMockExperimentService({ sequenceId: scenarioId === 'B' ? 2 : 1 });
     await intro(service);
-    if (scenarioId !== 'practice') { await service.finishTask(); await service.beginTask(); }
+    if (scenarioId !== 'practice') { await service.finishTask(); await startTask(service); }
     const summaries = await service.searchCatalog(scenarioId, '', 'venue');
     assert.equal(summaries.length, 3);
     assert.equal('wheelchairAccessible' in summaries[0], false);
@@ -65,7 +67,7 @@ for (const sequenceId of [1, 2, 3, 4]) {
     assert.equal(service.getSnapshot().step, 'task-1');
     await assert.rejects(service.saveSurveyAnswers('practice', answers), { code: 'INVALID_SURVEY' });
     for (const id of ['task-1', 'task-2']) {
-      await service.beginTask();
+      await startTask(service);
       const task = service.getSnapshot().tasks[id];
       const expected = service.getSnapshot().assignments[id === 'task-1' ? 0 : 1];
       assert.equal(task.scenarioId, expected.scenarioId);
@@ -98,6 +100,8 @@ for (const sequenceId of [1, 2, 3, 4]) {
       await service.submitSurvey(id);
       assert.equal(Object.keys(service.getSnapshot().tasks[id].survey.answers).length, 6);
     }
+    assert.equal(service.getSnapshot().step, 'feedback');
+    await finishFeedback(service);
     assert.equal(service.getSnapshot().step, 'completion');
     await service.reset(2);
     assert.equal(service.getSnapshot().step, 'consent');
@@ -108,7 +112,7 @@ for (const sequenceId of [1, 2, 3, 4]) {
 test('override retains independent initial and final choices for keep/change paths', async () => {
   for (const initial of ['small', 'large']) for (const final of ['small', 'large']) {
     const service = createMockExperimentService({ sequenceId: 3 });
-    await practice(service); await service.beginTask();
+    await practice(service); await startTask(service);
     await service.lockInitialChoice(initial); await service.requestRecommendation(); await service.confirmModel(final);
     const d = service.getSnapshot().tasks['task-1'].decisions.Venue;
     assert.equal(d.initialModel, initial); assert.equal(d.finalModel, final);
@@ -121,7 +125,7 @@ test('each scenario supports independent constraint violations and incomplete su
   for (const scenarioId of ['practice', 'A', 'B']) {
     const service = createMockExperimentService({ sequenceId: scenarioId === 'B' ? 2 : 1 });
     await intro(service);
-    if (scenarioId !== 'practice') { await service.finishTask(); await service.beginTask(); }
+    if (scenarioId !== 'practice') { await service.finishTask(); await startTask(service); }
     const id = scenarioId === 'practice' ? 'practice' : 'task-1';
     const reference = feasiblePlans[scenarioId];
     const variants = [
@@ -158,7 +162,7 @@ test('each scenario supports independent constraint violations and incomplete su
 
 test('ended tasks reject duplicate termination and mutations without changing recorded work', async () => {
   const service = createMockExperimentService({ sequenceId: 3 });
-  await practice(service); await service.beginTask();
+  await practice(service); await startTask(service);
   await service.lockInitialChoice('large');
   await service.updatePlan(feasiblePlans.A);
   await service.inspectItem('A-venue-good');
@@ -189,7 +193,7 @@ test('ended tasks reject duplicate termination and mutations without changing re
 test('documented contract walkthroughs preserve automatic/override and submission/survey payloads', async () => {
   for (const sequenceId of [1, 3]) {
     const service = createMockExperimentService({ sequenceId });
-    await intro(service); await service.finishTask(); await service.beginTask();
+    await intro(service); await service.finishTask(); await startTask(service);
     if (sequenceId === 3) {
       await assert.rejects(service.requestRecommendation(), { code: 'INVALID_ROUTING_PHASE' });
       await service.lockInitialChoice('large');
@@ -206,7 +210,7 @@ test('documented contract walkthroughs preserve automatic/override and submissio
     assert.deepEqual(task.constraints, { budget: true, capacity: true, dietary: false, accessibility: true });
     assert.equal(task.decisions.Venue.finalModel, 'small');
     assert.equal(task.messages.at(-1).model, 'small');
-    const raw = { mentalDemand: 20, physicalDemand: 0, temporalDemand: 40, performance: 60, effort: 30, frustration: 10 };
+    const raw = { mentalDemand: 25, physicalDemand: 0, temporalDemand: 50, performance: 75, effort: 25, frustration: 0 };
     await service.saveSurveyAnswers('task-1', raw); await service.submitSurvey('task-1');
     assert.deepEqual(service.getSnapshot().tasks['task-1'].survey.answers, raw);
     assert.equal(service.getSnapshot().step, 'task-2');
@@ -218,7 +222,7 @@ test('documented contract walkthroughs preserve automatic/override and submissio
 test('expired incomplete task preserves work and rejects late updates; fresh instance resets', async () => {
   let clock = 100;
   const service = createMockExperimentService({ now: () => clock });
-  await practice(service); await service.beginTask(); await service.requestRecommendation();
+  await practice(service); await startTask(service); await service.requestRecommendation();
   await service.sendMessage('A partial plan');
   clock = service.getSnapshot().tasks['task-1'].deadline;
   const finish = service.finishTask();
@@ -290,7 +294,7 @@ test('override guards preserve concealment and separately locked initial/recomme
   for (const initial of ['small', 'large']) {
     let clock = 1000;
     const service = createMockExperimentService({ sequenceId: 3, now: () => ++clock });
-    await practice(service); await service.beginTask();
+    await practice(service); await startTask(service);
     await assert.rejects(service.sendMessage('Premature agent work'), { code: 'MODEL_REQUIRED' });
     await assert.rejects(service.advanceCheckpoint(), { code: 'MODEL_REQUIRED' });
     await assert.rejects(service.confirmModel(initial), { code: 'INVALID_ROUTING_PHASE' });
@@ -319,7 +323,7 @@ test('override guards preserve concealment and separately locked initial/recomme
 test('concurrent automatic recommendation calls commit one decision without a participant choice', async () => {
   let clock = 2000;
   const service = createMockExperimentService({ now: () => ++clock });
-  await practice(service); await service.beginTask();
+  await practice(service); await startTask(service);
   const [first, second] = await Promise.all([service.requestRecommendation(), service.requestRecommendation()]);
   assert.deepEqual(first, second);
   assert.equal(first.phase, 'committed');

@@ -18,7 +18,8 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 - Money uses integer cents (provisional USD); timestamps/deadlines use milliseconds
   since epoch. Model IDs are small/large roles, not real provider identifiers.
 - Consent → demographics → tutorial → practice → task-1 → tlx-1 → task-2 → tlx-2
-  → completion. `beginTask()` is called when requirements become visible; repeated
+  → feedback → completion. Preparation substates precede the guide/practice/tasks.
+  `beginTask()` is called when requirements become visible after Start; repeated
   calls preserve the current task and its 15-minute experimental deadline.
 - `getScenario`, `searchCatalog`, `inspectItem` provide requirements, summaries,
   and details respectively. Summaries omit hidden capacity/diet/access facts;
@@ -34,11 +35,19 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
   #16 countdown triggers timeout and planning mutations reject expiry before writes;
   this is still browser/mock timing, not authoritative backend enforcement. At/after
   deadline, `endedAt` is the deadline rather than a delayed callback's clock time.
-- `saveSurveyAnswers` permits partial 0–100 demo responses in steps of 5 for the current ended
+- `saveSurveyAnswers` permits the current record's discrete values: v2 uses 0/25/50/75/100,
+  while earlier v1 metadata retains steps of 5, for the current ended
   experimental task. `submitSurvey` requires all six and advances the flow. Raw
   scoring is the mean of six correctly oriented common-scale values, retained in
   `survey.rawScore`. `survey.metadata` retains the provisional version, wording,
   anchors, scale, and per-item orientation. Practice has no survey/metadata/score.
+- `confirmPreparation(id, acknowledgedIds)` confirms all required statement IDs for
+  the current before-start/practice/task preparation, retaining version/wording/IDs/time
+  in `preparations`. `completeTutorial` requires before-start confirmation; `beginTask`
+  requires matching task confirmation. Confirmation alone creates no task/deadline.
+- `submitFeedback({ interfaceComments, studyComments })` accepts blank strings only
+  at the feedback step after TLX 2, stores session-linked optional text/version/time
+  separately from all task/survey records, and advances to completion.
 - Methods return promises. Snapshots are frozen and stable until an update;
   `pendingOperations` and typed `error` expose loading/failure. Failed validation
   preserves previous task data. Errors contain code/message, no credentials.
@@ -53,16 +62,19 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 | Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
 | Practice | #7 uses a separate untimed lunch scenario; fixed simulated small model for each stage, no router recommendation or survey | Practice treatment/instructions |
 | Catalog | Fictional packages; feasible totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
-| Feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
+| Live constraint feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
 | Routing | Fixed stage fixtures, identical across A/B; simulated reasons | Recommendation balance/reasons; future router threshold |
-| NASA-TLX | #15 uses 21 word-anchored circles, 0–100 in steps of 5; performance Perfect performance → Failure, higher means more workload. Retain raw answers, definition/orientation metadata, and unweighted mean. | Wording, anchors, increments, orientation and presentation approval |
+| NASA-TLX | #51 uses provisional adapted v2, five labelled choices at 0/25/50/75/100; performance Completely successful → Not successful, higher means more workload. Retain labels/raw answers/orientation/version/mean; v1 retained for earlier records. | Adaptation validity, wording, anchors, increments, orientation and approval |
+| Preparation | Before-start refresh/synthetic reminders and untimed/excluded practice or 15-minute/no-refresh/submit-anytime task acknowledgements; explicit Start gates | Wording/requiredness; acknowledgements are not proof of reading |
+| Optional feedback | Two final interface/study comment boxes; both may be blank, stored separately from workload | Prompt wording, use/retention policy and researcher approval |
 
-The #5 tutorial uses a standalone fictional $290 plan (a $90 venue, $160 meal,
+The #51 visual guide retains a standalone fictional $290 plan (a $90 venue, $160 meal,
 and $40 supplies package) against a $350 budget for 20 attendees. It illustrates
 capacity, vegetarian coverage, and step-free access without showing practice/A/B
 answers or checkpoint recommendation fixtures. Completing it changes the service
-step to practice. The #7 workspace loads requirements/catalog summaries through the
-service and begins the separate practice task as the workspace becomes available.
+step to practice preparation. After Start practice, the workspace loads
+requirements/catalog summaries through the service and begins the separate task
+as its requirements become visible.
 Practice has no deadline. Questionnaire inputs are retained on failed attempts;
 accepted responses live in service memory. All introduction copy/options are
 provisional and must be reviewed before real participant collection.
@@ -95,8 +107,8 @@ distinct fictional vendor labels, with stable item IDs and unchanged feasible to
   Stage-linked history and inspected items remain in service memory. Mutations are
   guarded while an operation is pending; failed messages keep the current draft.
 - Practice submission at any checkpoint uses `finishTask`, preserving incomplete
-  or invalid work and unvisited checkpoints. It proceeds directly to the Task 1
-  workspace with no practice survey. Task 1's deadline is created only when its
+   or invalid work and unvisited checkpoints. It proceeds to Task 1 preparation
+   with no practice survey. Task 1's deadline is created only when its
   requirements header is rendered, not by practice submission itself.
 - `PlanningWorkspace` accepts a task ID and derives its scenario from service
   assignments. #12 adds the routing UI to the reusable workspace; experimental
@@ -121,6 +133,26 @@ limitations remain; authoritative enforcement is future backend work.
 
 See [study-flow verification](frontend/study-flow-verification.md) for current
 developer commands, integration checks/results, and #22 handoff.
+
+## #51 current refinement / backend coordination
+
+New `StudyState` fields are `preparations` and `feedback`; `StudyStep` now includes
+feedback. Preparation IDs are before-start/practice/task-1/task-2. Each accepted
+record contains definition version, statement wording, acknowledged IDs and
+`confirmedAt`. Repeated confirmation preserves the original timestamp. This is
+acknowledgement, not evidence of reading. Reset clears these records.
+
+New tasks capture `provisional-adapted-nasa-tlx-5-v2`, increment 25, and per-item
+`labels`. The previous v1 definition is exported unchanged; scoring/validation use
+the stored metadata, not a global replacement. This adaptation changes precision
+and presentation and still needs researcher approval.
+
+`submitSurvey(task-2)` advances to feedback instead of completion. `submitFeedback`
+stores `interfaceComments`, `studyComments`, version `provisional-feedback-v1` and
+`submittedAt`; data remains linked through the synthetic session and is not scored.
+Blank/filled submissions both finish. The new methods, gate prerequisites, fields,
+values and transitions require #31/backend state/record-owner review before joint
+agreement is claimed. See [current refinements](frontend/study-refinements-verification.md).
 
 ## Routing UI in #12
 
@@ -162,9 +194,12 @@ await service.recordConsent(true);
 await service.saveDemographics({
   age: 25, gender: 'synthetic example', priorLlmUsage: 'occasional',
 });
+await service.confirmPreparation('before-start', ['no-refresh', 'synthetic-only']);
 await service.completeTutorial();
+await service.confirmPreparation('practice', ['untimed', 'excluded']);
 await service.beginTask(); // practice, excludedFromResults: true, deadline: null
 await service.finishTask(); // incomplete practice accepted; step becomes task-1
+await service.confirmPreparation('task-1', ['time-limit', 'no-refresh', 'submit-anytime']);
 await service.beginTask(); // requirements-visible event; 900,000 ms deadline
 ```
 
@@ -221,18 +256,19 @@ await service.finishTask();
 // constraints { budget: true, capacity: true, dietary: false, accessibility: true };
 // step 'tlx-1'. Only reached decisions exist; missing choices remain null.
 await service.saveSurveyAnswers('task-1', {
-  mentalDemand: 20, physicalDemand: 0, temporalDemand: 40,
-  performance: 60, effort: 30, frustration: 10,
+  mentalDemand: 25, physicalDemand: 0, temporalDemand: 50,
+  performance: 75, effort: 25, frustration: 0,
 });
 await service.submitSurvey('task-1'); // step 'task-2'; raw values unchanged
-// survey.rawScore: 160 / 6; metadata retains the explicit perfect-to-failure anchors.
+// survey.rawScore: 175 / 6; v2 metadata retains successful-to-unsuccessful labels.
 ```
 
 Instead of submission, `finishTask('timed-out')` preserves the same current work
 and advances to the same linked survey with status `timed-out`. Submission at or
 after the absolute deadline is also recorded as timeout. Ended task operations
 reject; task-2 is not created until its requirements appear. After task-2 ends,
-only its survey can be submitted, advancing from `tlx-2` to `completion`.
+only its survey can be submitted, advancing from `tlx-2` to `feedback`. Optional
+`submitFeedback` then advances to completion without changing task scores.
 
 ### Joint review still required
 
