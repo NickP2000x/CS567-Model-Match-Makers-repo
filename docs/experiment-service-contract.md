@@ -35,6 +35,12 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
   #16 countdown triggers timeout and planning mutations reject expiry before writes;
   this is still browser/mock timing, not authoritative backend enforcement. At/after
   deadline, `endedAt` is the deadline rather than a delayed callback's clock time.
+- `reopenTask(taskId)` (provisional, pending researcher approval) returns from the
+  ratings page to a submitted task before its survey is submitted. The original deadline
+  still applies (`TASK_EXPIRED` once it has passed); timed-out or rated tasks and practice
+  cannot be reopened (`INVALID_STEP`). Each return is appended to `task.reopens` as
+  `{ endedAt, reopenedAt }`; partial survey answers are kept. Backend route:
+  `POST /api/sessions/{sid}/tasks/{taskId}/reopen`.
 - `saveSurveyAnswers` permits the current record's discrete values: v2 uses 0/25/50/75/100,
   while earlier v1 metadata retains steps of 5, for the current ended
   experimental task. `submitSurvey` requires all six and advances the flow. Raw

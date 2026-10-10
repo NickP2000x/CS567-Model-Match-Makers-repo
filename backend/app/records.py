@@ -48,6 +48,7 @@ def summarize(path: Path) -> dict:
                 "overrideChanges": sum(1 for d in decisions if d["initialModel"] and d["finalModel"]
                                        and d["initialModel"] != d["finalModel"]),
                 "workloadScore": task["survey"]["rawScore"], "messages": len(task["messages"]),
+                "reopens": len(task.get("reopens", [])),
             })
         participants.append({"participant": session["participant_id"], "sequence": session["sequence_id"],
                              "step": state["step"], "tasks": tasks})
@@ -91,7 +92,7 @@ def format_report(summary: dict) -> str:
                 f"    {task['task']} {task['scenario']}/{task['condition']}: {task['status']}, "
                 f"{task['elapsedSeconds']}s, {task['constraintsMet']}/4 constraints, "
                 f"{task['checkpointsReached']} checkpoints, {task['overrideChanges']} override changes, "
-                f"{task['messages']} messages, workload {task['workloadScore']}")
+                f"{task['messages']} messages, {task['reopens']} returns, workload {task['workloadScore']}")
     lines.append("Routing (applied): " + json.dumps(dict(summary["routing"])))
     for purpose, usage in summary["modelUsage"].items():
         lines.append(f"Model calls ({purpose}): {usage['calls']} calls, {usage['ok']} ok, {usage['shown']} shown, "

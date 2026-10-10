@@ -87,6 +87,9 @@ rather than duplicating them.
   and stops at submission/timeout. Allow invalid/incomplete submission. Preserve
   current work at timeout and proceed to the correct task survey. No fabricated
   choices for unvisited checkpoints or late responses mutating ended tasks.
+  Provisional, pending researcher approval: before rating a submitted (not timed-out)
+  task, the participant may go back to it while its original deadline has not passed.
+  The deadline and timer are unchanged and each return is recorded in `task.reopens`.
 - Reuse one six-response NASA-TLX survey: mental, physical, temporal demand,
   performance, effort, frustration. Keep consistent approved or explicitly
   provisional wording/anchors. Retain raw responses and compute the unweighted

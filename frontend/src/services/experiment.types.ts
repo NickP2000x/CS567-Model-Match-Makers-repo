@@ -56,6 +56,8 @@ export interface Task {
   checkpoint: Checkpoint; decisions: Partial<Record<Checkpoint, Decision>>;
   messages: Message[]; inspectedItems: string[]; plan: Plan; totalCostCents: number; constraints: Constraints;
   survey: { answers: SurveyAnswers; metadata: SurveyMetadata | null; rawScore: number | null; submittedAt: number | null };
+  // Provisional: each return from the ratings page to a submitted task (original deadline kept).
+  reopens?: { endedAt: number; reopenedAt: number }[];
 }
 export interface StudyState {
   participantId: string; sequenceId: SequenceId; assignments: [Assignment, Assignment]; step: StudyStep;
@@ -90,6 +92,7 @@ export interface ExperimentService {
   sendMessage(text: string): Promise<void>;
   advanceCheckpoint(): Promise<void>;
   finishTask(reason?: 'submitted' | 'timed-out'): Promise<void>;
+  reopenTask(taskId: TaskId): Promise<void>;
   saveSurveyAnswers(taskId: TaskId, answers: SurveyAnswers): Promise<void>;
   submitSurvey(taskId: TaskId): Promise<void>;
   submitFeedback(answers: FeedbackAnswers): Promise<void>;
