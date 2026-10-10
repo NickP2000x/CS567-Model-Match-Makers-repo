@@ -33,6 +33,7 @@ From `backend/`, following [development setup](development-setup.md):
   13 tests passed with no warnings, health returned mock mode with no `.env`,
   unknown path returned the error envelope, real mode was rejected at startup,
   and the ignore rules matched as listed.
-- The GitHub Actions backend workflow had not run yet when this was recorded; check
-  the PR's CI result. WSL2/Linux backend setup was not tested locally.
+- GitHub Actions on the `issue-32-backend-setup` push (ubuntu-latest, Python 3.12):
+  Backend checks passed (install, `pip check`, pytest, key-free startup/health);
+  Frontend checks also passed. WSL2/Linux backend setup was not tested locally.
 - Frontend checks were not rerun: no frontend source, configuration, or scripts changed.
