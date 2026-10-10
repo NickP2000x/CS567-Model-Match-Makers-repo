@@ -169,3 +169,37 @@ unchanged and remains the default. Routing recommendations stay simulated until 
   the same tools (simpler, no extra dependencies). The agent suggests and checks
   but does not edit the plan. Default models follow the paper; Mixtral 8x7B needs
   about 32 GB of memory, and any substitute needs researcher approval.
+
+## #37 — RouteLLM router and checkpoint locking
+
+`ROUTER_MODE=routellm` replaces the fixed recommendations with RouteLLM's strong-model
+win rate (`score >= ROUTER_THRESHOLD` → large). The phase and concealment checks run
+before scoring; scoring runs outside the database lock; a recommendation is applied only
+if the participant is still at that checkpoint. Mock routing stays the default.
+
+### Repeatable checks
+
+1. `python -m pytest` (RouteLLM not installed; tests inject a scorer): settings require an
+   explicit threshold (and a key for embedding routers); `>=` threshold boundary; invalid
+   scores and router exceptions never fall back; missing package gives an install hint;
+   prompt contents; automatic uses the score and repeats do not rescore; override never
+   scores before the initial lock; router failure → `502 PROVIDER_ERROR` then retry;
+   recommendations ready after the deadline or submission are not applied; every
+   decision (including mock) is stored in `routing_decisions`.
+2. With `requirements-routellm.txt` installed: start with `ROUTER_MODE=routellm`,
+   `ROUTELLM_ROUTER=bert`, an explicit threshold, and route the four checkpoints.
+
+### Recorded results — 2026-10-10
+
+- 82 backend tests passed (14 new); 46 frontend tests passed (routing labels follow
+  `routerSimulated`). Mutation check: applying late recommendations, `>` instead of
+  `>=`, scoring before the concealment check, and falling back on failure each failed tests.
+- Real RouteLLM 0.2.0 (torch 2.14.1, transformers 5.19.0) in a separate environment,
+  `bert` router with its published checkpoint (first load ~2 minutes): the backend
+  started in routellm mode, `/api/health` reported it, and the four Task 1 checkpoints
+  scored 0.492 / 0.499 / 0.484 / 0.474. With threshold 0.48 that gave large, large,
+  large, small, applied and recorded, with no errors.
+- **Finding for the pilot:** scores for these stage prompts sit in a narrow band
+  (≈0.47–0.50), so the threshold decides almost everything; calibrate it in the pilot.
+  The `mf` router (trained on the paper's GPT-4/Mixtral pair) needs an OpenAI key and was
+  not run here.

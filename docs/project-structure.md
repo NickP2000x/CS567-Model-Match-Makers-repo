@@ -60,6 +60,7 @@ backend/
   .python-version         Pinned Python version (3.12)
   requirements.txt        Pinned runtime dependencies
   requirements-dev.txt    Pinned test dependencies
+  requirements-routellm.txt Optional RouteLLM router dependencies (#37)
   .env.example            Safe placeholders; real .env files are ignored by Git
   pytest.ini              Test configuration
   app/
@@ -73,6 +74,7 @@ backend/
     models.py             OpenAI-compatible small/large client (OpenAI, Ollama)
     agent.py              Bounded tool-calling planning agent and mock agent
     smoke_models.py       Manual real-model configuration check
+    router.py             Mock router and optional RouteLLM adapter
     config.py             Server-only settings with mock-mode defaults
     errors.py             Shared {"error": {code, message}} envelope
     fixtures/             Catalog/definitions exported from the frontend mock

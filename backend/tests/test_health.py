@@ -1,7 +1,7 @@
 def test_health_reports_mock_mode(client):
     response = client.get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "mode": "mock"}
+    assert response.json() == {"status": "ok", "mode": "mock", "router": "mock"}
 
 
 def test_openapi_and_docs_stay_under_api_prefix(client):

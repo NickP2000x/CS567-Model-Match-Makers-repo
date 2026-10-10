@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, StrictBool, StrictFloat, StrictInt
 from . import catalog, study
 from .agent import AgentContext, AgentFailed
 from .errors import ApiError
+from .router import RouterError, routing_prompt
 from .store import Store
 
 router = APIRouter(prefix="/api")
@@ -184,9 +185,39 @@ def lock_initial_choice(request: Request, sid: str, task_id: TaskId, body: Model
 
 @router.post("/sessions/{sid}/tasks/{task_id}/routing/recommendation")
 def request_recommendation(request: Request, sid: str, task_id: TaskId, body: CheckpointBody | None = None) -> dict:
-    checkpoint = body.checkpoint if body else None
-    return mutate(request, sid, lambda c, s, now: study.request_recommendation(
-        study.planning_task(c, s, task_id, checkpoint, now), now))
+    """Check the phase under the lock, score outside it, then apply only if the participant is
+    still at the same checkpoint. Repeats return the existing recommendation without rerouting."""
+    current = store(request)
+    checkpoint_router = request.app.state.router
+
+    def prepare(connection, state, now):
+        task = study.planning_task(connection, state, task_id, body.checkpoint if body else None, now)
+        if not study.recommendation_needed(task):
+            return None
+        scenario = catalog.get_scenario(connection, task["scenarioId"])
+        return {"checkpoint": task["checkpoint"], "condition": task["condition"], "scenarioId": task["scenarioId"],
+                "plan": task["plan"], "prompt": routing_prompt(scenario, task["checkpoint"], task["plan"], task["messages"])}
+
+    context, state = current.mutate(sid, prepare)
+    if context is None:
+        return state
+    try:
+        result = checkpoint_router.recommend(context["prompt"], context["checkpoint"])
+    except RouterError as error:
+        current.record_routing(sid, task_id, context, checkpoint_router.name, None, str(error), applied=False)
+        raise ApiError(502, "PROVIDER_ERROR", "The router is unavailable right now. Please try again.") from None
+
+    def commit(connection, state, now):
+        study.apply_recommendation(study.planning_task(connection, state, task_id, context["checkpoint"], now),
+                                   result.model, result.reason, now)
+
+    try:
+        _, state = current.mutate(sid, commit)
+    except ApiError:
+        current.record_routing(sid, task_id, context, checkpoint_router.name, result, None, applied=False)
+        raise
+    current.record_routing(sid, task_id, context, checkpoint_router.name, result, None, applied=True)
+    return state
 
 
 @router.post("/sessions/{sid}/tasks/{task_id}/routing/confirm")

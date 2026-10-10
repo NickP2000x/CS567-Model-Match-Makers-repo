@@ -7,10 +7,12 @@ interface RoutingProps {
   service: ExperimentService;
   pending: boolean;
   perform: (operation: () => Promise<void>) => Promise<boolean>;
+  routerSimulated: boolean;
+  agentSimulated: boolean;
 }
 
 // Mount a fresh panel per task/checkpoint. The service owns all recorded choices.
-export function RoutingPanel({ task, service, pending, perform }: RoutingProps) {
+export function RoutingPanel({ task, service, pending, perform, routerSimulated, agentSimulated }: RoutingProps) {
   const decision = task.decisions[task.checkpoint]!;
   const [initialSelection, setInitialSelection] = useState<Model | null>(null);
   const [finalSelection, setFinalSelection] = useState<Model | null>(null);
@@ -58,7 +60,7 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
   if (task.condition === 'practice') {
     return (
       <div className="routing-status">
-        <p>Simulated small model — fixed for this stage. Provisional practice treatment; no router recommendation.</p>
+        <p>{agentSimulated ? 'Simulated small model' : 'Small model'} — fixed for this stage. Provisional practice treatment; no router recommendation.</p>
       </div>
     );
   }
@@ -67,7 +69,7 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
   const alternative = decision.initialModel === 'small' ? 'large' : 'small';
   return (
     <section className="routing-status" aria-labelledby="routing-title">
-      <h4 id="routing-title">{task.condition === 'automatic' ? 'Automatic' : 'Override'} routing — simulated</h4>
+      <h4 id="routing-title">{task.condition === 'automatic' ? 'Automatic' : 'Override'} routing{routerSimulated ? ' — simulated' : ''}</h4>
       {task.condition === 'override' && decision.phase === 'choose' && (
         <form onSubmit={lockInitial}>
           <fieldset disabled={pending}>
@@ -93,11 +95,11 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
             <p>Recommendation unavailable. Your existing choices are retained.</p>
             <button type="button" disabled={pending} onClick={() => setRequestFailed(false)}>Retry recommendation</button>
           </>
-        ) : <p role="status">Loading the simulated recommendation…</p>
+        ) : <p role="status">Loading the {routerSimulated ? 'simulated ' : ''}recommendation…</p>
       )}
       {recommendationVisible && (
         <div className="recommendation-details">
-          <h5 ref={recommendationTitle} tabIndex={-1}>Simulated router recommendation</h5>
+          <h5 ref={recommendationTitle} tabIndex={-1}>{routerSimulated ? 'Simulated router recommendation' : 'Router recommendation'}</h5>
           <p>Recommended model: <strong>{decision.recommendedModel}</strong></p>
           {task.condition === 'override' && decision.initialModel === decision.recommendedModel && <p>Your choice matches the recommendation.</p>}
           <p>{decision.reason}</p>
@@ -124,7 +126,7 @@ export function RoutingPanel({ task, service, pending, perform }: RoutingProps) 
       )}
       {decision.phase === 'committed' && (
         <div role="status">
-          <h5 ref={committedTitle} tabIndex={-1}>Stage model: simulated {decision.finalModel}</h5>
+          <h5 ref={committedTitle} tabIndex={-1}>Stage model: {agentSimulated ? 'simulated ' : ''}{decision.finalModel}</h5>
           <p>{task.condition === 'automatic' ? 'Applied automatically. ' : 'Final choice confirmed. '}The model is fixed until the next checkpoint.</p>
         </div>
       )}

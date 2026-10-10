@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     # Most model calls that may request tools for one participant message (one final
     # answer call is added when the limit is reached).
     agent_max_steps: int = 4
+    # "mock": fixed simulated recommendations. "routellm": RouteLLM's strong-model win rate
+    # compared with ROUTER_THRESHOLD (a pilot decision; there is no default).
+    router_mode: Literal["mock", "routellm"] = "mock"
+    routellm_router: Literal["mf", "bert", "causal_llm", "sw_ranking", "random"] = "mf"
+    router_threshold: float | None = None
     # Relative paths resolve against backend/.
     database_path: Path = Path("data/model-matchmakers.sqlite3")
     # Development-only sequence selection/reset (#31 draft). Off unless explicitly enabled.
@@ -55,6 +60,12 @@ class Settings(BaseSettings):
             providers = {parse_model_spec(self.small_model)[0], parse_model_spec(self.large_model)[0]}
             if "openai" in providers and not (self.openai_api_key and self.openai_api_key.get_secret_value().strip()):
                 raise ValueError("MODEL_MODE=real with an openai model needs OPENAI_API_KEY in backend/.env.")
+        if self.router_mode == "routellm":
+            if self.router_threshold is None or not 0 <= self.router_threshold <= 1:
+                raise ValueError("ROUTER_MODE=routellm needs ROUTER_THRESHOLD between 0 and 1 (a pilot decision).")
+            if self.routellm_router in ("mf", "sw_ranking") and not (
+                    self.openai_api_key and self.openai_api_key.get_secret_value().strip()):
+                raise ValueError(f"The RouteLLM {self.routellm_router} router needs OPENAI_API_KEY for embeddings.")
         if self.agent_max_steps < 1 or self.model_timeout_seconds <= 0:
             raise ValueError("AGENT_MAX_STEPS must be at least 1 and MODEL_TIMEOUT_SECONDS positive.")
         return self
