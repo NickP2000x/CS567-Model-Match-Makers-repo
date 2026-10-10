@@ -4,9 +4,7 @@
 
 Consent → synthetic demographics → tutorial → practice. Screens use one
 app-boundary experiment service, with no direct response-fixture imports. The
-original #5 handoff is now the #7 practice workspace; #51 adds before-start
-acknowledgements, the visual guide and explicit preparation starts. See the
-[current refinement checks](study-refinements-verification.md) and
+original #5 handoff is now the #7 practice workspace; see
 [`workspace-verification.md`](workspace-verification.md) for Sprint 1 completion checks.
 
 Visual reference: `event-planning-mockup-small.png` in the
@@ -31,14 +29,14 @@ Use synthetic answers only.
 4. Enter age 25, a whitespace-only gender, and an example usage selection. Submit:
    the service error is visible and age/usage remain filled. Replace gender with
    “Prefer not to say”; use Tab/Enter to submit. The tutorial receives heading focus
-   and the error disappears after the Before you start acknowledgements.
-5. Use Back/Next to review the fictional $290 illustrated guide, four constraints,
+   and the error disappears.
+5. Review the fictional $290 example, three-panel explanation, four constraints,
    checkpoints, automatic/override ordering, stage locking, and submission/timing.
    No actual A/B recommendation, reason, or reference plan is displayed.
-6. At a laptop viewport and 200% zoom, verify readable guide content, visible focus,
-   no horizontal page overflow, and access to Finish instructions.
-7. Finish instructions, acknowledge practice preparation, and use Start practice:
-   the workspace loads, labeled untimed and provisional. Refresh returns to consent
+6. At a laptop viewport and 200% zoom, verify readable content/table, visible focus,
+   no horizontal page overflow, and access to Continue to practice.
+7. Use Tab/Enter on Continue to practice: practice receives heading focus and the
+   workspace loads, labeled untimed and provisional. Refresh returns to consent
    and clears the previously entered demographic answers.
 
 ## Recorded results — 2026-10-08

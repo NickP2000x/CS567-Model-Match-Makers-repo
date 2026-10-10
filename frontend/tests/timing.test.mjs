@@ -2,14 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createMockExperimentService } from '../src/services/mockExperiment.ts';
 import { EXPERIMENTAL_TASK_MS, remainingSeconds } from '../src/services/taskTiming.ts';
-import { acknowledge, startTask } from './study-helpers.mjs';
 
 async function ready(service) {
   await service.recordConsent(true);
   await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
-  await acknowledge(service, 'before-start');
-  await service.completeTutorial(); await startTask(service); await service.finishTask();
-  await startTask(service);
+  await service.completeTutorial(); await service.beginTask(); await service.finishTask();
+  await service.beginTask();
 }
 
 test('countdown derives from the absolute deadline and rounds up without negative values', () => {

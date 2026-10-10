@@ -58,9 +58,10 @@ export function WorkloadSurvey({ service, taskId, pending: actionPending, perfor
   }
 
   return (
-    <section className="workload-survey" aria-label={`Workload ratings for Task ${taskId === 'task-1' ? '1' : '2'}`}>
-      <p className="field-help">Provisional adapted NASA-TLX · Five labelled choices · Pending researcher approval</p>
-      <p id="workload-help">Select one response for each question about the task you just completed.</p>
+    <section className="workload-survey" aria-labelledby="workload-title">
+      <h3 id="workload-title">NASA-TLX workload survey — Task {taskId === 'task-1' ? '1' : '2'}</h3>
+      <p className="provisional-notice">Provisional wording, anchors, and 21-point presentation — pending researcher approval.</p>
+      <p id="workload-help">Rate the task you just completed. Select one circle in each row; nothing is selected by default. The ends describe the lowest and highest ratings.</p>
       <form onSubmit={submit} aria-describedby="workload-help">
         {surveyDimensions.map(dimension => {
           const item = metadata.items[dimension];
@@ -68,17 +69,15 @@ export function WorkloadSurvey({ service, taskId, pending: actionPending, perfor
             <fieldset key={dimension} disabled={submitting} className="workload-question" aria-describedby={`${dimension}-question`}>
               <legend>{item.label}</legend>
               <p id={`${dimension}-question`}>{item.question}</p>
-              {!item.labels && <div className="workload-anchors"><span>{item.leftAnchor}</span><span>{item.rightAnchor}</span></div>}
+              <div className="workload-anchors"><span>{item.leftAnchor}</span><span>{item.rightAnchor}</span></div>
               <div className="workload-scale">
-                <div className={`workload-points${item.labels ? ' labelled-points' : ''}`}
-                  style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}>
+                <div className="workload-points">
                   {points.map((value, index) => (
                     <label className="workload-option" key={value}>
                       <input type="radio" name={dimension} value={value} required
                         checked={answers[dimension] === value}
-                        aria-label={`${item.label}: ${item.labels?.[index] ?? `${value} out of 100`}`}
+                        aria-label={`${item.label}: position ${index + 1} of ${points.length}, ${value} out of 100${value === metadata.min ? `, ${item.leftAnchor}` : value === metadata.max ? `, ${item.rightAnchor}` : ''}`}
                         onChange={() => choose(dimension, value)} />
-                      {item.labels && <span>{item.labels[index]}</span>}
                     </label>
                   ))}
                 </div>
