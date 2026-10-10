@@ -61,9 +61,17 @@ backend/
   .env.example            Safe placeholders; real .env files are ignored by Git
   pytest.ini              Test configuration
   app/
-    main.py               FastAPI app factory and /api routes
+    main.py               FastAPI app factory and health check
+    routes.py             /api routes from the #31 HTTP draft
+    study.py              Study rules ported from the frontend mock service
+    store.py              Session allocation and per-request JSON state persistence
+    catalog.py            Catalog queries and the four constraint checks
+    db.py                 SQLite schema, catalog seeding, allocation slots
+    definitions.py        Sequences, checkpoints, and provisional materials
     config.py             Server-only settings with mock-mode defaults
     errors.py             Shared {"error": {code, message}} envelope
+    fixtures/             Catalog/definitions exported from the frontend mock
+  scripts/export_fixtures.mjs  Regenerates fixtures from frontend sources
   tests/                  Focused key-free backend tests
   .venv/                  Local virtual environment, ignored by Git
 ```

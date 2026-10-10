@@ -1,0 +1,26 @@
+{
+  "note": "Researcher-only feasible reference plans. Never served by the API.",
+  "plans": {
+    "practice": {
+      "venue": "practice-venue-good",
+      "catering": "practice-food-good",
+      "supplies": [
+        "practice-supplies-good"
+      ]
+    },
+    "A": {
+      "venue": "A-venue-good",
+      "catering": "A-food-good",
+      "supplies": [
+        "A-supplies-good"
+      ]
+    },
+    "B": {
+      "venue": "B-venue-good",
+      "catering": "B-food-good",
+      "supplies": [
+        "B-supplies-good"
+      ]
+    }
+  }
+}

@@ -11,12 +11,16 @@ or override those rules here. Work only on an explicitly selected backend issue
   Dependencies are fully pinned in `requirements.txt` / `requirements-dev.txt`;
   change a pin deliberately, regenerate from a fresh virtual environment, and run
   `pip check`.
-- `app/main.py` builds the app (`create_app`) and owns routes until a feature needs
-  its own module. `app/config.py` holds server-only settings. `app/errors.py` holds
-  the shared error envelope. Tests live in `tests/`.
-- Add modules only when an issue needs them (for example catalog/SQLite in #33,
-  sessions/study state in #34). No ORM, background workers, or generic frameworks
-  before there is a concrete need.
+- `app/main.py` builds the app; `app/routes.py` holds the `/api` routes;
+  `app/study.py` holds the study rules, ported one-to-one from the frontend
+  `mockExperiment.ts`; `app/store.py` loads/saves one JSON state per session in a
+  single SQLite transaction; `app/catalog.py` and `app/db.py` hold the seeded catalog
+  and schema; `app/definitions.py` holds sequences and provisional materials.
+- `app/fixtures/*.json` are exported from the frontend mock with
+  `node backend/scripts/export_fixtures.mjs`. Rerun it when the frontend catalog,
+  survey, preparation, or recommendation definitions change; never edit them by hand.
+- Keep it simple: plain `sqlite3`, no ORM, background workers, or generic frameworks.
+  Match the frontend mock's behavior and error codes instead of inventing new rules.
 
 ## API rules
 

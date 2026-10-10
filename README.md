@@ -89,9 +89,11 @@ Frontend and backend development use separate runtimes and dependencies:
 | Frontend | React, TypeScript, Vite, Node/npm | Browser interface |
 | Backend (scaffold) | Python 3.12, FastAPI, Uvicorn; SQLite planned | API, sessions, catalogs, and stored study state |
 
-The `scripts/` setup prepares the frontend only. The backend currently provides a
-mock-mode health check; catalog, sessions, and study endpoints follow in later
-backend issues. It needs Python 3.12 but no `.env` or keys. From the repository root:
+The `scripts/` setup prepares the frontend only. The backend runs the complete study
+flow in mock mode (catalog, sessions with balanced allocation, routing, timing,
+surveys, feedback) using the same simulated responses as the frontend mock; the
+frontend does not call it yet (#39). It needs Python 3.12 but no `.env` or keys.
+From the repository root:
 
 ```bash
 cd backend

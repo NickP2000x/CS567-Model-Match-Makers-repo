@@ -11,15 +11,20 @@ logger = logging.getLogger(__name__)
 class ApiError(Exception):
     """A participant-safe failure using the shared contract's error codes."""
 
-    def __init__(self, status: int, code: str, message: str):
+    def __init__(self, status: int, code: str, message: str, state: dict | None = None):
         super().__init__(message)
         self.status = status
         self.code = code
         self.message = message
+        # Only set when the server changed state while rejecting (TASK_EXPIRED).
+        self.state = state
 
 
-def error_response(status: int, code: str, message: str) -> JSONResponse:
-    return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
+def error_response(status: int, code: str, message: str, state: dict | None = None) -> JSONResponse:
+    content: dict = {"error": {"code": code, "message": message}}
+    if state is not None:
+        content["state"] = state
+    return JSONResponse(status_code=status, content=content)
 
 
 def install_error_handlers(app: FastAPI) -> None:
@@ -27,7 +32,7 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(ApiError)
     async def api_error(_: Request, error: ApiError) -> JSONResponse:
-        return error_response(error.status, error.code, error.message)
+        return error_response(error.status, error.code, error.message, error.state)
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(_: Request, __: RequestValidationError) -> JSONResponse:

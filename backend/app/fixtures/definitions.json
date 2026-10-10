@@ -1,0 +1,237 @@
+{
+  "source": "frontend/src/services/{workloadSurvey,studyPreparation}.ts and frontend/src/mocks/responses.ts",
+  "surveys": {
+    "current": "provisional-adapted-nasa-tlx-5-v2",
+    "definitions": {
+      "provisional-nasa-tlx-21-v1": {
+        "version": "provisional-nasa-tlx-21-v1",
+        "provisional": true,
+        "min": 0,
+        "max": 100,
+        "increment": 5,
+        "items": {
+          "mentalDemand": {
+            "label": "Mental demand",
+            "question": "How mentally demanding was the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload"
+          },
+          "physicalDemand": {
+            "label": "Physical demand",
+            "question": "How physically demanding was the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload"
+          },
+          "temporalDemand": {
+            "label": "Temporal demand",
+            "question": "How hurried or rushed did you feel?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload"
+          },
+          "performance": {
+            "label": "Performance",
+            "question": "How successful were you in accomplishing the task?",
+            "leftAnchor": "Perfect performance",
+            "rightAnchor": "Failure",
+            "orientation": "higher-is-more-workload"
+          },
+          "effort": {
+            "label": "Effort",
+            "question": "How hard did you have to work to accomplish the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload"
+          },
+          "frustration": {
+            "label": "Frustration",
+            "question": "How insecure, discouraged, irritated, stressed, or annoyed did you feel?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload"
+          }
+        }
+      },
+      "provisional-adapted-nasa-tlx-5-v2": {
+        "version": "provisional-adapted-nasa-tlx-5-v2",
+        "provisional": true,
+        "min": 0,
+        "max": 100,
+        "increment": 25,
+        "items": {
+          "mentalDemand": {
+            "label": "Mental demand",
+            "question": "How mentally demanding was the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Very low",
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ]
+          },
+          "physicalDemand": {
+            "label": "Physical demand",
+            "question": "How physically demanding was the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Very low",
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ]
+          },
+          "temporalDemand": {
+            "label": "Temporal demand",
+            "question": "How hurried or rushed did you feel?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Very low",
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ]
+          },
+          "performance": {
+            "label": "Performance",
+            "question": "How successful were you in accomplishing the task?",
+            "leftAnchor": "Completely successful",
+            "rightAnchor": "Not successful",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Completely successful",
+              "Mostly successful",
+              "Moderately successful",
+              "Slightly successful",
+              "Not successful"
+            ]
+          },
+          "effort": {
+            "label": "Effort",
+            "question": "How hard did you have to work to accomplish the task?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Very low",
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ]
+          },
+          "frustration": {
+            "label": "Frustration",
+            "question": "How insecure, discouraged, irritated, stressed, or annoyed did you feel?",
+            "leftAnchor": "Very low",
+            "rightAnchor": "Very high",
+            "orientation": "higher-is-more-workload",
+            "labels": [
+              "Very low",
+              "Low",
+              "Moderate",
+              "High",
+              "Very high"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "preparations": {
+    "before-start": {
+      "version": "provisional-before-start-v1",
+      "statements": [
+        {
+          "id": "no-refresh",
+          "text": "I will not refresh the page; refreshing restarts the demo."
+        },
+        {
+          "id": "synthetic-only",
+          "text": "I will use invented information only."
+        }
+      ]
+    },
+    "practice": {
+      "version": "provisional-practice-preparation-v1",
+      "statements": [
+        {
+          "id": "untimed",
+          "text": "I understand that practice has no time limit."
+        },
+        {
+          "id": "excluded",
+          "text": "I understand that practice does not count toward the study tasks."
+        }
+      ]
+    },
+    "task-1": {
+      "version": "provisional-task-preparation-v1",
+      "statements": [
+        {
+          "id": "time-limit",
+          "text": "I understand that this task lasts up to 15 minutes."
+        },
+        {
+          "id": "no-refresh",
+          "text": "I will not refresh the page."
+        },
+        {
+          "id": "submit-anytime",
+          "text": "I can submit my current plan at any time."
+        }
+      ]
+    },
+    "task-2": {
+      "version": "provisional-task-preparation-v1",
+      "statements": [
+        {
+          "id": "time-limit",
+          "text": "I understand that this task lasts up to 15 minutes."
+        },
+        {
+          "id": "no-refresh",
+          "text": "I will not refresh the page."
+        },
+        {
+          "id": "submit-anytime",
+          "text": "I can submit my current plan at any time."
+        }
+      ]
+    }
+  },
+  "feedback": {
+    "version": "provisional-feedback-v1",
+    "interfaceComments": "Was anything confusing or difficult about using the interface?",
+    "studyComments": "Do you have any other comments or suggestions about the study?"
+  },
+  "recommendations": {
+    "Venue": {
+      "model": "small",
+      "reason": "Simulated recommendation: start with a catalog comparison."
+    },
+    "Catering": {
+      "model": "large",
+      "reason": "Simulated recommendation: compare dietary coverage and servings."
+    },
+    "Supplies": {
+      "model": "small",
+      "reason": "Simulated recommendation: compare supplies and prices."
+    },
+    "Final constraint check": {
+      "model": "large",
+      "reason": "Simulated recommendation: review all four constraints together."
+    }
+  }
+}
