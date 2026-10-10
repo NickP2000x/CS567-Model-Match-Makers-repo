@@ -6,19 +6,13 @@ export type TaskId = 'practice' | 'task-1' | 'task-2';
 export type Category = 'venue' | 'catering' | 'supplies';
 export const checkpoints = ['Venue', 'Catering', 'Supplies', 'Final constraint check'] as const;
 export type Checkpoint = (typeof checkpoints)[number];
-export type StudyStep = 'consent' | 'demographics' | 'tutorial' | TaskId | 'tlx-1' | 'tlx-2' | 'feedback' | 'completion';
-export type PreparationId = 'before-start' | TaskId;
-export interface PreparationRecord {
-  version: string; acknowledgedIds: string[]; statements: { id: string; text: string }[]; confirmedAt: number;
-}
-export interface FeedbackAnswers { interfaceComments: string; studyComments: string }
+export type StudyStep = 'consent' | 'demographics' | 'tutorial' | TaskId | 'tlx-1' | 'tlx-2' | 'completion';
 export const surveyDimensions = ['mentalDemand', 'physicalDemand', 'temporalDemand', 'performance', 'effort', 'frustration'] as const;
 export type SurveyDimension = (typeof surveyDimensions)[number];
 export type SurveyAnswers = Partial<Record<SurveyDimension, number>>;
 export interface SurveyItemDefinition {
   label: string; question: string; leftAnchor: string; rightAnchor: string;
   orientation: 'higher-is-more-workload' | 'lower-is-more-workload';
-  labels?: string[];
 }
 export interface SurveyMetadata {
   version: string; provisional: true; min: number; max: number; increment: number;
@@ -61,8 +55,6 @@ export interface StudyState {
   participantId: string; sequenceId: SequenceId; assignments: [Assignment, Assignment]; step: StudyStep;
   consent: boolean | null; demographics: { age: number; gender: string; priorLlmUsage: string } | null;
   tasks: Partial<Record<TaskId, Task>>;
-  preparations: Partial<Record<PreparationId, PreparationRecord>>;
-  feedback: (FeedbackAnswers & { version: string; submittedAt: number }) | null;
   pendingOperations: number; error: { code: string; message: string } | null;
   simulated: true; refreshRestartsDemo: true;
 }
@@ -73,7 +65,6 @@ export interface ExperimentService {
   recordConsent(accepted: boolean): Promise<void>;
   saveDemographics(values: NonNullable<StudyState['demographics']>): Promise<void>;
   completeTutorial(): Promise<void>;
-  confirmPreparation(id: PreparationId, acknowledgedIds: string[]): Promise<void>;
   getScenario(id: ScenarioId): Promise<Scenario>;
   searchCatalog(id: ScenarioId, query?: string, category?: Category): Promise<CatalogSummary[]>;
   inspectItem(id: string): Promise<CatalogItem>;
@@ -87,5 +78,4 @@ export interface ExperimentService {
   finishTask(reason?: 'submitted' | 'timed-out'): Promise<void>;
   saveSurveyAnswers(taskId: TaskId, answers: SurveyAnswers): Promise<void>;
   submitSurvey(taskId: TaskId): Promise<void>;
-  submitFeedback(answers: FeedbackAnswers): Promise<void>;
 }

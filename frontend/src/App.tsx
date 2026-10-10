@@ -2,12 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Consent } from './features/introduction/Consent';
 import { Demographics } from './features/introduction/Demographics';
 import { Tutorial } from './features/introduction/Tutorial';
-import { Preparation } from './features/introduction/Preparation';
 import { PlanningWorkspace } from './features/planning/PlanningWorkspace';
 import { WorkloadSurvey } from './features/workload/WorkloadSurvey';
 import { DeveloperControls } from './features/study/DeveloperControls';
-import { StudyProgress } from './features/study/StudyProgress';
-import { Feedback } from './features/study/Feedback';
 import type { ExperimentService, StudyState, StudyStep, TaskId } from './services/experiment.types';
 import { useExperiment } from './services/useExperiment';
 
@@ -16,9 +13,9 @@ function context(state: StudyState) {
 }
 
 const headings: Record<StudyStep, string> = {
-  consent: 'Consent', demographics: 'About you', tutorial: 'Interface guide',
-  practice: 'Practice', 'task-1': 'Task 1', 'tlx-1': 'Workload ratings — Task 1',
-  'task-2': 'Task 2', 'tlx-2': 'Workload ratings — Task 2', feedback: 'Additional feedback', completion: 'Study demonstration complete',
+  consent: 'Provisional consent', demographics: 'Synthetic demographics', tutorial: 'How the planning task works',
+  practice: 'Practice', 'task-1': 'Task 1', 'tlx-1': 'NASA-TLX 1',
+  'task-2': 'Task 2', 'tlx-2': 'NASA-TLX 2', completion: 'Demonstration complete',
 };
 
 export function App({ service }: { service: ExperimentService }) {
@@ -31,10 +28,7 @@ export function App({ service }: { service: ExperimentService }) {
   const [terminating, setTerminating] = useState(false);
   const pending = busy || terminating || state.pendingOperations > 0;
 
-  const planningStep = state.step === 'practice' || state.step === 'task-1' || state.step === 'task-2' ? state.step : null;
-  const preparationId = state.step === 'tutorial' && !state.preparations['before-start'] ? 'before-start'
-    : planningStep && !state.preparations[planningStep] ? planningStep : null;
-  useEffect(() => { title.current?.focus(); }, [state.step, state.consent, preparationId]);
+  useEffect(() => { title.current?.focus(); }, [state.step, state.consent]);
 
   async function perform(operation: () => Promise<void>) {
     const origin = context(state);
@@ -71,23 +65,21 @@ export function App({ service }: { service: ExperimentService }) {
     } finally { endingTask.current = null; setTerminating(false); }
   }
 
-  const heading = state.step === 'consent' && state.consent === false ? 'Demo declined'
-    : preparationId === 'before-start' ? 'Before you start'
-    : preparationId === 'practice' ? 'Ready for practice'
-    : preparationId ? `Ready for Task ${preparationId === 'task-1' ? '1' : '2'}` : headings[state.step];
-  const planning = planningStep !== null && preparationId === null;
+  const heading = state.step === 'consent' && state.consent === false ? 'Demo declined' : headings[state.step];
+  const planning = state.step === 'practice' || state.step === 'task-1' || state.step === 'task-2';
   const surveyTask = state.step === 'tlx-1' ? 'task-1' : state.step === 'tlx-2' ? 'task-2' : null;
 
   return (
     <main className={planning ? 'planning-page' : undefined}>
-      <p className="prototype-label">Provisional demonstration · Simulated AI · Use invented information</p>
-      {state.step === 'consent' ? <>
-        <h1>Model Matchmakers</h1><h2 id="screen-title" ref={title} tabIndex={-1}>{heading}</h2>
-      </> : <>
-        <StudyProgress step={state.step} />
-        <h1 id="screen-title" ref={title} tabIndex={-1}>{heading}</h1>
-      </>}
+      <p className="prototype-label">Frontend research prototype</p>
+      <h1>Model Matchmakers</h1>
+      <p className="demo-notice">
+        Use synthetic information only. Router and agent behavior is simulated;
+        this build is not ready for real participant data collection.
+        Refreshing restarts the demonstration.
+      </p>
       <section aria-labelledby="screen-title" aria-busy={pending}>
+        <h2 id="screen-title" ref={title} tabIndex={-1}>{heading}</h2>
         {actionError && <p role="alert" className="error-message">{actionError}</p>}
         {state.step === 'consent' && (
           <Consent declined={state.consent === false} pending={pending}
@@ -97,9 +89,7 @@ export function App({ service }: { service: ExperimentService }) {
           <Demographics values={state.demographics} pending={pending}
             onSubmit={values => { void perform(() => service.saveDemographics(values)); }} />
         )}
-        {preparationId && <Preparation key={preparationId} id={preparationId} pending={pending}
-          onContinue={ids => { void perform(() => service.confirmPreparation(preparationId, ids)); }} />}
-        {state.step === 'tutorial' && preparationId === null && (
+        {state.step === 'tutorial' && (
           <Tutorial pending={pending} onContinue={() => { void perform(() => service.completeTutorial()); }} />
         )}
         {planning && (
@@ -112,8 +102,7 @@ export function App({ service }: { service: ExperimentService }) {
             <WorkloadSurvey key={surveyTask} service={service} taskId={surveyTask} pending={pending} perform={perform} />
           </>
         )}
-        {state.step === 'feedback' && <Feedback pending={pending} onFinish={answers => { void perform(() => service.submitFeedback(answers)); }} />}
-        {state.step === 'completion' && <p>Thank you. Both tasks, ratings, and optional feedback are complete. This demonstration is not approved for real participant data collection.</p>}
+        {state.step === 'completion' && <p>Both experimental tasks and workload surveys are finished. Thank you for exploring the demonstration. Study materials remain provisional and pending researcher approval.</p>}
       </section>
       {import.meta.env.DEV && <DeveloperControls state={state} pending={pending} terminating={terminating}
         onReset={sequence => { void perform(() => service.reset(sequence)); }}
@@ -121,7 +110,6 @@ export function App({ service }: { service: ExperimentService }) {
           if (state.step === 'task-1' || state.step === 'task-2') void finishTask(state.step, 'timed-out');
         }} />}
       <p role="status" className="operation-status">{pending ? 'Updating the demonstration…' : ''}</p>
-      <p className="field-help">Refreshing restarts this demonstration.</p>
     </main>
   );
 }

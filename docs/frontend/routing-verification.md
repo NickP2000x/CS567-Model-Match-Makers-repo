@@ -27,8 +27,6 @@ The normal app now mounts the experimental workspaces, timers, surveys, and
 completion through #16. See [study-flow verification](study-flow-verification.md)
 for integrated checks/results. Participant builds have no developer assignment
 selector or testing bypass.
-The #51 heading/progress/preparation and clearer agreement/choice labels preserve
-these routing rules; see [current refinement checks](study-refinements-verification.md).
 
 ## Integration requirements for #16
 
