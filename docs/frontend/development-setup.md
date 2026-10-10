@@ -118,6 +118,9 @@ For the word-anchored NASA-TLX component and scoring, see
 For the now-connected two-task flow, timers, development-only sequence/reset/timeout
 controls, production guard, and Sprint 3 handoff, see
 [`study-flow-verification.md`](study-flow-verification.md).
+For the current #51 preparation/start gates, visual guide, five-point ratings,
+optional feedback and #22 checks, see
+[`study-refinements-verification.md`](study-refinements-verification.md).
 
 ## AI-assisted work
 

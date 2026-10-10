@@ -2,7 +2,7 @@ import { surveyDimensions } from './experiment.types.ts';
 import type { SurveyAnswers, SurveyMetadata } from './experiment.types.ts';
 
 // Explicit provisional anchors, retained with each experimental task's answers.
-export const workloadSurveyDefinition: SurveyMetadata = {
+export const workloadSurveyDefinitionV1: SurveyMetadata = {
   version: 'provisional-nasa-tlx-21-v1', provisional: true, min: 0, max: 100, increment: 5,
   items: {
     mentalDemand: { label: 'Mental demand', question: 'How mentally demanding was the task?', leftAnchor: 'Very low', rightAnchor: 'Very high', orientation: 'higher-is-more-workload' },
@@ -13,9 +13,22 @@ export const workloadSurveyDefinition: SurveyMetadata = {
     frustration: { label: 'Frustration', question: 'How insecure, discouraged, irritated, stressed, or annoyed did you feel?', leftAnchor: 'Very low', rightAnchor: 'Very high', orientation: 'higher-is-more-workload' },
   },
 };
-Object.values(workloadSurveyDefinition.items).forEach(Object.freeze);
-Object.freeze(workloadSurveyDefinition.items);
-Object.freeze(workloadSurveyDefinition);
+// Preserve v1 for review/scoring of earlier records; new tasks use the adapted v2.
+const demandLabels = ['Very low', 'Low', 'Moderate', 'High', 'Very high'];
+const performanceLabels = ['Completely successful', 'Mostly successful', 'Moderately successful', 'Slightly successful', 'Not successful'];
+export const workloadSurveyDefinition: SurveyMetadata = {
+  version: 'provisional-adapted-nasa-tlx-5-v2', provisional: true, min: 0, max: 100, increment: 25,
+  items: Object.fromEntries(surveyDimensions.map(dimension => {
+    const labels = dimension === 'performance' ? performanceLabels : demandLabels;
+    return [dimension, { ...workloadSurveyDefinitionV1.items[dimension],
+      leftAnchor: labels[0], rightAnchor: labels[4], labels: [...labels] }];
+  })) as SurveyMetadata['items'],
+};
+for (const definition of [workloadSurveyDefinitionV1, workloadSurveyDefinition]) {
+  Object.values(definition.items).forEach(item => { if (item.labels) Object.freeze(item.labels); Object.freeze(item); });
+  Object.freeze(definition.items);
+  Object.freeze(definition);
+}
 
 export function isSurveyResponse(value: number, metadata: SurveyMetadata): boolean {
   return Number.isFinite(value) && value >= metadata.min && value <= metadata.max

@@ -4,7 +4,7 @@
 
 This is a basic **frontend research demonstration**, not the final experiment.
 Read the selected GitHub issue, its dependencies, and relevant code before editing.
-Use the eight active tasks in sprint trackers #24–#26; closed superseded issues are
+Use the nine active tasks in sprint trackers #24–#26; Sprint 3 orders #51 before #22. Closed superseded issues are
 historical, and `later-experiment` issues are deferred. Keep changes scoped and plain.
 This file owns shared project and research rules. Before editing frontend code,
 configuration, tests, or related setup tooling, also read `frontend/AGENTS.md`.
@@ -27,7 +27,10 @@ belong in `frontend/AGENTS.md`; keep shared research rules here rather than dupl
 ## Research invariants
 
 - Flow: Consent → Demographics → Tutorial → Practice → Task 1 → NASA-TLX 1 →
-  Task 2 → NASA-TLX 2 → Completion. Consent is the first participant screen.
+  Task 2 → NASA-TLX 2 → Optional feedback → Completion. Consent is the first participant screen.
+  #51 adds provisional before-start acknowledgements, visual tutorial and explicit
+  practice/task preparation starts within those phases. No requirements or task
+  deadlines before Start; record acknowledgements without claiming proof of reading.
 - Demographics cover age, gender, and prior LLM usage. Consent and other unapproved
   materials must be clearly marked provisional and pending researcher approval.
 - Practice uses a distinct scenario and is excluded from experimental records.
@@ -53,6 +56,10 @@ belong in `frontend/AGENTS.md`; keep shared research rules here rather than dupl
   performance, effort, frustration. Keep consistent approved or explicitly
   provisional wording/anchors. Retain raw responses and compute the unweighted
   mean using correctly oriented values; do not guess performance reversal.
+  #51's five-point fully labelled presentation is a provisional adapted NASA-TLX,
+  not an unchanged standard measure. Version labels/anchors/orientation and retain
+  earlier definitions for earlier records. Optional feedback is session-linked,
+  separate from workload scoring, and remains provisional pending researcher review.
 - Development sequence/reset/timeout controls must be hidden in participant builds.
 - Refresh may restart the demonstration; recovery and detailed measurements are
   deferred. Document this limitation, and do not claim real-study readiness.

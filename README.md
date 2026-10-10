@@ -37,13 +37,17 @@ platform instructions, and troubleshooting.
 
 The frontend supports:
 
-Consent → Demographics → Tutorial → Practice → Task 1 → NASA-TLX 1 →
-Task 2 → NASA-TLX 2 → Completion
+Consent → Demographics → Before-start reminders / Visual guide → Practice →
+Task 1 → Workload ratings 1 → Task 2 → Workload ratings 2 → Optional feedback → Completion
+
+Practice and each experimental task have an acknowledgement/preparation page and
+an explicit Start button. Requirements and experimental deadlines appear only after
+Start. Later pages show the current section and read-only study progress.
 
 Practice includes catalog inspection, plan editing, four constraint checks,
 four stages, and simulated conversation. Both experimental tasks include simulated
 automatic/override routing, a 15-minute countdown, permissive submission/timeout,
-and the reusable word-anchored NASA-TLX survey.
+and the reusable provisional five-point, fully labelled NASA-TLX adaptation.
 
 In development (`dev`), expand **Development controls** below the screen to choose
 one of the four A/B sequences, apply it with a reset, or trigger an experimental
@@ -74,6 +78,7 @@ For browser checklists and recorded results, see:
 - [Routing verification and integration handoff](docs/frontend/routing-verification.md)
 - [Workload survey verification and integration handoff](docs/frontend/workload-verification.md)
 - [Complete study flow verification and Sprint 3 handoff](docs/frontend/study-flow-verification.md)
+- [Study refinements and current #22 handoff](docs/frontend/study-refinements-verification.md)
 
 ## Frontend and backend setup
 

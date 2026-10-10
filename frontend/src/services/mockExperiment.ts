@@ -3,6 +3,7 @@ import { cannedResponse, recommendations } from '../mocks/responses.ts';
 import { checkpoints, surveyDimensions } from './experiment.types.ts';
 import { calculateWorkloadMean, isSurveyResponse, workloadSurveyDefinition } from './workloadSurvey.ts';
 import { EXPERIMENTAL_TASK_MS } from './taskTiming.ts';
+import { feedbackDefinition, preparationDefinition } from './studyPreparation.ts';
 import type { Assignment, Decision, ExperimentService, Model, SequenceId, StudyState, Task, TaskId } from './experiment.types.ts';
 
 const sequences: Record<SequenceId, [Assignment, Assignment]> = {
@@ -27,7 +28,7 @@ function initial(sequenceId: SequenceId): StudyState {
   if (!sequences[sequenceId]) fail('INVALID_SEQUENCE', 'Choose mock sequence 1–4.');
   return {
     participantId: `demo-sequence-${sequenceId}`, sequenceId, assignments: structuredClone(sequences[sequenceId]),
-    step: 'consent', consent: null, demographics: null, tasks: {}, pendingOperations: 0, error: null,
+    step: 'consent', consent: null, demographics: null, tasks: {}, preparations: {}, feedback: null, pendingOperations: 0, error: null,
     simulated: true, refreshRestartsDemo: true,
   };
 }
@@ -139,7 +140,18 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     }),
     completeTutorial: () => run(draft => {
       if (draft.step !== 'tutorial') fail('INVALID_STEP', 'Complete demographics first.');
+      if (!draft.preparations['before-start']) fail('INVALID_PREPARATION', 'Acknowledge the before-start instructions first.');
       draft.step = 'practice';
+    }),
+    confirmPreparation: (id, acknowledgedIds) => run(draft => {
+      const definition = preparationDefinition[id];
+      if (!definition || draft.step !== (id === 'before-start' ? 'tutorial' : id)) fail('INVALID_STEP', 'This preparation is not current.');
+      if (draft.preparations[id]) return; // Preserve the original acknowledgement/time on duplicate events.
+      if (acknowledgedIds.length !== definition.statements.length || new Set(acknowledgedIds).size !== acknowledgedIds.length
+        || definition.statements.some(statement => !acknowledgedIds.includes(statement.id))) {
+        fail('INVALID_PREPARATION', 'Acknowledge each instruction before continuing.');
+      }
+      draft.preparations[id] = { ...structuredClone(definition), acknowledgedIds: [...acknowledgedIds], confirmedAt: now() };
     }),
     getScenario: id => run(() => scenarios.find(s => s.id === id) ?? fail('NOT_FOUND', 'Scenario not found.')),
     searchCatalog: (id, query = '', category) => run(() => {
@@ -158,6 +170,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     beginTask: () => run(draft => {
       if (!['practice', 'task-1', 'task-2'].includes(draft.step)) fail('INVALID_STEP', 'Reach a planning step first.');
       const id = draft.step as TaskId;
+      if (!draft.preparations[id]) fail('INVALID_PREPARATION', 'Start the task from its preparation screen.');
       if (draft.tasks[id]) return; // Repeated visibility events do not restart deadlines.
       const assignment = id === 'practice' ? { scenarioId: 'practice' as const, condition: 'practice' as const }
         : draft.assignments[id === 'task-1' ? 0 : 1];
@@ -225,7 +238,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         || !task.survey.metadata || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')) fail('INVALID_SURVEY', 'Survey is unavailable for this task.');
       for (const [key, value] of Object.entries(answers)) {
         if (!surveyDimensions.includes(key as typeof surveyDimensions[number]) || !isSurveyResponse(value, task.survey.metadata))
-          fail('INVALID_SURVEY', 'Choose a provisional demo response from 0 to 100 in steps of 5.');
+          fail('INVALID_SURVEY', `Choose a response from 0 to 100 in steps of ${task.survey.metadata.increment}.`);
       }
       Object.assign(task.survey.answers, answers);
     }),
@@ -237,7 +250,14 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
       const score = calculateWorkloadMean(task.survey.answers, task.survey.metadata);
       if (score === null) fail('INVALID_SURVEY', 'Choose a valid response for all six dimensions.');
       task.survey.rawScore = score;
-      task.survey.submittedAt = now(); draft.step = id === 'task-1' ? 'task-2' : 'completion';
+      task.survey.submittedAt = now(); draft.step = id === 'task-1' ? 'task-2' : 'feedback';
+    }),
+    submitFeedback: answers => run(draft => {
+      if (draft.step !== 'feedback' || draft.feedback) fail('INVALID_STEP', 'Feedback is unavailable at this step.');
+      if (typeof answers.interfaceComments !== 'string' || typeof answers.studyComments !== 'string') fail('INVALID_FEEDBACK', 'Enter text or leave the boxes blank.');
+      draft.feedback = { interfaceComments: answers.interfaceComments, studyComments: answers.studyComments,
+        version: feedbackDefinition.version, submittedAt: now() };
+      draft.step = 'completion';
     }),
   };
 }
