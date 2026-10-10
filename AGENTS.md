@@ -24,6 +24,32 @@ in this phase. Use synthetic participant information and clearly label simulated
 router/agent behavior. Implementation details and frontend verification commands
 belong in `frontend/AGENTS.md`; keep shared research rules here rather than duplicating them.
 
+## Git branch and publishing safeguards
+
+- Before editing or committing, inspect `git status --short --branch` and
+  `git branch -vv`. Work on an issue-specific feature branch, not `main` or `master`.
+  Verify the intended base is merged/current; preserve unrelated work.
+- When creating a feature branch from a remote base, always use
+  `git switch --no-track -c <feature-branch> origin/main` (substitute the actual
+  branch/base names). Never omit `--no-track`: otherwise Git can make the feature
+  branch track `origin/main`, sending editor Sync Changes to the wrong branch.
+- Immediately verify the new branch has no upstream. Before every publish/push,
+  recheck branch and upstream: it must be unset or the same-named remote feature
+  branch, never `origin/main`, `origin/master`, or another branch. Stop and correct
+  mismatched tracking before proceeding; do not treat Sync Changes as publishing.
+- When publishing is explicitly requested, use
+  `git push -u origin <feature-branch>` with the feature branch named explicitly.
+  Verify afterward that it tracks `origin/<feature-branch>`. Avoid bare `git push`
+  or unverified editor sync, and never push `HEAD:main` or `HEAD:master`.
+- Normal requests to commit, publish a branch, sync, or create a PR do not authorize
+  a direct push to `main`/`master`. Use an owner-reviewed PR for changes to the base
+  branch; never approve or merge it. Any exceptional direct-base operation requires
+  explicit authorization naming that operation and target branch.
+- Inspect the complete PR diff and included commits against its intended base;
+  confirm local checks and remote branch targets. If an accidental base push is
+  discovered, preserve the feature work and use a repair PR rather than rewriting
+  shared history or automatically merging a recovery.
+
 ## Research invariants
 
 - Flow: Consent → Demographics → Tutorial → Practice → Task 1 → NASA-TLX 1 →
