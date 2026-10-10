@@ -40,8 +40,9 @@ and documentation when a change affects frontend development.
   `../docs/frontend/workspace-verification.md`,
   `../docs/frontend/routing-verification.md`,
   `../docs/frontend/workload-verification.md`,
-  `../docs/frontend/study-flow-verification.md`, and
-  `../docs/frontend/study-refinements-verification.md`, plus the shared
+  `../docs/frontend/study-flow-verification.md`,
+  `../docs/frontend/study-refinements-verification.md`, and
+  `../docs/frontend/prototype-smoke-checks.md`, plus the shared
   `../docs/experiment-service-contract.md` and `../docs/project-structure.md`.
   Verify the current issue/code/Git state; recorded results describe the tested
   version, not automatic approval of subsequent changes.

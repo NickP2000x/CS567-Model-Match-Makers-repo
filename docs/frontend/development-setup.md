@@ -121,6 +121,8 @@ controls, production guard, and Sprint 3 handoff, see
 For the current #51 preparation/start gates, visual guide, five-point ratings,
 optional feedback and #22 checks, see
 [`study-refinements-verification.md`](study-refinements-verification.md).
+For the final #22 demonstration checklist, actual results, untested platforms and
+provisional decisions, see [`prototype-smoke-checks.md`](prototype-smoke-checks.md).
 
 ## AI-assisted work
 

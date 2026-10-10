@@ -49,6 +49,7 @@ docs/
     workload-verification.md Survey/scoring checks and #16 integration handoff
     study-flow-verification.md Complete flow/results and #22 handoff
     study-refinements-verification.md #51 gates/visual guide/scale/feedback and #22 handoff
+    prototype-smoke-checks.md Final #22 checklist, results, and coverage boundaries
   backend/
     README.md              Backend work/documentation handoff; setup pending #32
 backend/                  Reserved location for future backend work; not created yet
@@ -67,7 +68,8 @@ Frontend entry points: [setup](frontend/development-setup.md),
 [routing checks/integration handoff](frontend/routing-verification.md), and
 [workload survey handoff](frontend/workload-verification.md), and
 [full study flow](frontend/study-flow-verification.md), and
-[current refinements / #22 handoff](frontend/study-refinements-verification.md).
+[current refinements](frontend/study-refinements-verification.md), and
+[final prototype smoke checks](frontend/prototype-smoke-checks.md).
 [Backend handoff](backend/README.md) identifies the planned setup/verification files
 to add during backend work. Component `AGENTS.md` files should point to their own
 documentation and the shared contract; root research rules remain canonical.
