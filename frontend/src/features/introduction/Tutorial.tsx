@@ -1,48 +1,48 @@
+import { useEffect, useRef, useState } from 'react';
+
+const guide = [
+  { title: 'Requirements and time', text: 'Read the guest count, budget, dietary needs, and access requirements. Each study task has up to 15 minutes.', area: [12, 12, 676, 54] },
+  { title: 'Catalog', text: 'Search venues, catering, and supplies. Inspect details before choosing; summaries may leave out important facts.', area: [12, 76, 218, 220] },
+  { title: 'AI planning agent', text: 'Ask for simulated help. Automatic applies the recommendation directly. Override: choose independently, lock, then see the recommendation and retain/change before confirming.', area: [240, 76, 218, 220] },
+  { title: 'Current event plan', text: 'Add or remove items and review the combined cost and four constraint checks. You can revise plan items at any stage.', area: [468, 76, 220, 220] },
+  { title: 'Checkpoints', text: 'Venue → Catering → Supplies → Final constraint check. Move forward through stages; each chosen model stays fixed throughout its stage.', area: [250, 113, 198, 39] },
+  { title: 'Submit plan', text: 'Submit at any checkpoint, even with an incomplete or invalid plan. Submission or timeout leads to the task’s workload survey. Practice is untimed and has no survey.', area: [548, 305, 140, 32] },
+];
+
 export function Tutorial({ pending, onContinue }: { pending: boolean; onContinue: () => void }) {
+  const [index, setIndex] = useState(0);
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { title.current?.focus(); }, [index]);
+  const current = guide[index];
   return (
     <>
-      <p className="provisional-notice">Provisional tutorial and example — pending researcher approval.</p>
-      <h3>Inspect, ask, and build a plan</h3>
-      <p>The planning workspace has three panels: Catalog on the left, AI planning agent in the middle, and Current event plan on the right.</p>
-      <ul>
-        <li>Search the venue, catering, and supplies catalog. Open item details to check capacity, dietary coverage, and wheelchair access.</li>
-        <li>Ask the simulated agent for help comparing options. Its responses are canned demonstration messages, not live model advice.</li>
-        <li>Select items for your plan and review the combined cost. Check budget, venue capacity, dietary coverage, and wheelchair accessibility.</li>
-      </ul>
-      <table>
-        <caption>Illustrative tutorial plan — fictional, not a practice or experimental task answer. Prices are provisional USD.</caption>
-        <thead><tr><th scope="col">Item</th><th scope="col">Example details</th><th scope="col">Cost</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Example Hall</th><td>24 seats; step-free access</td><td>$90</td></tr>
-          <tr><th scope="row">Example Meal</th><td>20 servings; vegetarian coverage</td><td>$160</td></tr>
-          <tr><th scope="row">Example Supplies</th><td>Event essentials package</td><td>$40</td></tr>
-        </tbody>
-      </table>
-      <p>
-        For an example event with 20 attendees, vegetarian meals, wheelchair access,
-        and a $350 budget, this $290 plan meets all four constraints. Inspect the
-        details rather than assuming every catalog option meets the requirements.
-      </p>
-      <h3>Four checkpoints and two routing conditions</h3>
-      <p>Work through Venue → Catering → Supplies → Final constraint check. The selected model stays fixed throughout each stage.</p>
-      <ul>
-        <li><strong>Automatic:</strong> a simulated router recommendation and reason are shown and applied directly. You do not choose or confirm a model.</li>
-        <li><strong>Override:</strong> independently choose small or large and lock your initial choice. Only then see the recommendation and reason; retain or change your choice and confirm the final model.</li>
-      </ul>
-      <p>Task assignments are provided by the demo. You do not choose your scenario or condition.</p>
-      <h3>Practice, submission, and workload questions</h3>
-      <p>
-        Practice uses a separate scenario and does not count toward experimental
-        records. For now, practice is untimed and uses a fixed simulated small model;
-        this treatment is provisional. No workload survey follows practice.
-      </p>
-      <p>
-        Each experimental task lasts up to 15 minutes from when its requirements
-        appear. You can submit an incomplete or invalid plan without being forced
-        to repair it. At submission or timeout, your current work is retained and
-        you proceed to that task’s six-question NASA-TLX workload survey.
-      </p>
-      <button type="button" disabled={pending} onClick={onContinue}>Continue to practice</button>
+      <p className="field-help">Illustration only — a separate fictional example, not a study-task answer.</p>
+      <svg className="interface-guide" viewBox="0 0 700 350" role="img" aria-labelledby="guide-image-title guide-image-description">
+        <title id="guide-image-title">Planning interface: {current.title} highlighted</title>
+        <desc id="guide-image-description">Three-panel example with catalog left, agent center, plan right, requirements above and Submit below. {current.text}</desc>
+        <rect width="700" height="350" fill="#202326" />
+        {[ [12,12,676,54], [12,76,218,220], [240,76,218,220], [468,76,220,220], [548,305,140,32] ].map((area, key) =>
+          <rect key={key} x={area[0]} y={area[1]} width={area[2]} height={area[3]} fill="#2b3036" stroke="#818b96" />)}
+        <g fill="#f1f3f5" fontSize="15" fontFamily="system-ui, sans-serif">
+          <text x="24" y="35">Event requirements</text><text x="24" y="55" fontSize="12">Example: 20 guests · $350 budget · Vegetarian · Wheelchair access</text>
+          <text x="554" y="35">Time remaining</text>
+          <text x="24" y="103">Catalog</text><text x="24" y="140">Search and inspect</text><text x="24" y="176">Example Hall · $90</text><text x="24" y="206">Example Meal · $160</text><text x="24" y="236">Example Supplies · $40</text>
+          <text x="252" y="103">AI planning agent</text><text x="252" y="132" fontSize="12">Venue → Catering → Supplies</text><text x="252" y="147" fontSize="12">→ Final constraint check</text>
+          <text x="252" y="183">Model choice at checkpoint</text><text x="252" y="224">Conversation</text><text x="252" y="260">Ask for help…</text>
+          <text x="480" y="103">Current event plan</text><text x="480" y="142">Venue / Catering / Supplies</text><text x="480" y="179">Example total: $290 / $350</text>
+          <text x="480" y="216">Budget · Capacity</text><text x="480" y="242">Dietary · Accessibility</text><text x="566" y="327">Submit plan</text>
+        </g>
+        <rect x={current.area[0]} y={current.area[1]} width={current.area[2]} height={current.area[3]} fill="none" stroke="#9dc8ff" strokeWidth="4" />
+      </svg>
+      <p className="field-help">Guide {index + 1} of {guide.length}</p>
+      <h2 ref={title} tabIndex={-1}>{current.title}</h2>
+      <p>{current.text}</p>
+      <div className="actions">
+        <button type="button" className="secondary" disabled={pending || index === 0} onClick={() => setIndex(value => value - 1)}>Back</button>
+        <button type="button" disabled={pending} onClick={() => index === guide.length - 1 ? onContinue() : setIndex(value => value + 1)}>
+          {index === guide.length - 1 ? 'Finish instructions' : 'Next'}
+        </button>
+      </div>
     </>
   );
 }

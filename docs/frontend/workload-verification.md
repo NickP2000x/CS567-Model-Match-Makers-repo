@@ -3,16 +3,18 @@
 ## Presentation and scoring
 
 `WorkloadSurvey` is one reusable service-backed survey for task-1/task-2. Each
-dimension has 21 connected radio circles with word anchors and no preselection.
-Positions map to 0–100 in increments of 5. Native required radio groups enforce
+new task uses #51's five fully labelled choices with no preselection; values map
+to 0/25/50/75/100. The earlier 21-point definition is retained for earlier records.
+Native required radio groups enforce
 explicit answers; keyboard Space/arrow keys work without autosave stealing focus.
 
 The definition is `frontend/src/services/workloadSurvey.ts`, version
-`provisional-nasa-tlx-21-v1`. Wording, anchors, increments, and presentation are
+`provisional-adapted-nasa-tlx-5-v2` (earlier `provisional-nasa-tlx-21-v1` preserved).
+Wording, anchors, increments, and presentation are
 **provisional, pending researcher approval**, not approved study materials.
 
 - Mental/physical/temporal demand, effort, frustration: Very low → Very high.
-- Performance: Perfect performance → Failure. Higher stored values mean more
+- Performance: Completely successful → Not successful. Higher stored values mean more
   workload for this explicitly chosen presentation, so performance is not reversed.
 - The service computes the unweighted mean of six correctly oriented common-scale
   values on submission. Orientation comes from stored metadata, not the dimension
@@ -20,7 +22,7 @@ The definition is `frontend/src/services/workloadSurvey.ts`, version
 - Each experimental task retains the wording/anchor version, scale, and per-item
   orientation in `survey.metadata`. `survey.rawScore` remains null until submission.
   Practice has null metadata/score and no survey.
-- Draft saves accept only the 21 allowed positions. Missing, nonfinite, out-of-range,
+- Draft saves follow the record's increment (25 for v2, 5 for v1). Missing, nonfinite, out-of-range,
   or off-point values are rejected atomically.
 
 ## Integration in #16
@@ -45,15 +47,16 @@ current integrated results; the component checks below also used isolated fixtur
 
 ## Repeatable focused checks
 
-1. Fresh task survey: six rows, 21 circles each, zero checked. Empty/partial Continue
+1. Fresh task survey: six rows, five labelled choices each, zero checked. Empty/partial Continue
    must not advance or create a score. Explicit zero answers count as real responses.
 2. Tab/Space/arrow-key a rating and verify focus remains on the selected radio while
    autosaving. Remount after an accepted partial save: only those choices restore.
-3. Complete raw answers `[20, 0, 40, 60, 30, 10]` in dimension order. Expected score
-   is `160 / 6` (26.666…); performance remains raw 60. All-left gives 0; all-right 100.
+3. Complete v2 raw answers `[25, 0, 50, 75, 25, 0]` in dimension order. Expected score
+   is `175 / 6` (29.166…); performance remains raw 75. All-left gives 0; all-right 100.
 4. Submit twice rapidly: one accepted survey, correct Task 2 transition, immutable
    submitted answers/metadata/score. Reuse for Task 2: all choices initially blank;
-   complete it and verify its score and completion without changing Task 1's record.
+   complete it and verify its score and final feedback transition without changing
+   Task 1's record; optional feedback Finish then reaches completion.
 5. Fail one draft save and one submission: selected circles remain, no retry loop,
    no fabricated score/advance; Continue retries the full visible draft successfully.
 6. Practice/current active/wrong-task survey must be unavailable. Inspect laptop

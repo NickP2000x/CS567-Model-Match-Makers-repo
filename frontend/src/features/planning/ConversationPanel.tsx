@@ -45,7 +45,8 @@ export function ConversationPanel({ task, pending, routing, onSend, onAdvance }:
           </li>
         ))}
       </ol>
-      <h4 id="checkpoint-title" ref={checkpointTitle} tabIndex={-1}>Current stage: {task.checkpoint}</h4>
+      <h4 id="checkpoint-title" ref={checkpointTitle} tabIndex={-1}>Stage {currentIndex + 1} of 4: {task.checkpoint}</h4>
+      <p className="field-help">Move forward through stages. You can revise plan items; stage models stay locked.</p>
       {routing}
       <h4>Conversation</h4>
       <div ref={log} className="conversation-log" role="log" aria-label="Simulated conversation" aria-live="polite" aria-relevant="additions">
