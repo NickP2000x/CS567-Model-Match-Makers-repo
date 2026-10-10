@@ -121,3 +121,51 @@ unset keeps the in-memory mock. The backend allows the local Vite origins via CO
 - Not done: Safari/Firefox, WSL2/Windows browser, screen reader.
 - For Nick (copy): the before-start acknowledgement still says refreshing restarts the
   demo, which is only true in mock mode. The footer now follows the mode.
+
+## #35/#36 — real model clients and planning agent
+
+`MODEL_MODE=real` sends participant messages to the stage's locked model through one
+OpenAI-compatible client (OpenAI, or Ollama's `/v1` API). The agent is a bounded
+tool-calling loop (search, inspect, check plan) that never edits the plan. Mock mode is
+unchanged and remains the default. Routing recommendations stay simulated until #37.
+
+### Repeatable checks
+
+1. `python -m pytest` (no keys, no network beyond localhost):
+   - **Config:** real mode needs `OPENAI_API_KEY` only when a model uses openai;
+     invalid model specs and limits are rejected at startup.
+   - **Client:** a local fake OpenAI-compatible server checks the request (model,
+     messages, tools, `Authorization` only for openai), tool-call and token parsing, and
+     HTTP errors, invalid JSON, timeouts, and unreachable hosts becoming safe errors
+     (no key or response body in the message).
+   - **Agent:** tool use then answer with the locked model, failed checks fed back for
+     revision, tool errors returned to the model, bounded loop with a forced final
+     answer, empty-answer fallback, prompt contents and history limit, no plan changes.
+   - **API:** real replies shown (`simulated: false`) and recorded in `model_calls`
+     without leaking model names or tokens; large model used when the stage locks it;
+     provider failure → `502 PROVIDER_ERROR` with state unchanged and retry working;
+     replies arriving after the deadline (`TASK_EXPIRED`), a checkpoint change
+     (`STALE_OPERATION`), or submission (`NO_ACTIVE_TASK`) discarded but recorded
+     (`shown = 0`); practice uses the real small model; end-to-end over HTTP with
+     settings-built clients.
+2. With real credentials in `backend/.env`: `python -m app.smoke_models`.
+
+### Recorded results — 2026-10-09
+
+- macOS, Python 3.12.15: 68 backend tests passed (27 new for #35/#36).
+- Mutation check: saving late replies without re-checking, ignoring the locked stage
+  model, an unbounded tool loop, or not recording failed calls each made tests fail;
+  sources restored.
+- Live run with a standalone fake OpenAI-compatible server (no real provider): backend
+  in real mode reported `mode: real`; `smoke_models` passed for both sizes plus an agent
+  turn with `check_plan`; the frontend adapter integration tests passed (52/52) through
+  the real-mode backend; the headless-browser walkthrough of the production build
+  passed with replies labelled `small model`/`large model` (not "Simulated"). 82 model
+  calls were recorded (all shown, tokens stored); every request carried the key; no
+  backend or browser errors.
+- **Not done:** no real OpenAI or Ollama call was made (no key or Ollama on this
+  machine). Run `python -m app.smoke_models` with real credentials and record the result.
+- **Decisions to confirm:** #36 names LangGraph; this uses a plain bounded loop with
+  the same tools (simpler, no extra dependencies). The agent suggests and checks
+  but does not edit the plan. Default models follow the paper; Mixtral 8x7B needs
+  about 32 GB of memory, and any substitute needs researcher approval.

@@ -70,6 +70,9 @@ backend/
     catalog.py            Catalog queries and the four constraint checks
     db.py                 SQLite schema, catalog seeding, allocation slots
     definitions.py        Sequences, checkpoints, and provisional materials
+    models.py             OpenAI-compatible small/large client (OpenAI, Ollama)
+    agent.py              Bounded tool-calling planning agent and mock agent
+    smoke_models.py       Manual real-model configuration check
     config.py             Server-only settings with mock-mode defaults
     errors.py             Shared {"error": {code, message}} envelope
     fixtures/             Catalog/definitions exported from the frontend mock

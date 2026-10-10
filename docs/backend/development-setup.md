@@ -61,16 +61,43 @@ the default.
 
 | Variable | Default | Notes |
 |---|---|---|
-| `MODEL_MODE` | `mock` | Only `mock` is accepted until model adapters (#35). Any other value stops startup with a validation error. |
-| `OPENAI_API_KEY` | unset | Server-only secret for optional real calls (#35). Never put it in frontend `VITE_*` variables. |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Non-secret local model address (#35). |
+| `MODEL_MODE` | `mock` | `mock` or `real`. Other values, or real mode without a needed key, stop startup. |
+| `SMALL_MODEL` / `LARGE_MODEL` | `ollama:mixtral:8x7b` / `openai:gpt-4-turbo` | `provider:model` with provider `openai` or `ollama`. |
+| `OPENAI_API_KEY` | unset | Server-only secret, required in real mode when a model uses `openai`. Never put it in frontend `VITE_*` variables. |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint. |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Non-secret local model address; the client uses its `/v1` API. |
+| `MODEL_TIMEOUT_SECONDS` / `AGENT_MAX_STEPS` | `60` / `4` | Per-call timeout; tool-using calls per participant message. |
 | `DATABASE_PATH` | `data/model-matchmakers.sqlite3` | Relative to `backend/`. Created and seeded on first request; database files are ignored by Git. Delete the file to start over with fresh allocation slots. |
 | `DEV_CONTROLS` | `false` | Development only: `POST /api/sessions` accepts `sequenceId`, and `/reset` starts a new session. Such sessions use `dev-…` IDs and never consume the 12 allocation slots. |
 
+## Real models (#35/#36)
+
+Mock mode needs nothing. To use real models, put these in `backend/.env` (never in
+frontend `VITE_*` variables) and restart the server:
+
+```bash
+MODEL_MODE=real
+SMALL_MODEL=ollama:mixtral:8x7b      # paper default; or openai:<model>
+LARGE_MODEL=openai:gpt-4-turbo       # paper default
+OPENAI_API_KEY=<your key>            # needed when either model is openai:
+```
+
+- Ollama: install it, run `ollama pull mixtral:8x7b` (about 26 GB; needs a machine with
+  roughly 32 GB of memory), and keep `ollama serve` running. Without that hardware, a
+  smaller or hosted substitute is a researcher decision; record it in verification.
+- Check the configuration before a session: `python -m app.smoke_models` sends one
+  prompt to each model and one agent turn with tools, printing latency and tokens.
+- In real mode the agent replies with the stage's locked model. It can search,
+  inspect, and check plans (at most `AGENT_MAX_STEPS` tool-using calls plus one final
+  answer) but never edits the plan. Recommendations are still simulated until #37.
+- Each model call is stored in the `model_calls` table (research-only). A provider
+  failure returns `502 PROVIDER_ERROR` and the participant can retry. A reply that
+  arrives after the deadline, a checkpoint change, or submission is not shown.
+
 ## Troubleshooting
 
-- `Input should be 'mock'` at startup: `MODEL_MODE` is set to another value in your
-  shell or `backend/.env`.
+- `Input should be 'mock' or 'real'` or `needs OPENAI_API_KEY` at startup: fix
+  `MODEL_MODE` / the key in your shell or `backend/.env`.
 - `python3.12: command not found`: install Python 3.12 as above.
 - `Address already in use`: another process uses port 8000; pass `--port 8001`.
 - `ModuleNotFoundError: app`: run commands from `backend/` with `.venv` active.

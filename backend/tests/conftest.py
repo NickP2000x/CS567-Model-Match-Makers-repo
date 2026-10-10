@@ -33,9 +33,9 @@ def clock() -> Clock:
 
 @pytest.fixture
 def make_client(tmp_path, clock):
-    def make(**overrides) -> TestClient:
+    def make(agent=None, **overrides) -> TestClient:
         settings = isolated_settings(database_path=tmp_path / "study.sqlite3", **overrides)
-        return TestClient(create_app(settings, clock))
+        return TestClient(create_app(settings, clock, agent))
     return make
 
 
