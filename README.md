@@ -73,6 +73,7 @@ Build before previewing. Preview normally uses **http://localhost:4173** and ser
 the production assets generated in `frontend/dist/`.
 
 For browser checklists and recorded results, see:
+- [Final prototype smoke checklist and coverage](docs/frontend/prototype-smoke-checks.md)
 - [Introduction verification](docs/frontend/introduction-verification.md)
 - [Practice workspace verification](docs/frontend/workspace-verification.md)
 - [Routing verification and integration handoff](docs/frontend/routing-verification.md)
