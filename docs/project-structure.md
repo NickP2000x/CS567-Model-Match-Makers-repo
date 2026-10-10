@@ -75,6 +75,8 @@ backend/
     agent.py              Bounded tool-calling planning agent and mock agent
     smoke_models.py       Manual real-model configuration check
     router.py             Mock router and optional RouteLLM adapter
+    oracle.py             Offline paired-output oracle (python -m app.oracle)
+    records.py            Study records summary (python -m app.records)
     config.py             Server-only settings with mock-mode defaults
     errors.py             Shared {"error": {code, message}} envelope
     fixtures/             Catalog/definitions exported from the frontend mock

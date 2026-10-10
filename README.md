@@ -55,8 +55,9 @@ timeout. These controls are absent from the normal production build/preview.
 The standalone mock defaults to sequence 1; real randomized, balanced assignment
 and persistence are planned backend work.
 
-The frontend currently uses an in-memory mock service. No backend, database,
-API keys, or `.env` file are required. Refreshing restarts the demonstration.
+By default the frontend uses an in-memory mock service: no backend, database, API
+keys, or `.env` file are required, and refreshing restarts the demonstration. With
+`VITE_API_BASE_URL` set it uses the backend instead, and a refresh resumes the session.
 
 ## Check and preview the frontend
 
@@ -87,7 +88,7 @@ Frontend and backend development use separate runtimes and dependencies:
 | Component | Stack | Purpose |
 |---|---|---|
 | Frontend | React, TypeScript, Vite, Node/npm | Browser interface |
-| Backend (scaffold) | Python 3.12, FastAPI, Uvicorn; SQLite planned | API, sessions, catalogs, and stored study state |
+| Backend | Python 3.12, FastAPI, Uvicorn, SQLite | API, sessions, catalog, routing, agent, and research records |
 
 The `scripts/` setup prepares the frontend only. The backend runs the complete study
 flow in mock mode (catalog, sessions with balanced allocation, routing, timing,
@@ -112,9 +113,10 @@ Then open **http://127.0.0.1:8000/api/health**. See
 and configuration, and the [backend documentation handoff](docs/backend/README.md)
 for the planned work.
 
-After API integration, local backend mode will normally require the frontend
-and backend servers running in separate terminals. Standalone frontend mock mode
-will remain available.
+Backend mode needs the frontend and backend servers running in separate terminals;
+standalone frontend mock mode remains available. Real models (#35/#36), the RouteLLM
+router (#37), the offline oracle (#40), and the records report (#41) are optional and
+described in [Backend development setup](docs/backend/development-setup.md).
 
 See [Project structure](docs/project-structure.md) and the
 [experiment service contract draft](docs/experiment-service-contract.md)

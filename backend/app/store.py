@@ -94,18 +94,20 @@ class Store:
 
 
     def record_model_calls(self, session_id: str, task_id: str, checkpoint: str, size: str,
-                           provider: str, model: str, calls: list, shown: bool) -> None:
+                           provider: str, model: str, calls: list, shown: bool,
+                           purpose: str = "participant") -> None:
         if not calls:
             return
+        self._ensure_ready()
         now = self.clock()
         with db.transaction(self.path) as connection:
             connection.executemany(
                 "INSERT INTO model_calls (session_id, task_id, checkpoint, size, provider, model, step, ok, error,"
-                " prompt_tokens, completion_tokens, latency_ms, tools, shown, created_at)"
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                " prompt_tokens, completion_tokens, latency_ms, tools, shown, created_at, purpose)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 [(session_id, task_id, checkpoint, size, provider, model, call.step, int(call.ok), call.error,
                   call.prompt_tokens, call.completion_tokens, call.latency_ms, json.dumps(call.tools),
-                  int(shown), now) for call in calls])
+                  int(shown), now, purpose) for call in calls])
 
 
     def record_routing(self, session_id: str, task_id: str, context: dict, router: str, result, error: str | None,

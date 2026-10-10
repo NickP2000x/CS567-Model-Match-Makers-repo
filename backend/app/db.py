@@ -28,12 +28,13 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 -- Research record of every real model call (#35/#38). Never served to participants.
 -- `shown` is 0 when the reply was discarded because the task or checkpoint had moved on.
+-- `purpose` separates participant-path calls from offline oracle evaluation (#40).
 CREATE TABLE IF NOT EXISTS model_calls (
   id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, task_id TEXT NOT NULL,
   checkpoint TEXT NOT NULL, size TEXT NOT NULL, provider TEXT NOT NULL, model TEXT NOT NULL,
   step INTEGER NOT NULL, ok INTEGER NOT NULL, error TEXT, prompt_tokens INTEGER,
   completion_tokens INTEGER, latency_ms INTEGER NOT NULL, tools TEXT NOT NULL,
-  shown INTEGER NOT NULL, created_at INTEGER NOT NULL
+  shown INTEGER NOT NULL, created_at INTEGER NOT NULL, purpose TEXT NOT NULL DEFAULT 'participant'
 );
 -- Research record of each checkpoint recommendation (#37), with the context it scored.
 -- `applied` is 0 when the participant had moved on before the recommendation was ready.
@@ -43,6 +44,13 @@ CREATE TABLE IF NOT EXISTS routing_decisions (
   plan TEXT NOT NULL, prompt TEXT NOT NULL, router TEXT NOT NULL, score REAL, threshold REAL,
   recommended TEXT, ok INTEGER NOT NULL, error TEXT, applied INTEGER NOT NULL,
   latency_ms INTEGER NOT NULL, created_at INTEGER NOT NULL
+);
+-- Offline oracle (#40): both models' proposals for one recorded checkpoint context.
+-- label: small (small passes), large (only large passes), neither (rule pending researchers).
+CREATE TABLE IF NOT EXISTS oracle_results (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, routing_id INTEGER NOT NULL UNIQUE, session_id TEXT NOT NULL,
+  task_id TEXT NOT NULL, checkpoint TEXT NOT NULL, small_plan TEXT, small_passed INTEGER NOT NULL,
+  large_plan TEXT, large_passed INTEGER NOT NULL, label TEXT NOT NULL, created_at INTEGER NOT NULL
 );
 """
 SLOTS_PER_SEQUENCE = 3
@@ -78,6 +86,10 @@ def init_db(path: Path) -> None:
     connection = connect(path)
     try:
         connection.executescript(SCHEMA)
+        # Databases created before #40 lack model_calls.purpose.
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(model_calls)")}
+        if "purpose" not in columns:
+            connection.execute("ALTER TABLE model_calls ADD COLUMN purpose TEXT NOT NULL DEFAULT 'participant'")
     finally:
         connection.close()
     with transaction(path) as connection:
