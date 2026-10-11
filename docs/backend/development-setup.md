@@ -122,6 +122,28 @@ ROUTER_THRESHOLD=<pilot value between 0 and 1>
 - Router failures return `502 PROVIDER_ERROR` with no fallback; the participant retries.
 - `/api/health` reports `"router"`; the routing panel stops saying "simulated".
 
+## Oracle and records (#40/#41)
+
+Both are offline commands run from `backend/` against the configured database:
+
+```bash
+python -m app.oracle            # MODEL_MODE=real: run both models on each recorded checkpoint
+python -m app.oracle --limit 5  # evaluate at most five pending checkpoints
+python -m app.records           # summary: allocation, tasks, routing, model usage, oracle labels
+```
+
+- The oracle takes each applied recommendation's frozen context (scenario, stage, plan)
+  from `routing_decisions`, asks the small and the large model for a complete plan
+  (bounded tool loop ending in `submit_plan`), and checks it deterministically.
+  Provisional pass rule: Venue needs capacity and access; Catering adds dietary
+  coverage; Supplies and Final need all four constraints, including budget.
+- Label: `small` if the small model passes, `large` if only the large model passes,
+  `neither` otherwise. The neither case and any reliance formula are researcher decisions.
+- Results go to `oracle_results`; oracle calls are stored in `model_calls` with
+  `purpose = 'oracle'`, separate from participant calls. Nothing is shown to participants.
+  Failed checkpoints stay pending and are retried by the next run.
+- `records` counts only (no statistics); development sessions are excluded.
+
 ## Troubleshooting
 
 - `Input should be 'mock' or 'real'` or `needs OPENAI_API_KEY` at startup: fix

@@ -203,3 +203,74 @@ if the participant is still at that checkpoint. Mock routing stays the default.
   (≈0.47–0.50), so the threshold decides almost everything; calibrate it in the pilot.
   The `mf` router (trained on the paper's GPT-4/Mixtral pair) needs an OpenAI key and was
   not run here.
+
+## #40 — paired-output oracle
+
+### Repeatable checks
+
+`python -m pytest` (scripted clients): label rule (small preferred when it passes);
+provisional stage pass rule; proposals via tools then `submit_plan`, no proposal when the
+model never submits, bounded loop with submit-only last step, malformed submissions;
+the four fixture cases small-pass / large-only / both / neither; results and calls stored
+separately (`purpose = 'oracle'`, never shown) with session state byte-for-byte unchanged;
+no re-evaluation; a failed checkpoint stays pending, records both sizes' calls, and is
+retried; older databases gain the `purpose` column.
+
+### Recorded results — 2026-10-10
+
+- 90 backend tests passed (8 new for #40/#41). Mutation check: preferring large when
+  both pass, counting oracle calls as participant usage, judging Venue on all four
+  constraints, and re-evaluating finished checkpoints each failed tests.
+
+## #41 — integrated verification
+
+### Repeatable run
+
+1. Backend in real mode (`MODEL_MODE=real`) with `ROUTER_MODE=routellm`; the frontend
+   production build with `VITE_API_BASE_URL`; `DEV_CONTROLS=true` for the adapter tests.
+2. `MM_API_URL=… bash scripts/frontend.sh test` (all four sequences through the adapter).
+3. Browser walkthroughs of the production build (participants take allocation slots).
+4. `python -m app.oracle`, then `python -m app.records`.
+
+### Recorded results — 2026-10-10
+
+Mac (Darwin 25.5), Python 3.12.15, Node 24.14.0, headless Chromium (Playwright, outside
+the repository). Real RouteLLM 0.2.0 `bert` router (threshold 0.48 for this run only);
+models were a local fake OpenAI-compatible server (`fake-small` / `fake-large`), not real
+providers.
+
+- Health reported `mode: real`, `router: routellm`. Adapter integration: 52/52 passed.
+- Three browser participants were allocated P01–P03 (sequences 3, 4, 1) and each completed
+  consent → completion with a refresh mid-Task 1 (same checkpoint and messages), both
+  conditions over four checkpoints, ratings, and feedback. No browser console errors.
+- 57 routing decisions (scores 0.383–0.496; 15 large) were applied and recorded. The oracle
+  evaluated all 57 (0 failures) and stored 114 oracle calls separately from 118 participant
+  calls (all participant replies shown, no oracle output shown).
+- The records report showed allocation {1: 1, 3: 1, 4: 1} with 9 slots free; 3 study and 6
+  development sessions (excluded); per-task status, elapsed time, constraints, checkpoints,
+  messages, and workload; oracle labels small 12 / large 12; final choice matched the
+  oracle label at 9 of 24 checkpoints.
+- No backend errors; every model request carried the key.
+- **Not done:** real OpenAI/Ollama calls, the `mf` RouteLLM router (needs a key),
+  WSL2/Linux and Windows-browser runs, screen readers, a timeout reached in real time
+  (covered by tests with a controlled clock), concurrent real participants.
+
+## Open decisions and approvals (for Nick and the researchers)
+
+This is technical readiness for a pilot, not approval for participant collection or a
+substitute for IRB approval.
+
+- **Contract (#31):** agree the HTTP draft, especially the task in the path, server-side
+  deadlines, `ALLOCATION_FULL` after 12 sessions (or a new block), and `DEV_CONTROLS`.
+- **Models (#35):** GPT-4 Turbo availability; Mixtral 8x7B needs ~32 GB of memory. Any
+  substitution needs approval and must be recorded.
+- **Agent (#36):** a plain bounded tool loop is used instead of LangGraph; the agent
+  suggests but never edits the plan.
+- **Router (#37):** which RouteLLM router (`mf` matches the paper's model pair) and the
+  threshold (scores clustered in 0.38–0.50 here, so calibrate in the pilot); wording of
+  the "Router estimate" reasons.
+- **Oracle (#40):** the per-stage pass rule, the `neither` case, and any reliance formula.
+- **Records (#38):** latency and token-accounting definitions; raw events are kept.
+- **Materials:** consent, demographics, practice treatment, catalog values, live
+  constraint feedback, adapted NASA-TLX, feedback prompts, and the before-start
+  "refreshing restarts" acknowledgement (true only in mock mode).

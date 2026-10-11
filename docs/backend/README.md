@@ -1,7 +1,9 @@
 # Backend documentation handoff
 
-The backend scaffold from #32 runs a key-free mock-mode FastAPI service under
-`backend/`. This page identifies the planned work and documentation locations.
+The backend under `backend/` implements backend sprints 1–3 (#31–#41) for review:
+mock mode by default, with optional real models, RouteLLM routing, an offline oracle,
+and a records summary. Results and open decisions are in [verification](verification.md).
+This page identifies the planned work and documentation locations.
 Backend work is authorized only for an explicitly selected backend issue, following
 root `AGENTS.md` and [`backend/AGENTS.md`](../../backend/AGENTS.md).
 

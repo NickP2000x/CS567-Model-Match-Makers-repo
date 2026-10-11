@@ -20,7 +20,9 @@ or override those rules here. Work only on an explicitly selected backend issue
   `app/agent.py` the bounded tool-calling planning agent and the mock agent, and
   `app/smoke_models.py` a manual real-model check. `app/router.py` holds the mock
   router and the optional RouteLLM adapter (`requirements-routellm.txt`, never needed
-  for tests or CI; tests inject a scorer).
+  for tests or CI; tests inject a scorer). `app/oracle.py` is the offline paired-output
+  oracle (`python -m app.oracle`) and `app/records.py` the records summary
+  (`python -m app.records`); both read research tables and never change session state.
 - `app/fixtures/*.json` are exported from the frontend mock with
   `node backend/scripts/export_fixtures.mjs`. Rerun it when the frontend catalog,
   survey, preparation, or recommendation definitions change; never edit them by hand.
