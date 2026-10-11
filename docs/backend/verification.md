@@ -81,3 +81,43 @@ databases, controllable clock). The tests cover:
 - Not done: the frontend does not call the backend yet (#39); real models/router
   (#35–#37) and research event logging (#38) are not implemented; WSL2/Linux local
   run not tested.
+
+## #39 — frontend API adapter
+
+`frontend/src/services/apiExperiment.ts` implements the same `ExperimentService` the
+screens already use, over the #31 routes. `VITE_API_BASE_URL` selects it explicitly;
+unset keeps the in-memory mock. The backend allows the local Vite origins via CORS.
+
+### Repeatable checks
+
+1. `bash scripts/frontend.sh test`: offline adapter tests (scripted fetch) for
+   create/resume/replace session, connection errors, task and checkpoint in planning
+   requests, error mapping, `TASK_EXPIRED` state handoff, local guards, reset.
+2. Start the backend with `DEV_CONTROLS=true`, then
+   `MM_API_URL=http://127.0.0.1:8000 bash scripts/frontend.sh test`: all four
+   sequences consent → completion through the adapter, override concealment and
+   backend errors, refresh resume with an unchanged deadline.
+3. Backend `pytest`: CORS allows local dev/preview origins (also on error responses)
+   and rejects others.
+4. Browser: production build with `VITE_API_BASE_URL`, backend without
+   `DEV_CONTROLS`, fresh database. Complete one participant from consent to
+   completion, refreshing in the middle of Task 1.
+
+### Recorded results — 2026-10-09
+
+- macOS, Node 24.14.0 (project-local), Python 3.12.15. Frontend type-check and
+  build passed; 46 frontend tests passed with 6 integration tests skipped by default,
+  and 52 passed with `MM_API_URL` set against a live mock-mode backend. Backend: 41 tests passed.
+- Headless Chromium (Playwright, kept outside the repository), production preview:
+  allocation gave `P03` (sequence 1); intro, guide, practice (search, inspect, add,
+  simulated reply, submit), Task 1 automatic and Task 2 override across all four
+  checkpoints, ratings, feedback, completion. A refresh at Task 1 Catering resumed
+  the same checkpoint and messages. Development controls were absent. No browser
+  console errors and no backend errors. The backend record had both surveys and four
+  decisions per task.
+- Development server: with a backend lacking `DEV_CONTROLS`, the server-unavailable
+  screen explained the fix; with it, a `dev-…` session was created and the UI reset
+  to sequence 3 created a new backend session.
+- Not done: Safari/Firefox, WSL2/Windows browser, screen reader.
+- For Nick (copy): the before-start acknowledgement still says refreshing restarts the
+  demo, which is only true in mock mode. The footer now follows the mode.

@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .config import Settings, get_settings
 from .errors import install_error_handlers
@@ -19,6 +20,8 @@ def create_app(settings: Settings | None = None, clock: Callable[[], int] = syst
     # The database is created and seeded on first use, not at import time.
     app.state.store = Store(settings.resolved_database_path, clock)
     install_error_handlers(app)
+    app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origin_list,
+                       allow_methods=["GET", "POST", "PUT"], allow_headers=["Content-Type"])
 
     @app.get("/api/health")
     def health() -> dict[str, str]:

@@ -7,11 +7,12 @@ interface ConversationProps {
   task: Task;
   pending: boolean;
   routing: ReactNode;
+  simulated: boolean;
   onSend: (text: string) => Promise<boolean>;
   onAdvance: () => void;
 }
 
-export function ConversationPanel({ task, pending, routing, onSend, onAdvance }: ConversationProps) {
+export function ConversationPanel({ task, pending, routing, simulated, onSend, onAdvance }: ConversationProps) {
   const [message, setMessage] = useState('');
   const checkpointTitle = useRef<HTMLHeadingElement>(null);
   const previousCheckpoint = useRef(task.checkpoint);
@@ -49,17 +50,17 @@ export function ConversationPanel({ task, pending, routing, onSend, onAdvance }:
       <p className="field-help">Move forward through stages. You can revise plan items; stage models stay locked.</p>
       {routing}
       <h4>Conversation</h4>
-      <div ref={log} className="conversation-log" role="log" aria-label="Simulated conversation" aria-live="polite" aria-relevant="additions">
+      <div ref={log} className="conversation-log" role="log" aria-label={simulated ? 'Simulated conversation' : 'Conversation'} aria-live="polite" aria-relevant="additions">
         {task.messages.length === 0 && <p>Ask for help comparing catalog options. Use synthetic information only.</p>}
         {task.messages.map(entry => (
           <article key={entry.id} className={entry.role === 'assistant' ? 'message simulated-message' : 'message'}>
-            <p className="message-label">{entry.role === 'assistant' ? `Simulated ${entry.model} model` : 'You'} · {entry.checkpoint}</p>
+            <p className="message-label">{entry.role === 'assistant' ? `${entry.simulated ? 'Simulated ' : ''}${entry.model} model` : 'You'} · {entry.checkpoint}</p>
             <p>{entry.text}</p>
           </article>
         ))}
       </div>
       <form onSubmit={event => { void send(event); }} className="message-form">
-        <label htmlFor="agent-message">Message to simulated agent</label>
+        <label htmlFor="agent-message">Message to {simulated ? 'simulated ' : ''}agent</label>
         <textarea id="agent-message" rows={3} required value={message} disabled={pending || !model}
           onChange={event => setMessage(event.target.value)} />
         <button type="submit" disabled={pending || !model}>Send message</button>
