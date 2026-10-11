@@ -111,7 +111,7 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
       </header>
       <p className="workspace-notice">
         Provisional demonstration: fictional catalog and prices (USD), live constraint feedback.
-        {taskId === 'practice' ? ' Practice is excluded from experimental records and uses a fixed simulated small model. No survey follows practice.'
+        {taskId === 'practice' ? ` Practice is excluded from experimental records and uses a fixed ${state.simulated ? 'simulated ' : ''}small model. No survey follows practice.`
           : ` Scenario ${scenarioId} · ${state.assignments[taskId === 'task-1' ? 0 : 1].condition === 'automatic' ? 'Automatic' : 'Override'} routing.`}
       </p>
       {!task ? <p role="status">Preparing the planning task…</p> : <div className="workspace-panels">
@@ -124,7 +124,8 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
           })} />
         <ConversationPanel task={task} pending={pending} simulated={state.simulated}
           routing={<RoutingPanel key={`${task.id}-${task.checkpoint}`} task={task}
-            service={service} pending={pending} perform={perform} />}
+            service={service} pending={pending} perform={perform}
+            routerSimulated={state.routerSimulated !== false} agentSimulated={state.simulated} />}
           onSend={text => perform(() => service.sendMessage(text))}
           onAdvance={() => { void perform(() => service.advanceCheckpoint()); }} />
         <PlanPanel task={task} catalog={data.catalog} pending={pending}

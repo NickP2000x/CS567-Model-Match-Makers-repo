@@ -39,7 +39,7 @@ def into_task_1(participant):
 
 def test_real_reply_is_shown_and_recorded(real):
     client, clients, calls = real(small=[tool("search_catalog", {"category": "venue"}), answer("Try Willow Conference Hall.")])
-    assert client.get("/api/health").json() == {"status": "ok", "mode": "real"}
+    assert client.get("/api/health").json() == {"status": "ok", "mode": "real", "router": "mock"}
     participant = into_task_1(Participant(client, 1))
     assert participant.state["simulated"] is False
     data = participant.call("POST", "/tasks/task-1/messages", {"checkpoint": "Venue", "text": "Which venue?"})

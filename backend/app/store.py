@@ -21,11 +21,13 @@ def system_clock() -> int:
 
 
 class Store:
-    def __init__(self, path: Path, clock: Callable[[], int] = system_clock, simulated: bool = True):
+    def __init__(self, path: Path, clock: Callable[[], int] = system_clock, simulated: bool = True,
+                 router_simulated: bool = True):
         self.path = path
         self.clock = clock
         # New sessions report whether agent replies are simulated (mock mode) or real.
         self.simulated = simulated
+        self.router_simulated = router_simulated
         self._ready = False
         self._lock = threading.Lock()
 
@@ -56,12 +58,12 @@ class Store:
                 ).fetchone()
                 if slot is None:
                     raise ApiError(409, "ALLOCATION_FULL", "All study slots are allocated.")
-                state = new_state(session_id, f"P{slot['slot']:02d}", slot["sequence_id"], self.simulated)
+                state = new_state(session_id, f"P{slot['slot']:02d}", slot["sequence_id"], self.simulated, self.router_simulated)
                 connection.execute("UPDATE allocation_slots SET session_id = ? WHERE slot = ?",
                                    (session_id, slot["slot"]))
             else:
                 # Development sessions never consume allocation slots.
-                state = new_state(session_id, f"dev-{session_id[:8]}", sequence_id, self.simulated)
+                state = new_state(session_id, f"dev-{session_id[:8]}", sequence_id, self.simulated, self.router_simulated)
             connection.execute(
                 "INSERT INTO sessions (id, participant_id, sequence_id, development, state, created_at, updated_at)"
                 " VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -104,6 +106,20 @@ class Store:
                 [(session_id, task_id, checkpoint, size, provider, model, call.step, int(call.ok), call.error,
                   call.prompt_tokens, call.completion_tokens, call.latency_ms, json.dumps(call.tools),
                   int(shown), now) for call in calls])
+
+
+    def record_routing(self, session_id: str, task_id: str, context: dict, router: str, result, error: str | None,
+                       applied: bool) -> None:
+        with db.transaction(self.path) as connection:
+            connection.execute(
+                "INSERT INTO routing_decisions (session_id, task_id, checkpoint, condition, scenario_id, plan, prompt,"
+                " router, score, threshold, recommended, ok, error, applied, latency_ms, created_at)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (session_id, task_id, context["checkpoint"], context["condition"], context["scenarioId"],
+                 json.dumps(context["plan"]), context["prompt"], router,
+                 result.score if result else None, result.threshold if result else None,
+                 result.model if result else None, int(error is None), error, int(applied),
+                 result.latency_ms if result else 0, self.clock()))
 
 
 def load(connection: sqlite3.Connection, session_id: str) -> dict:

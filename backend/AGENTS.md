@@ -18,7 +18,9 @@ or override those rules here. Work only on an explicitly selected backend issue
   and schema; `app/definitions.py` holds sequences and provisional materials.
   `app/models.py` is the OpenAI-compatible small/large client (OpenAI and Ollama),
   `app/agent.py` the bounded tool-calling planning agent and the mock agent, and
-  `app/smoke_models.py` a manual real-model check.
+  `app/smoke_models.py` a manual real-model check. `app/router.py` holds the mock
+  router and the optional RouteLLM adapter (`requirements-routellm.txt`, never needed
+  for tests or CI; tests inject a scorer).
 - `app/fixtures/*.json` are exported from the frontend mock with
   `node backend/scripts/export_fixtures.mjs`. Rerun it when the frontend catalog,
   survey, preparation, or recommendation definitions change; never edit them by hand.
@@ -38,6 +40,9 @@ or override those rules here. Work only on an explicitly selected backend issue
 - Prices are integer cents; timestamps are epoch milliseconds from the server clock.
 - Never hold the database transaction during a model call. Validate, release, call,
   then re-check the task/checkpoint/deadline before saving; discard late replies.
+- Routing follows the same rule: check concealment and phase under the lock, score
+  outside it, apply only if the participant is still at that checkpoint. Never invent a
+  threshold or a fallback recommendation; router failures return `PROVIDER_ERROR`.
 - The `model_calls` table is research-only (provider, model, tokens, latency, shown).
   Never return it, provider names, or token counts in participant responses.
 

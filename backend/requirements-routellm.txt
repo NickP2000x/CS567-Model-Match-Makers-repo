@@ -1,0 +1,6 @@
+# Optional RouteLLM router (#37): ROUTER_MODE=routellm. Large download (PyTorch, transformers).
+# Not needed for mock mode, tests, or CI. Versions below were checked together on 2026-10-10.
+-r requirements.txt
+routellm==0.2.0
+torch==2.14.1
+transformers==5.19.0

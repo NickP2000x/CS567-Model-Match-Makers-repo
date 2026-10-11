@@ -67,6 +67,7 @@ the default.
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint. |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Non-secret local model address; the client uses its `/v1` API. |
 | `MODEL_TIMEOUT_SECONDS` / `AGENT_MAX_STEPS` | `60` / `4` | Per-call timeout; tool-using calls per participant message. |
+| `ROUTER_MODE` / `ROUTELLM_ROUTER` / `ROUTER_THRESHOLD` | `mock` / `mf` / none | RouteLLM router (#37); the threshold must be set explicitly. |
 | `DATABASE_PATH` | `data/model-matchmakers.sqlite3` | Relative to `backend/`. Created and seeded on first request; database files are ignored by Git. Delete the file to start over with fresh allocation slots. |
 | `DEV_CONTROLS` | `false` | Development only: `POST /api/sessions` accepts `sequenceId`, and `/reset` starts a new session. Such sessions use `dev-…` IDs and never consume the 12 allocation slots. |
 
@@ -93,6 +94,33 @@ OPENAI_API_KEY=<your key>            # needed when either model is openai:
 - Each model call is stored in the `model_calls` table (research-only). A provider
   failure returns `502 PROVIDER_ERROR` and the participant can retry. A reply that
   arrives after the deadline, a checkpoint change, or submission is not shown.
+
+## RouteLLM router (#37)
+
+By default recommendations are the fixed simulated fixtures. To use RouteLLM:
+
+```bash
+python -m pip install -r requirements-routellm.txt   # large: PyTorch, transformers, ...
+```
+
+Then in `backend/.env`:
+
+```bash
+ROUTER_MODE=routellm
+ROUTELLM_ROUTER=mf          # mf (paper pair GPT-4 vs Mixtral; needs OPENAI_API_KEY) or bert (local)
+ROUTER_THRESHOLD=<pilot value between 0 and 1>
+```
+
+- RouteLLM scores how much a stage needs the strong model (0–1). A score at or above
+  `ROUTER_THRESHOLD` recommends the large model. The threshold has no default: it is
+  a pilot decision, held fixed for the main study.
+- The router downloads its published checkpoint from Hugging Face on first start.
+- The scored text is the stage, the event requirements, the current plan, and the
+  participant's last questions. Each decision (score, threshold, prompt, plan) is
+  stored in the research-only `routing_decisions` table.
+- Participant-facing reasons are provisional templates ("Router estimate: …").
+- Router failures return `502 PROVIDER_ERROR` with no fallback; the participant retries.
+- `/api/health` reports `"router"`; the routing panel stops saying "simulated".
 
 ## Troubleshooting
 

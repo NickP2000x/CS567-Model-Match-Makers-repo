@@ -68,6 +68,8 @@ export interface StudyState {
   // resumes the backend session, whose agent is real when the backend runs real models.
   simulated: boolean; refreshRestartsDemo: boolean;
   sessionId?: string;
+  // Backend only: false when recommendations come from RouteLLM (#37). Absent means simulated.
+  routerSimulated?: boolean;
 }
 export interface ExperimentService {
   getSnapshot(): StudyState;

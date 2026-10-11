@@ -35,6 +35,15 @@ CREATE TABLE IF NOT EXISTS model_calls (
   completion_tokens INTEGER, latency_ms INTEGER NOT NULL, tools TEXT NOT NULL,
   shown INTEGER NOT NULL, created_at INTEGER NOT NULL
 );
+-- Research record of each checkpoint recommendation (#37), with the context it scored.
+-- `applied` is 0 when the participant had moved on before the recommendation was ready.
+CREATE TABLE IF NOT EXISTS routing_decisions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, task_id TEXT NOT NULL,
+  checkpoint TEXT NOT NULL, condition TEXT NOT NULL, scenario_id TEXT NOT NULL,
+  plan TEXT NOT NULL, prompt TEXT NOT NULL, router TEXT NOT NULL, score REAL, threshold REAL,
+  recommended TEXT, ok INTEGER NOT NULL, error TEXT, applied INTEGER NOT NULL,
+  latency_ms INTEGER NOT NULL, created_at INTEGER NOT NULL
+);
 """
 SLOTS_PER_SEQUENCE = 3
 

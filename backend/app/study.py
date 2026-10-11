@@ -11,7 +11,7 @@ import sqlite3
 from . import catalog
 from .definitions import (
     CHECKPOINTS, CURRENT_SURVEY, EXPERIMENTAL_TASK_MS, FEEDBACK_VERSION, PREPARATIONS,
-    RECOMMENDATIONS, SEQUENCES, SURVEY_DIMENSIONS,
+    SEQUENCES, SURVEY_DIMENSIONS,
 )
 from .errors import ApiError
 
@@ -31,14 +31,15 @@ def routing_phase(message: str) -> ApiError:
     return ApiError(409, "INVALID_ROUTING_PHASE", message)
 
 
-def new_state(session_id: str, participant_id: str, sequence_id: int, simulated: bool = True) -> dict:
+def new_state(session_id: str, participant_id: str, sequence_id: int, simulated: bool = True,
+              router_simulated: bool = True) -> dict:
     if sequence_id not in SEQUENCES:
         raise ApiError(400, "INVALID_SEQUENCE", "Choose sequence 1–4.")
     return {
         "sessionId": session_id, "participantId": participant_id, "sequenceId": sequence_id,
         "assignments": copy.deepcopy(list(SEQUENCES[sequence_id])), "step": "consent",
         "consent": None, "demographics": None, "tasks": {}, "preparations": {}, "feedback": None,
-        "simulated": simulated,
+        "simulated": simulated, "routerSimulated": router_simulated,
     }
 
 
@@ -190,17 +191,21 @@ def lock_initial_choice(task: dict, model: str, now: int) -> None:
     decision.update(initialModel=model, initialLockedAt=now, phase="locked")
 
 
-def request_recommendation(task: dict, now: int) -> None:
+def recommendation_needed(task: dict) -> bool:
+    """Reject early reveals; False when this checkpoint already has its recommendation."""
     decision = task["decisions"][task["checkpoint"]]
     if task["condition"] == "practice" or (task["condition"] == "override" and decision["phase"] == "choose"):
         raise routing_phase("Lock the independent initial choice before revealing the recommendation.")
-    if decision["recommendedModel"]:
+    return not decision["recommendedModel"]
+
+
+def apply_recommendation(task: dict, model: str, reason: str, now: int) -> None:
+    if not recommendation_needed(task):
         return  # Repeated requests return the same recommendation and timestamps.
-    recommendation = RECOMMENDATIONS[task["checkpoint"]]
-    decision.update(recommendedModel=recommendation["model"], reason=recommendation["reason"],
-                    recommendationShownAt=now)
+    decision = task["decisions"][task["checkpoint"]]
+    decision.update(recommendedModel=model, reason=reason, recommendationShownAt=now)
     if task["condition"] == "automatic":
-        decision.update(phase="committed", finalModel=recommendation["model"], finalCommittedAt=now)
+        decision.update(phase="committed", finalModel=model, finalCommittedAt=now)
     else:
         decision["phase"] = "recommended"
 
