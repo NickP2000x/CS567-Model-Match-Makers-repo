@@ -1,0 +1,317 @@
+{
+  "version": "catalog-v1",
+  "source": "frontend/src/mocks/scenarios.ts",
+  "scenarios": [
+    {
+      "id": "practice",
+      "title": "Practice team lunch",
+      "requirements": {
+        "budgetCents": 50000,
+        "attendees": 15,
+        "dietaryNeeds": [
+          "vegetarian"
+        ],
+        "wheelchairRequired": true
+      },
+      "provisional": true
+    },
+    {
+      "id": "A",
+      "title": "Company workshop",
+      "requirements": {
+        "budgetCents": 100000,
+        "attendees": 40,
+        "dietaryNeeds": [
+          "vegetarian",
+          "gluten-free"
+        ],
+        "wheelchairRequired": true
+      },
+      "provisional": true
+    },
+    {
+      "id": "B",
+      "title": "Company celebration",
+      "requirements": {
+        "budgetCents": 140000,
+        "attendees": 60,
+        "dietaryNeeds": [
+          "vegan",
+          "nut-free"
+        ],
+        "wheelchairRequired": true
+      },
+      "provisional": true
+    }
+  ],
+  "items": [
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "summary": "A welcoming event space.",
+      "capacity": 15,
+      "wheelchairAccessible": true,
+      "id": "practice-venue-good",
+      "name": "Meadow Hall",
+      "details": "Capacity covers the guest list. Step-free entrance and accessible event room."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "summary": "A welcoming event space.",
+      "capacity": 10,
+      "wheelchairAccessible": true,
+      "id": "practice-venue-capacity",
+      "name": "Garden Room",
+      "details": "Maximum event capacity: 10."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "summary": "A welcoming event space.",
+      "capacity": 15,
+      "wheelchairAccessible": false,
+      "id": "practice-venue-access",
+      "name": "Cedar Room",
+      "details": "Event room is upstairs; no lift or step-free route."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "catering",
+      "priceCents": 20000,
+      "summary": "A shared meal package.",
+      "servings": 15,
+      "dietaryCoverage": [
+        "vegetarian"
+      ],
+      "id": "practice-food-good",
+      "name": "Harvest Kitchen",
+      "details": "Serves 15; covers vegetarian requirements."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "catering",
+      "priceCents": 20000,
+      "summary": "A shared meal package.",
+      "servings": 15,
+      "dietaryCoverage": [],
+      "id": "practice-food-diet",
+      "name": "Classic Kitchen",
+      "details": "Standard menu; the required dietary alternatives are not included."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "catering",
+      "priceCents": 20000,
+      "summary": "A shared meal package.",
+      "servings": 10,
+      "dietaryCoverage": [
+        "vegetarian"
+      ],
+      "id": "practice-food-servings",
+      "name": "Riverside Kitchen",
+      "details": "Package serves only 10 guests."
+    },
+    {
+      "id": "practice-supplies-good",
+      "scenarioId": "practice",
+      "category": "supplies",
+      "name": "Basic Supplies",
+      "summary": "Event essentials.",
+      "priceCents": 5000,
+      "details": "Complete fixed-price supplies package."
+    },
+    {
+      "id": "practice-supplies-cost",
+      "scenarioId": "practice",
+      "category": "supplies",
+      "name": "Premium Supplies",
+      "summary": "Premium event essentials.",
+      "priceCents": 30000,
+      "details": "Complete fixed-price supplies package. Check the combined venue, catering, and supplies cost against the budget."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "summary": "A welcoming event space.",
+      "capacity": 40,
+      "wheelchairAccessible": true,
+      "id": "A-venue-good",
+      "name": "Willow Conference Hall",
+      "details": "Capacity covers the guest list. Step-free entrance and accessible event room."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "summary": "A welcoming event space.",
+      "capacity": 35,
+      "wheelchairAccessible": true,
+      "id": "A-venue-capacity",
+      "name": "Birch Meeting Room",
+      "details": "Maximum event capacity: 35."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "summary": "A welcoming event space.",
+      "capacity": 40,
+      "wheelchairAccessible": false,
+      "id": "A-venue-access",
+      "name": "Maple Suite",
+      "details": "Event room is upstairs; no lift or step-free route."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "summary": "A shared meal package.",
+      "servings": 40,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-good",
+      "name": "Orchard Catering",
+      "details": "Serves 40; covers vegetarian, gluten-free requirements."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "summary": "A shared meal package.",
+      "servings": 40,
+      "dietaryCoverage": [],
+      "id": "A-food-diet",
+      "name": "Market Table",
+      "details": "Standard menu; the required dietary alternatives are not included."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "summary": "A shared meal package.",
+      "servings": 35,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-servings",
+      "name": "Lakeside Catering",
+      "details": "Package serves only 35 guests."
+    },
+    {
+      "id": "A-supplies-good",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Essentials",
+      "summary": "Event essentials.",
+      "priceCents": 10000,
+      "details": "Complete fixed-price supplies package."
+    },
+    {
+      "id": "A-supplies-cost",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Plus",
+      "summary": "Premium event essentials.",
+      "priceCents": 40000,
+      "details": "Complete fixed-price supplies package. Check the combined venue, catering, and supplies cost against the budget."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "summary": "A welcoming event space.",
+      "capacity": 60,
+      "wheelchairAccessible": true,
+      "id": "B-venue-good",
+      "name": "Harbor Events Hall",
+      "details": "Capacity covers the guest list. Step-free entrance and accessible event room."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "summary": "A welcoming event space.",
+      "capacity": 55,
+      "wheelchairAccessible": true,
+      "id": "B-venue-capacity",
+      "name": "Beacon Room",
+      "details": "Maximum event capacity: 55."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "summary": "A welcoming event space.",
+      "capacity": 60,
+      "wheelchairAccessible": false,
+      "id": "B-venue-access",
+      "name": "Seabreeze Suite",
+      "details": "Event room is upstairs; no lift or step-free route."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 60000,
+      "summary": "A shared meal package.",
+      "servings": 60,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-good",
+      "name": "Coastline Catering",
+      "details": "Serves 60; covers vegan, nut-free requirements."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 60000,
+      "summary": "A shared meal package.",
+      "servings": 60,
+      "dietaryCoverage": [],
+      "id": "B-food-diet",
+      "name": "Bay Table",
+      "details": "Standard menu; the required dietary alternatives are not included."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 60000,
+      "summary": "A shared meal package.",
+      "servings": 55,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-servings",
+      "name": "Pier Kitchen",
+      "details": "Package serves only 55 guests."
+    },
+    {
+      "id": "B-supplies-good",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Celebration Essentials",
+      "summary": "Event essentials.",
+      "priceCents": 10000,
+      "details": "Complete fixed-price supplies package."
+    },
+    {
+      "id": "B-supplies-cost",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Celebration Plus",
+      "summary": "Premium event essentials.",
+      "priceCents": 40000,
+      "details": "Complete fixed-price supplies package. Check the combined venue, catering, and supplies cost against the budget."
+    }
+  ]
+}

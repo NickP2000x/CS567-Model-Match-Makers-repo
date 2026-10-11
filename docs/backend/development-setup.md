@@ -64,8 +64,8 @@ the default.
 | `MODEL_MODE` | `mock` | Only `mock` is accepted until model adapters (#35). Any other value stops startup with a validation error. |
 | `OPENAI_API_KEY` | unset | Server-only secret for optional real calls (#35). Never put it in frontend `VITE_*` variables. |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Non-secret local model address (#35). |
-| `DATABASE_PATH` | `data/model-matchmakers.sqlite3` | Relative to `backend/`. Used from #33; database files are ignored by Git. |
-| `DEV_CONTROLS` | `false` | Development-only sequence selection/reset (#31 draft). |
+| `DATABASE_PATH` | `data/model-matchmakers.sqlite3` | Relative to `backend/`. Created and seeded on first request; database files are ignored by Git. Delete the file to start over with fresh allocation slots. |
+| `DEV_CONTROLS` | `false` | Development only: `POST /api/sessions` accepts `sequenceId`, and `/reset` starts a new session. Such sessions use `dev-…` IDs and never consume the 12 allocation slots. |
 
 ## Troubleshooting
 
