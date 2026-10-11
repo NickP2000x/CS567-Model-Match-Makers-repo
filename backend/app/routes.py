@@ -9,6 +9,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictFloat, StrictInt
 
 from . import catalog, study
+from .agent import AgentContext, AgentFailed
 from .errors import ApiError
 from .store import Store
 
@@ -196,8 +197,41 @@ def confirm_model(request: Request, sid: str, task_id: TaskId, body: ModelBody) 
 
 @router.post("/sessions/{sid}/tasks/{task_id}/messages")
 def send_message(request: Request, sid: str, task_id: TaskId, body: MessageBody) -> dict:
-    return mutate(request, sid, lambda c, s, now: study.send_message(
-        study.planning_task(c, s, task_id, body.checkpoint, now), body.text, now))
+    """Validate under the lock, call the agent without holding it, then save the reply only
+    if the task is still active at the same checkpoint (late replies are discarded)."""
+    current = store(request)
+    agent = request.app.state.agent
+
+    def prepare(connection, state, now):
+        task = study.planning_task(connection, state, task_id, body.checkpoint, now)
+        model = study.message_model(task, body.text)
+        scenario = catalog.get_scenario(connection, task["scenarioId"])
+        context = AgentContext(scenario, task["checkpoint"], task["plan"], study.message_history(task), body.text)
+        return model, context, now
+
+    (model, context, sent_at), _ = current.mutate(sid, prepare)
+    provider, model_name = agent.describe(model)
+
+    def record(calls, shown):
+        current.record_model_calls(sid, task_id, context.checkpoint, model, provider, model_name, calls, shown)
+
+    try:
+        reply = current.read(lambda connection: agent.reply(model, context, connection))
+    except AgentFailed as failure:
+        record(failure.calls, shown=False)
+        raise ApiError(502, "PROVIDER_ERROR", "The AI assistant is unavailable right now. Please try again.") from None
+
+    def commit(connection, state, now):
+        task = study.planning_task(connection, state, task_id, context.checkpoint, now)
+        study.append_exchange(task, body.text, reply.text, model, reply.simulated, sent_at, now)
+
+    try:
+        _, state = current.mutate(sid, commit)
+    except ApiError:
+        record(reply.calls, shown=False)
+        raise
+    record(reply.calls, shown=True)
+    return state
 
 
 @router.post("/sessions/{sid}/tasks/{task_id}/checkpoint/advance")

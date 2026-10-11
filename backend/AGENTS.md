@@ -16,6 +16,9 @@ or override those rules here. Work only on an explicitly selected backend issue
   `mockExperiment.ts`; `app/store.py` loads/saves one JSON state per session in a
   single SQLite transaction; `app/catalog.py` and `app/db.py` hold the seeded catalog
   and schema; `app/definitions.py` holds sequences and provisional materials.
+  `app/models.py` is the OpenAI-compatible small/large client (OpenAI and Ollama),
+  `app/agent.py` the bounded tool-calling planning agent and the mock agent, and
+  `app/smoke_models.py` a manual real-model check.
 - `app/fixtures/*.json` are exported from the frontend mock with
   `node backend/scripts/export_fixtures.mjs`. Rerun it when the frontend catalog,
   survey, preparation, or recommendation definitions change; never edit them by hand.
@@ -33,12 +36,17 @@ or override those rules here. Work only on an explicitly selected backend issue
 - Request models forbid unknown fields (`extra="forbid"`) so malformed requests
   become `400 INVALID_REQUEST`.
 - Prices are integer cents; timestamps are epoch milliseconds from the server clock.
+- Never hold the database transaction during a model call. Validate, release, call,
+  then re-check the task/checkpoint/deadline before saving; discard late replies.
+- The `model_calls` table is research-only (provider, model, tokens, latency, shown).
+  Never return it, provider names, or token counts in participant responses.
 
 ## Configuration and secrets
 
-- The backend must start and pass tests with no `.env` and no keys. Mock mode is
-  the default and, until #35, the only accepted `MODEL_MODE`. Real mode must be an
-  explicit opt-in that fails clearly when misconfigured; never switch silently.
+- The backend must start and pass tests with no `.env` and no keys. Mock mode is the
+  default. `MODEL_MODE=real` is an explicit opt-in that fails at startup when
+  misconfigured; never fall back to mock silently. Tests use scripted clients and a
+  local fake OpenAI-compatible server, never real providers.
 - `OPENAI_API_KEY` is server-only: keep it a `SecretStr`, never return, log, or copy
   it into frontend `VITE_*` variables. `OLLAMA_BASE_URL` and `DATABASE_PATH` are
   non-secret with defaults. Only `backend/.env.example` (placeholders) is committed.

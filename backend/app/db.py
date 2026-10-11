@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS sessions (
   development INTEGER NOT NULL, state TEXT NOT NULL,
   created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
 );
+-- Research record of every real model call (#35/#38). Never served to participants.
+-- `shown` is 0 when the reply was discarded because the task or checkpoint had moved on.
+CREATE TABLE IF NOT EXISTS model_calls (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, task_id TEXT NOT NULL,
+  checkpoint TEXT NOT NULL, size TEXT NOT NULL, provider TEXT NOT NULL, model TEXT NOT NULL,
+  step INTEGER NOT NULL, ok INTEGER NOT NULL, error TEXT, prompt_tokens INTEGER,
+  completion_tokens INTEGER, latency_ms INTEGER NOT NULL, tools TEXT NOT NULL,
+  shown INTEGER NOT NULL, created_at INTEGER NOT NULL
+);
 """
 SLOTS_PER_SEQUENCE = 3
 

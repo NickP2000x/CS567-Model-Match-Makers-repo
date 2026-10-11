@@ -21,9 +21,11 @@ def system_clock() -> int:
 
 
 class Store:
-    def __init__(self, path: Path, clock: Callable[[], int] = system_clock):
+    def __init__(self, path: Path, clock: Callable[[], int] = system_clock, simulated: bool = True):
         self.path = path
         self.clock = clock
+        # New sessions report whether agent replies are simulated (mock mode) or real.
+        self.simulated = simulated
         self._ready = False
         self._lock = threading.Lock()
 
@@ -54,12 +56,12 @@ class Store:
                 ).fetchone()
                 if slot is None:
                     raise ApiError(409, "ALLOCATION_FULL", "All study slots are allocated.")
-                state = new_state(session_id, f"P{slot['slot']:02d}", slot["sequence_id"])
+                state = new_state(session_id, f"P{slot['slot']:02d}", slot["sequence_id"], self.simulated)
                 connection.execute("UPDATE allocation_slots SET session_id = ? WHERE slot = ?",
                                    (session_id, slot["slot"]))
             else:
                 # Development sessions never consume allocation slots.
-                state = new_state(session_id, f"dev-{session_id[:8]}", sequence_id)
+                state = new_state(session_id, f"dev-{session_id[:8]}", sequence_id, self.simulated)
             connection.execute(
                 "INSERT INTO sessions (id, participant_id, sequence_id, development, state, created_at, updated_at)"
                 " VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -87,6 +89,21 @@ class Store:
         if expired is not None:
             raise ApiError(409, "TASK_EXPIRED", "The task deadline has passed.", state=expired)
         return result, state
+
+
+    def record_model_calls(self, session_id: str, task_id: str, checkpoint: str, size: str,
+                           provider: str, model: str, calls: list, shown: bool) -> None:
+        if not calls:
+            return
+        now = self.clock()
+        with db.transaction(self.path) as connection:
+            connection.executemany(
+                "INSERT INTO model_calls (session_id, task_id, checkpoint, size, provider, model, step, ok, error,"
+                " prompt_tokens, completion_tokens, latency_ms, tools, shown, created_at)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [(session_id, task_id, checkpoint, size, provider, model, call.step, int(call.ok), call.error,
+                  call.prompt_tokens, call.completion_tokens, call.latency_ms, json.dumps(call.tools),
+                  int(shown), now) for call in calls])
 
 
 def load(connection: sqlite3.Connection, session_id: str) -> dict:

@@ -11,7 +11,7 @@ import sqlite3
 from . import catalog
 from .definitions import (
     CHECKPOINTS, CURRENT_SURVEY, EXPERIMENTAL_TASK_MS, FEEDBACK_VERSION, PREPARATIONS,
-    RECOMMENDATIONS, SEQUENCES, SURVEY_DIMENSIONS, canned_response,
+    RECOMMENDATIONS, SEQUENCES, SURVEY_DIMENSIONS,
 )
 from .errors import ApiError
 
@@ -31,14 +31,14 @@ def routing_phase(message: str) -> ApiError:
     return ApiError(409, "INVALID_ROUTING_PHASE", message)
 
 
-def new_state(session_id: str, participant_id: str, sequence_id: int) -> dict:
+def new_state(session_id: str, participant_id: str, sequence_id: int, simulated: bool = True) -> dict:
     if sequence_id not in SEQUENCES:
         raise ApiError(400, "INVALID_SEQUENCE", "Choose sequence 1–4.")
     return {
         "sessionId": session_id, "participantId": participant_id, "sequenceId": sequence_id,
         "assignments": copy.deepcopy(list(SEQUENCES[sequence_id])), "step": "consent",
         "consent": None, "demographics": None, "tasks": {}, "preparations": {}, "feedback": None,
-        "simulated": True,
+        "simulated": simulated,
     }
 
 
@@ -213,19 +213,28 @@ def confirm_model(task: dict, model: str, now: int) -> None:
     decision.update(finalModel=model, finalCommittedAt=now, phase="committed")
 
 
-def send_message(task: dict, text: str, now: int) -> None:
+def message_model(task: dict, text: str) -> str:
+    """Validate a participant message and return the stage's locked model."""
     model = task["decisions"][task["checkpoint"]]["finalModel"]
     if not model:
         raise ApiError(409, "MODEL_REQUIRED", "Complete routing before agent work.")
     if not text.strip():
         raise ApiError(400, "EMPTY_MESSAGE", "Enter a message.")
+    return model
+
+
+def message_history(task: dict) -> list[dict]:
+    return [{"role": message["role"], "content": message["text"]} for message in task["messages"]]
+
+
+def append_exchange(task: dict, text: str, reply: str, model: str, simulated: bool, sent_at: int, now: int) -> None:
     index = len(task["messages"])
-    base = {"checkpoint": task["checkpoint"], "createdAt": now}
+    checkpoint = task["checkpoint"]
     task["messages"] += [
-        {"id": f"{task['id']}-message-{index}", "role": "user", "text": text.strip(),
-         "model": None, "simulated": False, **base},
-        {"id": f"{task['id']}-message-{index + 1}", "role": "assistant",
-         "text": canned_response(model, task["checkpoint"]), "model": model, "simulated": True, **base},
+        {"id": f"{task['id']}-message-{index}", "role": "user", "text": text.strip(), "checkpoint": checkpoint,
+         "model": None, "createdAt": sent_at, "simulated": False},
+        {"id": f"{task['id']}-message-{index + 1}", "role": "assistant", "text": reply, "checkpoint": checkpoint,
+         "model": model, "createdAt": now, "simulated": simulated},
     ]
 
 

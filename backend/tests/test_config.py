@@ -24,8 +24,8 @@ def test_api_key_is_never_shown_in_settings_output(monkeypatch):
     assert "sk-test-not-real" not in str(settings.model_dump())
 
 
-def test_real_mode_is_rejected_until_model_adapters_exist(monkeypatch):
-    monkeypatch.setenv("MODEL_MODE", "real")
+def test_unknown_model_mode_is_rejected(monkeypatch):
+    monkeypatch.setenv("MODEL_MODE", "live")
     with pytest.raises(ValidationError):
         isolated_settings()
 
@@ -54,3 +54,32 @@ def test_copied_env_example_keeps_mock_defaults(monkeypatch):
     assert settings.openai_api_key is None
     assert settings.dev_controls is False
     assert settings.resolved_database_path == BACKEND_DIR / "data" / "model-matchmakers.sqlite3"
+
+
+def test_real_mode_with_openai_model_requires_a_key(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with pytest.raises(ValidationError, match="OPENAI_API_KEY"):
+        isolated_settings(model_mode="real")
+    settings = isolated_settings(model_mode="real", openai_api_key="sk-test-not-real")
+    assert settings.model_mode == "real" and settings.large_model == "openai:gpt-4-turbo"
+
+
+def test_real_mode_with_only_ollama_needs_no_key(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    settings = isolated_settings(model_mode="real", small_model="ollama:mixtral:8x7b",
+                                 large_model="ollama:llama3.1:70b")
+    assert settings.openai_api_key is None
+
+
+def test_model_specs_are_validated():
+    from app.config import parse_model_spec
+
+    assert parse_model_spec("ollama:mixtral:8x7b") == ("ollama", "mixtral:8x7b")
+    assert parse_model_spec(" openai:gpt-4-turbo ") == ("openai", "gpt-4-turbo")
+    for bad in ("gpt-4", "anthropic:x", "openai:", ""):
+        with pytest.raises(ValueError):
+            parse_model_spec(bad)
+    with pytest.raises(ValidationError):
+        isolated_settings(model_mode="real", small_model="mixtral", openai_api_key="k")
+    with pytest.raises(ValidationError):
+        isolated_settings(agent_max_steps=0)
