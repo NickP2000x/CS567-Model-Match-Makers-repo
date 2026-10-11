@@ -1,5 +1,9 @@
 # Issue #51 refinements and #22 verification handoff
 
+The completed #22 smoke pass is recorded in
+[`prototype-smoke-checks.md`](prototype-smoke-checks.md), including actual coverage
+and remaining platform/researcher decisions. The #51 results below remain historical.
+
 ## Current presentation
 
 Consent (Model Matchmakers branding) → Demographics → Before you start →

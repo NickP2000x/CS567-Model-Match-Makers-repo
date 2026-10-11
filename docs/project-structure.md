@@ -41,6 +41,7 @@ scripts/
 docs/
   project-structure.md     Repository boundaries
   experiment-service-contract.md Shared frontend/backend contract and decisions
+  experiment-api-http-draft.md   #31 HTTP mapping proposal for that contract
   frontend/
     development-setup.md   Frontend installation and preview instructions
     introduction-verification.md Introduction checks and recorded results
@@ -49,6 +50,7 @@ docs/
     workload-verification.md Survey/scoring checks and #16 integration handoff
     study-flow-verification.md Complete flow/results and #22 handoff
     study-refinements-verification.md #51 gates/visual guide/scale/feedback and #22 handoff
+    prototype-smoke-checks.md Final #22 checklist, results, and coverage boundaries
   backend/
     README.md              Backend work/documentation handoff
     development-setup.md   Python environment, mock-mode startup, and configuration
