@@ -275,6 +275,8 @@ only its survey can be submitted, advancing from `tlx-2` to `feedback`. Optional
 - Confirm IDs, task linkage, cents/millisecond units, and method/error shapes.
 - Agree how network payloads map to the service, including session creation and
   subscriptions/refresh. These are not endpoints specified by this frontend draft.
+  The backend HTTP proposal for this review is
+  [`experiment-api-http-draft.md`](experiment-api-http-draft.md).
 - Agree authoritative requirements-visible/deadline and late-response behavior;
   the mock has no autonomous timeout trigger or server enforcement.
 - Review catalog/feedback policy and all provisional materials above. NASA-TLX
