@@ -278,6 +278,11 @@ def finish_task(request: Request, sid: str, task_id: TaskId, body: FinishBody | 
     return mutate(request, sid, lambda c, s, now: study.finish_task(c, s, task_id, reason, now))
 
 
+@router.post("/sessions/{sid}/tasks/{task_id}/reopen")
+def reopen_task(request: Request, sid: str, task_id: SurveyTaskId) -> dict:
+    return mutate(request, sid, lambda c, s, now: study.reopen_task(s, task_id, now))
+
+
 # --- Surveys and feedback ---------------------------------------------------------
 
 @router.put("/sessions/{sid}/surveys/{task_id}")

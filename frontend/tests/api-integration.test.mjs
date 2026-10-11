@@ -68,6 +68,10 @@ for (const sequenceId of [1, 2, 3, 4]) {
       assert.equal(service.getSnapshot().tasks[taskId].messages.length, 8);
       await service.finishTask();
       assert.equal(service.getSnapshot().step, surveyStep);
+      await service.reopenTask(taskId); // provisional Back to Task, then submit again
+      assert.equal(service.getSnapshot().step, taskId);
+      await service.finishTask();
+      assert.equal(service.getSnapshot().tasks[taskId].reopens.length, 1);
       await service.saveSurveyAnswers(taskId, Object.fromEntries(surveyDimensions.map(key => [key, 50])));
       await service.submitSurvey(taskId);
       assert.equal(service.getSnapshot().tasks[taskId].survey.rawScore, 50);

@@ -232,6 +232,17 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     finishTask: (reason = 'submitted') => run(draft => {
       endTask(draft, active(draft), reason, now());
     }, 'termination'),
+    // Provisional: return from the ratings page to a submitted task before rating it.
+    // The original deadline still applies; timed-out or rated tasks cannot be reopened.
+    reopenTask: id => run(draft => {
+      const task = draft.tasks[id];
+      if (!task || id === 'practice' || draft.step !== (id === 'task-1' ? 'tlx-1' : 'tlx-2')
+        || task.status !== 'submitted' || task.survey.submittedAt !== null) fail('INVALID_STEP', 'This task cannot be reopened.');
+      const at = now();
+      if (task.deadline !== null && at >= task.deadline) fail('TASK_EXPIRED', 'Time is up; this task can no longer be reopened.');
+      task.reopens = [...(task.reopens ?? []), { endedAt: task.endedAt!, reopenedAt: at }];
+      task.status = 'active'; task.endedAt = null; draft.step = id;
+    }),
     saveSurveyAnswers: (id, answers) => run(draft => {
       const task = draft.tasks[id];
       if (!task || id === 'practice' || task.status === 'active' || task.survey.submittedAt !== null

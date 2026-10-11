@@ -166,6 +166,9 @@ export async function createApiExperimentService(options: ApiExperimentOptions):
       if (!PLANNING_STEPS.includes(state.step)) return fail('NO_ACTIVE_TASK', 'Start an active planning task first.');
       return mutate('POST', `/tasks/${state.step}/finish`, { reason });
     },
+    reopenTask: taskId => taskId === 'practice'
+      ? fail('INVALID_STEP', 'This task cannot be reopened.')
+      : mutate('POST', `/tasks/${taskId}/reopen`),
     saveSurveyAnswers: (taskId, answers) => taskId === 'practice'
       ? fail('INVALID_SURVEY', 'Survey is unavailable for this task.')
       : mutate('PUT', `/surveys/${taskId}`, { answers }),

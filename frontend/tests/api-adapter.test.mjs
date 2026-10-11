@@ -159,6 +159,18 @@ test('a server failure without a JSON body still reports a typed error', async (
   assert.equal(service.getSnapshot().step, 'consent');
 });
 
+test('back to task calls the reopen route; practice is refused locally', async () => {
+  const { fetch, calls } = scriptedFetch({
+    'POST /api/sessions': [[201, serverState({ step: 'tlx-1', tasks: { 'task-1': { ...activeTask(), status: 'submitted', endedAt: 5 } } })]],
+    'POST /api/sessions/s1/tasks/task-1/reopen': [[200, serverState({ step: 'task-1', tasks: { 'task-1': activeTask() } })]],
+  });
+  const service = await createApiExperimentService({ ...base, fetch, storage: memoryStorage() });
+  await assert.rejects(service.reopenTask('practice'), { code: 'INVALID_STEP' });
+  await service.reopenTask('task-1');
+  assert.equal(calls.length, 2);
+  assert.equal(service.getSnapshot().step, 'task-1');
+});
+
 test('development reset switches to the new session', async () => {
   const storage = memoryStorage();
   const { fetch, calls } = scriptedFetch({

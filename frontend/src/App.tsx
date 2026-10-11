@@ -109,6 +109,15 @@ export function App({ service }: { service: ExperimentService }) {
         {surveyTask && (
           <>
             <p role="status">{state.tasks[surveyTask]?.status === 'timed-out' ? 'Time is up. Your current work was preserved.' : 'Your current plan was submitted.'} Please rate the task you just completed.</p>
+            {state.tasks[surveyTask]?.status === 'submitted' && (
+              <div className="actions">
+                <button type="button" className="secondary" disabled={pending}
+                  onClick={() => { void perform(() => service.reopenTask(surveyTask)); }}>
+                  Back to Task {surveyTask === 'task-1' ? '1' : '2'}
+                </button>
+                <p className="field-help">You can return until the task's 15-minute limit ends; the timer keeps running. Provisional option pending researcher approval.</p>
+              </div>
+            )}
             <WorkloadSurvey key={surveyTask} service={service} taskId={surveyTask} pending={pending} perform={perform} />
           </>
         )}

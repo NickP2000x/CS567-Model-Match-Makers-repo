@@ -274,3 +274,25 @@ substitute for IRB approval.
 - **Materials:** consent, demographics, practice treatment, catalog values, live
   constraint feedback, adapted NASA-TLX, feedback prompts, and the before-start
   "refreshing restarts" acknowledgement (true only in mock mode).
+
+## Back to Task from the ratings page (provisional)
+
+Requested during review: after Submit Plan, a "Back to Task N" button on the ratings page
+reopens the submitted task. It is a change to the study rule that submission is final, so
+it is marked provisional pending researcher approval (root `AGENTS.md`).
+
+- Allowed only for a submitted experimental task whose ratings are not yet submitted and
+  whose original deadline has not passed. The deadline and timer are unchanged; plan,
+  decisions, messages, and partial ratings are kept; each return is recorded in
+  `task.reopens` and counted by `python -m app.records`.
+- Same rule in the frontend mock (`reopenTask`) and the backend
+  (`POST /api/sessions/{sid}/tasks/{taskId}/reopen`).
+
+### Recorded results — 2026-10-10
+
+- Backend: 93 tests passed (3 new). Frontend: 49 passed with 6 skipped by default (3 new),
+  and 55 passed against a live mock-mode backend (the four-sequence runs now go back to
+  each task once and submit again).
+- Headless browser, production build: Submit Task 1 → ratings showed "Back to Task 1" →
+  Task 1 returned with the timer running and the plan item and stage model kept →
+  Submit Plan → ratings → Task 2 preparation; the backend recorded one return. No errors.

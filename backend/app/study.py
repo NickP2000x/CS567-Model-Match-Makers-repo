@@ -155,6 +155,20 @@ def finish_task(connection: sqlite3.Connection, state: dict, task_id: str, reaso
     end_task(connection, state, active_task(state, task_id), reason, now)
 
 
+def reopen_task(state: dict, task_id: str, now: int) -> None:
+    """Provisional: return from the ratings page to a submitted task before rating it.
+    The original deadline still applies; timed-out or already rated tasks cannot reopen."""
+    task = state["tasks"].get(task_id)
+    if (task is None or task_id == "practice" or state["step"] != SURVEY_STEP.get(task_id)
+            or task["status"] != "submitted" or task["survey"]["submittedAt"] is not None):
+        raise invalid_step("This task cannot be reopened.")
+    if task["deadline"] is not None and now >= task["deadline"]:
+        raise ApiError(409, "TASK_EXPIRED", "Time is up; this task can no longer be reopened.")
+    task.setdefault("reopens", []).append({"endedAt": task["endedAt"], "reopenedAt": now})
+    task["status"], task["endedAt"] = "active", None
+    state["step"] = task_id
+
+
 def inspect_item(connection: sqlite3.Connection, task: dict, item_id: str) -> dict:
     item = catalog.get_item(connection, item_id)
     if item is None or item["scenarioId"] != task["scenarioId"]:
