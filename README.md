@@ -6,6 +6,9 @@ override of router recommendations during an event-planning task. This prototype
 uses simulated router and model behavior and synthetic information only; it is
 not ready for real participant data collection.
 
+**Quick start:** see [RUNNING.md](RUNNING.md) for a short guide to running the
+frontend and backend, including native Windows steps.
+
 ## Run the frontend
 
 Run these commands from the repository root:
