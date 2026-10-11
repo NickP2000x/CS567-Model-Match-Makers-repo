@@ -7,3 +7,8 @@ coverage/
 !.env.example
 *.tsbuildinfo
 .DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+*.sqlite3
+*.sqlite3-*
