@@ -69,7 +69,7 @@ Windows PowerShell still uses the separate instructions in `RUNNING.md`.
 ## Recorded verification — 2026-10-24
 
 - `bash -n` passed for both scripts.
-- Final frontend suite: 74 passed, with six API tests skipped in the offline run;
+- Final frontend suite: 75 passed, with six API tests skipped in the offline run;
   those six had passed separately against the isolated backend. Type-check/build
   and all 95 backend tests also passed during #65 verification.
 - Setup/launcher focused tests passed: missing prerequisites, create/reuse Python
@@ -103,6 +103,12 @@ Windows PowerShell still uses the separate instructions in `RUNNING.md`.
   Linux wall-clock identity with boot ID/kernel start ticks and added a regression
   that changes the apparent `ps` time while stop remains valid. All 17 launcher
   checks passed, including simulated macOS paths.
+- PR CI exposed a frontend-pane shutdown failure not seen in the local checks.
+  Added an explicit exited-but-unreaped (zombie) process regression: `kill -0`
+  succeeds for a zombie, so readiness/monitor/stop checks now inspect process state
+  rather than treating that PID as a running server. The tmux shutdown assertion
+  allows the full bounded cleanup interval and captures pane diagnostics on failure.
+  The launcher suite now has 18 checks.
 - Browser fixtures/tooling and clean-install dependencies remained under temporary
   storage outside the repository. Existing developer dependencies/configuration/
   database were not changed by these checks.

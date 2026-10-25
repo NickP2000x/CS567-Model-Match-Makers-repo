@@ -158,7 +158,7 @@ backend_pid=$!
 ready=false
 deadline=$((SECONDS + 10#$START_TIMEOUT))
 while [ "$SECONDS" -lt "$deadline" ]; do
-  if ! kill -0 "$backend_pid" 2>/dev/null; then
+  if ! mm_process_running "$backend_pid"; then
     printf 'Backend stopped during startup. Check its error output above.\n' >&2
     exit 1
   fi
@@ -201,7 +201,7 @@ else
 fi
 
 printf '\nOpen http://localhost:%s\nAPI docs: http://127.0.0.1:%s/api/docs\nDevelopment sessions enabled. Both servers log here; press Ctrl+C to stop both.\nOr run bash scripts/stop.sh from another terminal.\n' "$FRONTEND_PORT" "$BACKEND_PORT"
-while kill -0 "$backend_pid" 2>/dev/null && kill -0 "$frontend_pid" 2>/dev/null; do
+while mm_process_running "$backend_pid" && mm_process_running "$frontend_pid"; do
   sleep 1
 done
 printf 'A server exited; stopping the other server. Check the output above.\n' >&2

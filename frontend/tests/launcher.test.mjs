@@ -117,13 +117,25 @@ function assertStopped(f) {
   }
 }
 
-async function waitFor(check, detail) {
-  for (let i = 0; i < 100; i++) {
+async function waitFor(check, detail, timeout = 10000) {
+  const deadline = performance.now() + timeout;
+  while (performance.now() < deadline) {
     if (await check()) return;
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   assert.fail(detail());
 }
+
+test('Linux exited-but-unreaped process is not treated as a running server', { skip: skip || (process.platform !== 'linux' && 'Linux zombie regression'), timeout: 10000 }, async t => {
+  const parent = spawn(python.stdout.trim(), ['-u', '-c', 'import signal,subprocess,sys,time; child=subprocess.Popen([sys.executable,"-c","pass"]); signal.signal(signal.SIGTERM,lambda *args:(child.wait(),sys.exit(0))); print(child.pid,flush=True); time.sleep(30)']);
+  const exited = new Promise(resolve => parent.on('exit', resolve));
+  t.after(async () => { parent.kill(); await exited; });
+  const pid = await new Promise(resolve => parent.stdout.once('data', chunk => resolve(Number(String(chunk).trim()))));
+  await waitFor(() => readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].startsWith('Z '), () => 'child did not become a zombie');
+  assert.doesNotThrow(() => process.kill(pid, 0));
+  const result = spawnSync('/bin/bash', ['-c', 'source "$1"; mm_process_running "$2"', 'check', new URL('process-identity.sh', scripts).pathname, String(pid)]);
+  assert.equal(result.status, 1, result.stderr.toString());
+});
 
 test('combined launcher explains missing prerequisites without starting services', { skip, timeout: 15000 }, async t => {
   for (const options of [{ environment: false }, { frontend: false }]) {
@@ -304,7 +316,7 @@ test('Linux stop remains valid when wall-clock ps timestamps change', { skip: sk
 
 const tmuxAvailable = spawnSync('tmux', ['-V']).status === 0;
 for (const action of ['stop command', 'frontend Ctrl+C', 'backend Ctrl+C']) {
-  test(`tmux uses two panes and shuts down the pair with ${action}`, { skip: skip || (!tmuxAvailable && 'tmux is not installed'), timeout: 25000 }, async t => {
+  test(`tmux uses two panes and shuts down the pair with ${action}`, { skip: skip || (!tmuxAvailable && 'tmux is not installed'), timeout: 35000 }, async t => {
     const f = await fixture();
     const run = launch(f, t, ['--tmux']);
     assert.equal((await run.exited).code, 0, run.output());
@@ -324,7 +336,11 @@ for (const action of ['stop command', 'frontend Ctrl+C', 'backend Ctrl+C']) {
       const pane = action === 'frontend Ctrl+C' ? 1 : 0;
       assert.equal(tmux(['send-keys', '-t', `${session}:0.${pane}`, 'C-c']).status, 0);
     }
-    await waitFor(() => tmux(['has-session', '-t', session]).status !== 0, () => 'tmux session survived shutdown');
+    await waitFor(() => tmux(['has-session', '-t', session]).status !== 0,
+      () => 'tmux session survived shutdown:\n' + tmux(['capture-pane', '-p', '-t', `${session}:0.0`]).stdout
+        + '\nFrontend:\n' + tmux(['capture-pane', '-p', '-t', `${session}:0.1`]).stdout
+        + '\nPanes:\n' + tmux(['list-panes', '-t', `${session}:0`, '-F', '#{pane_pid} #{pane_dead} #{pane_current_command}']).stdout,
+      20000);
     assertStopped(f);
   });
 }

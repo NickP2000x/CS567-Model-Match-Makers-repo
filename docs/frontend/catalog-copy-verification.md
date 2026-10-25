@@ -57,7 +57,7 @@ records retain their saved wording/version. Research notices remain provisional.
 Verified 2026-10-24 on the #65 working branch, WSL Linux, project-local Node
 24.14.0/npm 11.9.0, Python 3.12, headless Chromium 156:
 
-- Frontend strict type-check and production build passed. All 74 offline tests
+- Frontend strict type-check and production build passed. All 75 offline tests
   passed; the six opt-in API tests were initially skipped as expected, then all six
   passed separately with `MM_API_URL` pointing to an isolated mock backend.
   The final offline count includes the subsequent

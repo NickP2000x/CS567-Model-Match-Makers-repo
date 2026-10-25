@@ -39,7 +39,7 @@ printf 'Stopping this checkout’s frontend and backend…\n'
 kill -TERM "$pid" 2>/dev/null || true
 deadline=$((SECONDS + 15))
 while [ "$SECONDS" -lt "$deadline" ]; do
-  if [ "$(process_start "$pid")" != "$started" ]; then
+  if ! mm_process_running "$pid" || [ "$(process_start "$pid")" != "$started" ]; then
     printf 'Project launcher stopped.\n'
     exit 0
   fi
