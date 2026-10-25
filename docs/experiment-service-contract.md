@@ -64,14 +64,14 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 
 | Topic | Current mock choice | Researcher decision |
 |---|---|---|
-| Consent | #5 shows draft demo-only consent; accept advances, decline leaves a stop message on the consent step | Approved consent wording, risks, withdrawal/data-handling and exit copy |
+| Consent | Draft demo-only consent; accept advances, decline leaves a stop message. #65 describes assistance and persistence using the active service mode, including server records and configured AI services in real mode | Approved consent wording, risks, withdrawal/data-handling and exit copy |
 | Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
 | Practice | #7 uses a separate untimed lunch scenario; fixed simulated small model for each stage, no router recommendation or survey | Practice treatment/instructions |
-| Catalog | Fictional packages; feasible totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
+| Catalog | #65 catalog-v2: 8 practice options; 18 each for A/B (6 per category), multiple feasible plans and detail-only distractors. Original reference totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
 | Live constraint feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
 | Routing | Fixed stage fixtures, identical across A/B; simulated reasons | Recommendation balance/reasons; future router threshold |
 | NASA-TLX | #51 uses provisional adapted v2, five labelled choices at 0/25/50/75/100; performance Completely successful → Not successful, higher means more workload. Retain labels/raw answers/orientation/version/mean; v1 retained for earlier records. | Adaptation validity, wording, anchors, increments, orientation and approval |
-| Preparation | Before-start refresh/synthetic reminders and untimed/excluded practice or 15-minute/no-refresh/submit-anytime task acknowledgements; explicit Start gates | Wording/requiredness; acknowledgements are not proof of reading |
+| Preparation | Before-start v2 refresh/synthetic reminders warn that unsent work may be lost, without claiming every mode restarts; untimed/excluded practice or 15-minute/no-refresh/submit-anytime task acknowledgements; explicit Start gates | Wording/requiredness; acknowledgements are not proof of reading |
 | Optional feedback | Two final interface/study comment boxes; both may be blank, stored separately from workload | Prompt wording, use/retention policy and researcher approval |
 
 The #51 visual guide retains a standalone fictional $290 plan (a $90 venue, $160 meal,
@@ -97,6 +97,24 @@ exceeds it when combined with the reference venue and catering. Budget is theref
 a combined-plan check, not a concealed price. This presentation and the live
 constraint feedback remain provisional for researcher review. Practice/A/B now use
 distinct fictional vendor labels, with stable item IDs and unchanged feasible totals.
+
+### #65 catalog and mode-aware copy
+
+Catalog-v2 keeps all original item IDs, prices, capacities, dietary/serving facts,
+and accessibility flags. A/B each add three venues, three catering options, and
+four supplies packages; practice remains at eight options. Additional researcher-only
+reference plans total $625/$890 for A and $1,025/$1,290 for B. The matched option
+and distractor structures do not establish equal difficulty; pilot evaluation is
+still required. There are still exactly four constraints. Supplies are optional
+and affect only budget; availability, distance, and equipment are not requirements.
+
+Frontend copy distinguishes `simulated`, `routerSimulated`, and
+`refreshRestartsDemo`: a backend may persist simulated replies or use live models,
+and routing can be simulated independently of agent replies. No provider/model
+identities are disclosed by these notices. The shared before-start v2 reminder is
+mode-neutral, so the statement recorded by frontend and backend stays identical.
+Previously saved acknowledgement wording/version remains in its session record.
+These changes do not approve consent or add demographic questions.
 
 ## Workspace behavior in #7
 

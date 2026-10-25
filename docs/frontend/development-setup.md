@@ -123,8 +123,26 @@ optional feedback and #22 checks, see
 [`study-refinements-verification.md`](study-refinements-verification.md).
 For the final #22 demonstration checklist, actual results, untested platforms and
 provisional decisions, see [`prototype-smoke-checks.md`](prototype-smoke-checks.md).
+For #65's expanded catalog, mode-aware copy, and focused checks, see
+[`catalog-copy-verification.md`](catalog-copy-verification.md).
 
 ## Backend (API) mode
+
+After frontend setup and backend virtual-environment/dependency setup, WSL/Linux/macOS
+users can run `bash scripts/run.sh` from the root to start both servers in one
+terminal. It waits for backend readiness, connects Vite to the API, enables
+development sessions, and stops its server process groups on Ctrl+C. Existing
+backend configuration is used; Windows Ollama must already be running when needed.
+Add `--tmux` for separate backend/frontend log panes (tmux must be installed).
+`bash scripts/stop.sh` stops either launch mode from another terminal using its
+recorded process identity; it does not stop manually launched servers or Ollama.
+See [the running guide](../../RUNNING.md#one-command-start-macos--linux--wsl2)
+for port and startup-timeout overrides. The separate-terminal commands remain below.
+Alternatively, `bash scripts/setup-all.sh` performs both components' initial setup;
+add `--routellm` for the optional router dependencies, or `--check` to verify an
+existing setup without installs. Python 3.12 must already be available. See
+[launcher/setup verification](launcher-setup-verification.md) for results and
+platform coverage.
 
 By default the frontend uses the in-memory mock and needs no backend. To run it
 against the backend instead (#39), start the backend first (see

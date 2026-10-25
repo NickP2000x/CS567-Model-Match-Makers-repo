@@ -30,13 +30,14 @@ function executable(path, content) {
 // Each test owns a tiny isolated repository; it never changes real Node or npm.
 function project(overrides = {}, native = true) {
   const root = mkdtempSync(join(tmpdir(), 'model-matchmakers setup '));
-  for (const dir of ['scripts', 'frontend/node_modules', 'bin']) {
+  for (const dir of ['scripts', 'frontend/node_modules/vite/bin', 'backend', 'bin']) {
     mkdirSync(join(root, dir), { recursive: true });
   }
-  for (const name of ['runtime.sh', 'setup.sh', 'frontend.sh']) {
+  for (const name of ['runtime.sh', 'setup.sh', 'frontend.sh', 'setup-all.sh']) {
     writeFileSync(join(root, 'scripts', name), readFileSync(join(sourceDir, name)));
   }
   writeFileSync(join(root, 'frontend/.nvmrc'), '24.14.0\n');
+  writeFileSync(join(root, 'frontend/node_modules/vite/bin/vite.js'), '// dependency fixture\n');
   const env = {
     ...process.env,
     PATH: `${join(root, 'bin')}:/usr/bin:/bin`,
@@ -190,4 +191,113 @@ test('launcher never downloads Node automatically', () => {
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Run bash scripts\/setup\.sh/);
   assert.equal(existsSync(join(fixture.root, '.tools')), false);
+});
+
+function backendPython(fixture, existing = false) {
+  fixture.env.TEST_PYTHON_VERSION = 'Python 3.12.15';
+  fixture.env.TEST_PIP_LOG = join(fixture.root, 'pip-calls.txt');
+  fixture.env.TEST_VENV_LOG = join(fixture.root, 'venv-calls.txt');
+  const script = `#!/bin/bash
+if [ "$1" = -I ]; then shift; fi
+case "$1" in
+  --version) printf '%s\\n' "$TEST_PYTHON_VERSION" ;;
+  -m)
+    shift
+    case "$1" in
+      venv)
+        shift
+        printf 'create\\n' >> "$TEST_VENV_LOG"
+        mkdir -p "$1/bin"
+        cp "$0" "$1/bin/python"
+        ;;
+      pip)
+        shift
+        printf '%s\\n' "$*" >> "$TEST_PIP_LOG"
+        if [ "$1" = install ] && [ "$TEST_INSTALL_FAILURE" = true ]; then exit 17; fi
+        ;;
+    esac ;;
+  -)
+    if [ "$TEST_IMPORT_FAILURE" = true ]; then
+      printf 'Missing backend packages: routellm\\n' >&2
+      exit 1
+    fi ;;
+esac
+`;
+  executable(join(fixture.root, 'bin/python3.12'), script);
+  if (existing) {
+    mkdirSync(join(fixture.root, 'backend/.venv/bin'), { recursive: true });
+    executable(join(fixture.root, 'backend/.venv/bin/python'), script);
+  }
+}
+
+test('full setup reuses frontend setup, creates backend once, and installs pinned requirements', () => {
+  const f = project();
+  backendPython(f);
+  const first = run(f, 'setup-all.sh', []);
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(readFileSync(f.env.TEST_VENV_LOG, 'utf8'), 'create\n');
+  assert.match(readFileSync(f.env.TEST_NPM_LOG, 'utf8'), /ci\nrun build/);
+  assert.deepEqual(readFileSync(f.env.TEST_PIP_LOG, 'utf8').trim().split('\n'), [
+    `install -r ${join(f.root, 'backend/requirements-dev.txt')}`, 'check',
+  ]);
+  assert.match(first.stdout, /Next: bash scripts\/run.sh/);
+  const second = run(f, 'setup-all.sh', ['--routellm']);
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(readFileSync(f.env.TEST_VENV_LOG, 'utf8'), 'create\n');
+  assert.match(readFileSync(f.env.TEST_PIP_LOG, 'utf8'), /requirements-routellm\.txt/);
+});
+
+test('full setup check performs no installs and reports missing backend or router dependencies', () => {
+  const absent = project();
+  const missing = run(absent, 'setup-all.sh', ['--check']);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stderr, /Backend environment is missing/);
+  const f = project();
+  backendPython(f, true);
+  const check = run(f, 'setup-all.sh', ['--check', '--routellm']);
+  assert.equal(check.status, 0, check.stderr);
+  assert.equal(existsSync(f.env.TEST_NPM_LOG), false);
+  assert.equal(existsSync(f.env.TEST_VENV_LOG), false);
+  assert.equal(readFileSync(f.env.TEST_PIP_LOG, 'utf8'), 'check\n');
+  f.env.TEST_IMPORT_FAILURE = 'true';
+  const imports = run(f, 'setup-all.sh', ['--check', '--routellm']);
+  assert.equal(imports.status, 1);
+  assert.match(imports.stderr, /Missing backend packages/);
+});
+
+test('full setup preserves incomplete/incompatible environments and propagates install failures', () => {
+  const broken = project();
+  mkdirSync(join(broken.root, 'backend/.venv'));
+  const incomplete = run(broken, 'setup-all.sh', []);
+  assert.equal(incomplete.status, 1);
+  assert.match(incomplete.stderr, /incomplete/);
+  assert.equal(existsSync(broken.env.TEST_NPM_LOG), false);
+  const f = project();
+  backendPython(f, true);
+  f.env.TEST_PYTHON_VERSION = 'Python 3.11.0';
+  const incompatible = run(f, 'setup-all.sh', []);
+  assert.equal(incompatible.status, 1);
+  assert.match(incompatible.stderr, /requires Python 3.12/);
+  assert.equal(existsSync(f.env.TEST_NPM_LOG), false);
+  f.env.TEST_PYTHON_VERSION = 'Python 3.12.15';
+  f.env.TEST_INSTALL_FAILURE = 'true';
+  const failed = run(f, 'setup-all.sh', []);
+  assert.equal(failed.status, 17);
+  assert.doesNotMatch(failed.stdout, /setup checks passed/);
+});
+
+test('full setup supports simulated Ubuntu, WSL2, and macOS Intel/Apple Silicon paths', () => {
+  for (const overrides of [
+    { TEST_SYSTEM: 'Linux', TEST_RELEASE: '6.8.0-generic' },
+    { TEST_SYSTEM: 'Linux', TEST_RELEASE: 'microsoft-standard-WSL2' },
+    { TEST_SYSTEM: 'Darwin', TEST_ARCH: 'x86_64', TEST_NODE_OS: 'darwin' },
+    { TEST_SYSTEM: 'Darwin', TEST_ARCH: 'arm64', TEST_NODE_OS: 'darwin' },
+  ]) {
+    const f = project(overrides);
+    backendPython(f);
+    const result = run(f, 'setup-all.sh', ['--routellm']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /setup checks passed/);
+    assert.match(readFileSync(f.env.TEST_PIP_LOG, 'utf8'), /requirements-routellm\.txt/);
+  }
 });

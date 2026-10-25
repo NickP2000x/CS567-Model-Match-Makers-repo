@@ -1,5 +1,6 @@
 import json
 import sqlite3
+import sys
 
 import pytest
 from pydantic import ValidationError
@@ -57,6 +58,8 @@ def test_router_failures_never_fall_back(bad):
 
 def test_missing_routellm_package_gives_an_install_hint(monkeypatch):
     monkeypatch.setattr(router_module.os, "environ", {})
+    # Simulate absence even on developer machines with the optional package installed.
+    monkeypatch.setitem(sys.modules, "routellm.controller", None)
     with pytest.raises(RuntimeError, match="requirements-routellm.txt"):
         load_routellm_scorer("bert", None)
     assert router_module.os.environ["OPENAI_API_KEY"] == "not-used-by-this-router"

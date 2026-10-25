@@ -41,7 +41,7 @@ test('all catalogs have feasible plans and detail-only violations; summaries omi
     await intro(service);
     if (scenarioId !== 'practice') { await service.finishTask(); await startTask(service); }
     const summaries = await service.searchCatalog(scenarioId, '', 'venue');
-    assert.equal(summaries.length, 3);
+    assert.equal(summaries.length, scenarioId === 'practice' ? 3 : 6);
     assert.equal('wheelchairAccessible' in summaries[0], false);
     assert.equal('details' in summaries[0], false);
     const hidden = await service.inspectItem(`${scenarioId}-venue-access`);
@@ -283,8 +283,8 @@ test('practice and experimental catalogs have distinct vendor labels and service
   const catalogs = await Promise.all(['practice', 'A', 'B'].map(id => service.searchCatalog(id)));
   const names = catalogs.flatMap(items => items.map(item => item.name));
   assert.equal(new Set(names).size, names.length);
-  for (const items of catalogs) {
-    assert.equal(items.length, 8);
+  for (const [index, items] of catalogs.entries()) {
+    assert.equal(items.length, index === 0 ? 8 : 18);
     assert.deepEqual(new Set(items.map(item => item.category)), new Set(['venue', 'catering', 'supplies']));
     assert.ok(items.every(item => !('details' in item) && !('capacity' in item) && !('dietaryCoverage' in item)));
   }

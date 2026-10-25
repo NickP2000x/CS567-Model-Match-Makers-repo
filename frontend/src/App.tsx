@@ -80,7 +80,7 @@ export function App({ service }: { service: ExperimentService }) {
 
   return (
     <main className={planning ? 'planning-page' : undefined}>
-      <p className="prototype-label">Provisional demonstration · Simulated AI · Use invented information</p>
+      <p className="prototype-label">Provisional demonstration · {state.simulated ? 'Simulated AI assistance' : 'Live AI assistance'} · {state.routerSimulated !== false ? 'Simulated routing' : 'Live routing'} · Use invented information</p>
       {state.step === 'consent' ? <>
         <h1>Model Matchmakers</h1><h2 id="screen-title" ref={title} tabIndex={-1}>{heading}</h2>
       </> : <>
@@ -90,7 +90,8 @@ export function App({ service }: { service: ExperimentService }) {
       <section aria-labelledby="screen-title" aria-busy={pending}>
         {actionError && <p role="alert" className="error-message">{actionError}</p>}
         {state.step === 'consent' && (
-          <Consent declined={state.consent === false} pending={pending}
+          <Consent declined={state.consent === false} pending={pending} simulated={state.simulated}
+            refreshRestartsDemo={state.refreshRestartsDemo}
             onDecision={accepted => { void perform(() => service.recordConsent(accepted)); }} />
         )}
         {state.step === 'demographics' && (
@@ -100,7 +101,7 @@ export function App({ service }: { service: ExperimentService }) {
         {preparationId && <Preparation key={preparationId} id={preparationId} pending={pending}
           onContinue={ids => { void perform(() => service.confirmPreparation(preparationId, ids)); }} />}
         {state.step === 'tutorial' && preparationId === null && (
-          <Tutorial pending={pending} onContinue={() => { void perform(() => service.completeTutorial()); }} />
+          <Tutorial pending={pending} simulated={state.simulated} onContinue={() => { void perform(() => service.completeTutorial()); }} />
         )}
         {planning && (
           <PlanningWorkspace key={state.step} service={service} taskId={state.step as TaskId}

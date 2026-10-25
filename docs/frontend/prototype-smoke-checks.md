@@ -1,5 +1,9 @@
 # Issue #22 — final prototype smoke checks
 
+For the subsequent #65 catalog expansion and mode-aware participant copy, see
+[catalog/copy verification](catalog-copy-verification.md). The #22 results below
+are historical standalone-mock checks, not verification of later changes.
+
 Baseline: merged #51 / Git safeguards, commit `3c7a64a`. Verified 2026-10-10.
 Outcome: **the standalone simulated frontend passed the scoped demonstration
 checks below**. No essential application defect was found during this pass.

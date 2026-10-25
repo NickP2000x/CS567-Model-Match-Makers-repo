@@ -47,7 +47,7 @@ export function ConversationPanel({ task, pending, routing, simulated, onSend, o
         ))}
       </ol>
       <h4 id="checkpoint-title" ref={checkpointTitle} tabIndex={-1}>Stage {currentIndex + 1} of 4: {task.checkpoint}</h4>
-      <p className="field-help">Move forward through stages. You can revise plan items; stage models stay locked.</p>
+      <p className="field-help">Move forward through stages; stage models stay locked. The agent suggests changes, but you add or remove catalog items yourself.</p>
       {routing}
       <h4>Conversation</h4>
       <div ref={log} className="conversation-log" role="log" aria-label={simulated ? 'Simulated conversation' : 'Conversation'} aria-live="polite" aria-relevant="additions">
