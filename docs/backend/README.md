@@ -39,6 +39,9 @@ orders the work:
   checks not performed, and unresolved decisions, extended as backend issues land.
 - [`backend/AGENTS.md`](../../backend/AGENTS.md): backend-specific instructions.
 - [Main README](../../README.md): backend quick start linked to the detailed setup.
+- [Offline tools (#67–#68)](offline-tools.md): read-only linked CSV exports and
+  explicitly opted-in paired-model routing calibration; generated artifacts remain
+  separate from participant records and no statistical pipeline is introduced.
 
 Update these files from the implemented commands as each issue lands; do not
 document behavior in advance. Keep shared protocol rules in root `AGENTS.md` and shared

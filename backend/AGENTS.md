@@ -3,7 +3,8 @@
 Read root `../AGENTS.md` first. It owns shared research invariants, current phase,
 data-handling rules, Git workflow, and PR approval/merge control. Do not duplicate
 or override those rules here. Work only on an explicitly selected backend issue
-(#31–#41) and read it with its dependencies before editing.
+(#31–#41 or the explicitly selected offline tools #67–#68) and read it with its
+dependencies before editing.
 
 ## Stack and structure
 
@@ -23,6 +24,10 @@ or override those rules here. Work only on an explicitly selected backend issue
   for tests or CI; tests inject a scorer). `app/oracle.py` is the offline paired-output
   oracle (`python -m app.oracle`) and `app/records.py` the records summary
   (`python -m app.records`); both read research tables and never change session state.
+  `app.export_csv` exports a read-only database snapshot; `app.calibrate` evaluates
+  synthetic contexts in a separate in-memory catalog and writes its own artifacts.
+  Neither tool initializes or migrates the participant database. Real calibration
+  requires explicit opt-in; CSV export never loads provider settings.
 - `app/fixtures/*.json` are exported from the frontend mock with
   `node backend/scripts/export_fixtures.mjs`. Rerun it when the frontend catalog,
   survey, preparation, or recommendation definitions change; never edit them by hand.

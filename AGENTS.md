@@ -7,7 +7,7 @@ backend scaffold, not the final experiment.
 Read the selected GitHub issue, its dependencies, and relevant code before editing.
 Frontend work uses the nine active tasks in sprint trackers #24–#26; Sprint 3 orders #51 before #22.
 Backend work uses sprint trackers #28–#30 and only the explicitly selected backend
-issue (#31–#41). Closed superseded issues are
+issue (#31–#41), or explicitly selected offline-tool follow-ups #67–#68. Closed superseded issues are
 historical, and `later-experiment` issues are deferred. Keep changes scoped and plain.
 This file owns shared project and research rules. Before editing frontend code,
 configuration, tests, or related setup tooling, also read `frontend/AGENTS.md`.
@@ -27,7 +27,9 @@ no backend calls until the API adapter issue (#39). Backend code is limited to w
 the selected backend issue requires (for example SQLite in #33, sessions in #34);
 it runs in mock mode by default, and real router/model calls require explicit
 server-side configuration in their own issues. There is no deployment,
-authentication, statistical analysis, or research-data export in this phase. Use
+authentication or statistical analysis in this phase. #67–#68 explicitly add local
+offline calibration and read-only CSV export; these do not authorize participant
+collection or an analysis pipeline. Use
 synthetic participant information and clearly label simulated router/agent
 behavior. Implementation details and verification commands belong in
 `frontend/AGENTS.md` and `backend/AGENTS.md`; keep shared research rules here
