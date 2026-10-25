@@ -47,7 +47,8 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
     assert [call.tools for call in reply.calls] == [["search_catalog"], ["inspect_item"], ["check_plan"], []]
     assert all(call.ok for call in reply.calls) and reply.calls[0].prompt_tokens == 20
     search, item, check = tool_results(clients["large"])
-    assert [entry["id"] for entry in search] == ["A-venue-good", "A-venue-capacity", "A-venue-access"]
+    assert [entry["id"] for entry in search] == ["A-venue-good", "A-venue-capacity", "A-venue-access",
+                                               "A-venue-economy", "A-venue-premium", "A-venue-near-capacity"]
     assert "capacity" not in search[0]  # search returns summaries only
     assert item["capacity"] == 40 and item["wheelchairAccessible"] is True
     assert check == {"totalCostCents": 80000, "allConstraintsMet": True,

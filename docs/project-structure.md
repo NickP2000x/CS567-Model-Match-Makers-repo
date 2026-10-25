@@ -39,6 +39,10 @@ scripts/
   setup.sh                Local Node bootstrap and frontend setup
   runtime.sh              Shared native/local Node and bundled npm selection
   frontend.sh             Dev/check/build launcher using the selected runtime
+  setup-all.sh            Combined frontend/backend setup and optional RouteLLM dependencies
+  run.sh                  API-mode development launcher with optional two-pane tmux mode
+  stop.sh                 Stop the recorded launch using PID/start-time verification
+  process-identity.sh     Stable Linux kernel / UTC macOS process identity helper
 .tools/                   Local runtimes/downloads, ignored by Git
 docs/
   project-structure.md     Repository boundaries

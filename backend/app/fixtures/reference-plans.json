@@ -22,5 +22,39 @@
         "B-supplies-good"
       ]
     }
+  },
+  "alternatives": {
+    "A": [
+      {
+        "venue": "A-venue-economy",
+        "catering": "A-food-economy",
+        "supplies": [
+          "A-supplies-stationery"
+        ]
+      },
+      {
+        "venue": "A-venue-premium",
+        "catering": "A-food-buffet",
+        "supplies": [
+          "A-supplies-tableware"
+        ]
+      }
+    ],
+    "B": [
+      {
+        "venue": "B-venue-economy",
+        "catering": "B-food-economy",
+        "supplies": [
+          "B-supplies-stationery"
+        ]
+      },
+      {
+        "venue": "B-venue-premium",
+        "catering": "B-food-buffet",
+        "supplies": [
+          "B-supplies-tableware"
+        ]
+      }
+    ]
   }
 }

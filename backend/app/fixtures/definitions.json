@@ -151,11 +151,11 @@
   },
   "preparations": {
     "before-start": {
-      "version": "provisional-before-start-v1",
+      "version": "provisional-before-start-v2",
       "statements": [
         {
           "id": "no-refresh",
-          "text": "I will not refresh the page; refreshing restarts the demo."
+          "text": "I will avoid refreshing the page during the demonstration; unsent work may be lost."
         },
         {
           "id": "synthetic-only",

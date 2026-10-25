@@ -1,5 +1,49 @@
 # Backend verification
 
+## #65 — expanded catalogs and participant copy (2026-10-24)
+
+- Regenerated catalog-v2, reference plans (including additional feasible examples),
+  and before-start v2 definitions from the frontend sources. Practice has eight
+  items; A/B each have 18 (six per category). The four constraints and original
+  item IDs/prices/scored facts are preserved.
+- Focused catalog/session checks passed, followed by all **95 backend tests**.
+  New coverage includes alternative feasible costs, new distractors, summary/detail
+  boundaries, and reseeding an old-format temporary catalog without changing saved
+  session JSON/timestamps or original item facts.
+- An existing missing-RouteLLM test assumed the optional package was absent; it
+  now explicitly simulates import failure, so installed RouteLLM cannot trigger
+  checkpoint downloads during the test. Agent-tool expectations include six venues.
+- All **six API integration tests**, including all four sequences and refresh/deadline
+  preservation, passed against a separate mock backend and temporary database.
+- Pytest was isolated from unrelated ROS plugin autoload and the developer `.env`:
+
+  ```bash
+  # From backend/, using its Python environment; no .env or real providers loaded.
+  PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 MODEL_MODE=mock ROUTER_MODE=mock python -c \
+    'from app.config import Settings; Settings.model_config["env_file"] = None; import pytest; raise SystemExit(pytest.main([]))'
+  ```
+
+- Browser/copy checks and coverage boundaries are recorded in
+  [catalog/copy verification](../frontend/catalog-copy-verification.md).
+  Existing developer session data was not used or modified. No live provider/router
+  checks, threshold calibration, or researcher approval are claimed.
+
+### User-run small-model timeout diagnostic (2026-10-24)
+
+- Read-only inspection found a practice Qwen3.5 request failing on its first call
+  with `ollama unreachable (TimeoutError)` at 60.07 seconds; earlier errors were
+  `URLError`. These failed call records were preserved.
+- Windows Ollama was reachable from WSL at the user's established host address;
+  `/api/version` reported 0.40.3 and `/api/ps` initially listed no loaded models.
+- An explicit local-only `ChatClient` call to `qwen3.5:9b` succeeded in 18.61 seconds
+  with 17 prompt / 129 completion tokens and final reply `OK`. A subsequent
+  practice-agent venue question succeeded in 5.94 seconds with two calls and
+  `search_catalog`, using an isolated temporary database.
+- No `.env` was inspected, no cloud model calls were made, and no participant
+  session was changed by these diagnostics. They establish current local-model/
+  agent availability at that explicit endpoint, not the effective configuration
+  of the previously stopped server or completion of a new browser trial.
+
 Repeatable backend checks and the results actually recorded. Results describe the
 tested version only. Mock-mode results do not cover real models, the frontend
 integration (#39), or approval of provisional study materials.

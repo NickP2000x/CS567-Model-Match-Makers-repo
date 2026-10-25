@@ -8,6 +8,11 @@ not ready for real participant data collection.
 
 **Quick start:** see [RUNNING.md](RUNNING.md) for a short guide to running the
 frontend and backend, including native Windows steps.
+For both parts on WSL/Linux/macOS, use `bash scripts/setup-all.sh --routellm`
+(Python 3.12 required), then `bash scripts/run.sh`; Ctrl+C stops both servers.
+Omit `--routellm` for the default mock-only setup.
+Use `bash scripts/run.sh --tmux` for two log panes, and
+`bash scripts/stop.sh` to stop the tracked servers from another terminal.
 
 ## Run the frontend
 

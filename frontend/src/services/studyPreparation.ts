@@ -1,8 +1,8 @@
 import type { PreparationId } from './experiment.types.ts';
 
 export const preparationDefinition: Record<PreparationId, { version: string; statements: { id: string; text: string }[] }> = {
-  'before-start': { version: 'provisional-before-start-v1', statements: [
-    { id: 'no-refresh', text: 'I will not refresh the page; refreshing restarts the demo.' },
+  'before-start': { version: 'provisional-before-start-v2', statements: [
+    { id: 'no-refresh', text: 'I will avoid refreshing the page during the demonstration; unsent work may be lost.' },
     { id: 'synthetic-only', text: 'I will use invented information only.' },
   ] },
   practice: { version: 'provisional-practice-preparation-v1', statements: [

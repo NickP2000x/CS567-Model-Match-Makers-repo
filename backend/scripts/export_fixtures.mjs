@@ -10,12 +10,13 @@ const preparation = await import('../../frontend/src/services/studyPreparation.t
 const write = (name, value) => writeFileSync(new URL(`../app/fixtures/${name}`, import.meta.url), `${JSON.stringify(value, null, 2)}\n`);
 
 write('catalog.json', {
-  version: 'catalog-v1', source: 'frontend/src/mocks/scenarios.ts',
+  version: 'catalog-v2', source: 'frontend/src/mocks/scenarios.ts',
   scenarios: scenarios.scenarios, items: scenarios.catalog,
 });
 write('reference-plans.json', {
   note: 'Researcher-only feasible reference plans. Never served by the API.',
   plans: scenarios.feasiblePlans,
+  alternatives: scenarios.alternativeFeasiblePlans,
 });
 write('definitions.json', {
   source: 'frontend/src/services/{workloadSurvey,studyPreparation}.ts and frontend/src/mocks/responses.ts',

@@ -35,6 +35,29 @@ python -m pytest
 `.venv/` is ignored by Git. Re-running the install is safe. Later sessions only
 need `cd backend` and `source .venv/bin/activate`.
 
+### Combined setup and launch (WSL/Linux/macOS)
+
+After installing Python 3.12, from the repository root:
+
+```bash
+bash scripts/setup-all.sh --routellm  # omit the flag if only mock routing is needed
+bash scripts/run.sh
+```
+
+Setup reuses the frontend installer and creates/reuses `backend/.venv`; pip/package
+checks use isolated Python mode to avoid inherited `PYTHONPATH`/user-package pollution.
+`--check --routellm` checks an existing full setup without installs or app initialization.
+The launcher uses the backend's normal configuration, enables development sessions,
+sets CORS origins for the chosen local frontend port, and waits for backend health
+before starting API-connected Vite. Ctrl+C stops both server process groups.
+Neither script installs Windows Ollama, downloads models, signs into cloud accounts,
+or changes existing `.env`/SQLite data. See [RUNNING.md](../../RUNNING.md) for details
+and [verification coverage](../frontend/launcher-setup-verification.md).
+`bash scripts/run.sh --tmux` separates backend/frontend logs into two panes;
+`bash scripts/stop.sh` stops the tracked launch from another terminal. Ctrl+C in
+either tmux pane also stops both servers. The backend supervisor receives the
+first shutdown signal so it can reap its own workers before group escalation.
+
 ## Start the server
 
 With the environment active, from `backend/`:

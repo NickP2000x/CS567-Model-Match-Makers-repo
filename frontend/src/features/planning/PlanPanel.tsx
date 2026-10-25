@@ -44,7 +44,7 @@ export function PlanPanel({ task, catalog, budgetCents, pending, onRemove, onSub
           ))}
         </ul>
       </div>
-      <p className="field-help">Provisional live feedback. Dietary coverage includes enough servings. Supplies completeness is not a fifth constraint.</p>
+      <p className="field-help">Provisional live feedback. Dietary coverage includes enough servings. Supplies are optional and count toward the budget; their completeness is not scored.</p>
       <div className="plan-submit">
         <p>You may submit an incomplete or invalid plan at any checkpoint.</p>
         <button type="button" disabled={pending} onClick={onSubmit}>Submit Plan</button>
