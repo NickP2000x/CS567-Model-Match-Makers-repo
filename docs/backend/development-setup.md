@@ -167,6 +167,32 @@ python -m app.records           # summary: allocation, tasks, routing, model usa
   Failed checkpoints stay pending and are retried by the next run.
 - `records` counts only (no statistics); development sessions are excluded.
 
+## Offline CSV export and calibration (#67–#68)
+
+Repository-root shortcuts select `backend/.venv/bin/python` automatically:
+
+```bash
+bash scripts/export-csv.sh
+bash scripts/calibrate.sh --dry-run
+```
+
+They forward CLI options and help. The export defaults to the standard database;
+use `--database /absolute/path/to/study.sqlite3` if needed. Custom relative paths
+are interpreted from `backend/`. Real calibration still needs explicit `--real`.
+
+From `backend/` with its virtual environment active:
+
+```bash
+python -m app.export_csv --database data/model-matchmakers.sqlite3
+python -m app.calibrate --dry-run --min-pass-rate 0.7
+```
+
+The exporter never loads `.env` and never writes/migrates the selected database.
+Calibration's dry run is explicitly simulated; real model/router evaluation requires
+`--real` and configured real models. See [offline tools](offline-tools.md) for data
+formats, filtering, real-call limits, provisional oracle/threshold rules, and
+researcher-review requirements. Neither command modifies the live router threshold.
+
 ## Troubleshooting
 
 - `Input should be 'mock' or 'real'` or `needs OPENAI_API_KEY` at startup: fix

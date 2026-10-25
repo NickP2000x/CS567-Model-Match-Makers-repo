@@ -1,5 +1,75 @@
 # Backend verification
 
+## README quickstart verification (2026-10-25)
+
+- README now places shell commands, manual equivalents, and default database/CSV/
+  calibration locations together before the detailed frontend/backend sections.
+- **130 backend tests**, **75 offline frontend tests**, frontend type-check/build,
+  and all **six API integration checks** passed. The six API checks were skipped
+  in the offline frontend command as intended, then run against the isolated server.
+- Executed manual first-time setup in a fresh temporary checkout whose path contains
+  spaces: Python 3.12 venv, isolated pip install/check of pinned development
+  requirements, Node 24.14.0, `npm ci`, and frontend production build. The shell
+  setup readiness check passed against that installation.
+- Actual manual Uvicorn and npm/Vite commands passed browser consent-to-practice,
+  a simulated message, and separate-terminal shutdown. Verified `stop.sh` did not
+  stop those untracked manual servers.
+- Actual shared-terminal and two-pane tmux launchers both passed browser/API session
+  creation, same-tab resume, and stop-command cleanup of both listening ports.
+- Actual shell wrappers and manual Python commands both produced dry calibration
+  reports and 13 linked CSVs in the documented default directories. Verified
+  manifests/dictionary, zero provider calls, and unchanged source database bytes.
+- All services and data lived in temporary storage on alternate local ports.
+  No developer `.env` was copied and no working study database was used. The first
+  browser-verifier attempt needed an explicit wait for API navigation; a later
+  harness log-pipe blockage was fixed by running API checks asynchronously. Neither
+  required an application change.
+- Optional heavyweight RouteLLM installation was not repeated clean, real provider
+  calibration was not run, and actual macOS/native Windows-browser checks remain
+  unperformed. Existing setup/install-command tests and prior installed-package
+  checks cover the optional setup path; these results do not validate a study cutoff.
+
+## #67–#68 — offline calibration and CSV export (2026-10-25)
+
+- **130 backend tests passed**, including 35 new offline-tool checks. Tests use
+  temporary/in-memory databases, scripted clients/scorers, and synthetic data;
+  settings were isolated from the developer `.env` and unrelated ROS plugins using
+  the key-free pytest invocation documented below.
+- CSV coverage: linked sessions/tasks/messages/choices, raw survey/metadata retention,
+  original stored scores, development/practice filtering, participant/oracle purpose,
+  earlier missing tables/columns, null unvisited placeholders, invalid non-object
+  state rejection, empty stable headers, Unicode/quotes/multiline
+  text, reversible null escaping, orphan warnings, unique output folders, read-only
+  rejection of writes, byte-for-byte source preservation, and a WAL snapshot that
+  excludes a concurrent writer's later session.
+- Calibration coverage: all 24 A/B stage contexts, immutable in-memory catalog,
+  paired identical prompts, alternating evaluation order, both/neither/large-only
+  outcomes, absent submitted plans, provider/router failures without mock fallback,
+  secret-free metadata, exposed checkpoint identity, score/threshold equality and
+  limits, adaptive narrow-band thresholds, holdout isolation, explicit real-mode
+  gates, error artifacts, and unchanged configured participant database.
+- Both actual CLIs passed on a fresh synthetic database under temporary storage.
+  Export produced 13 linked CSVs plus manifest/dictionary and preserved database
+  bytes and multiline feedback. Dry calibration evaluated 24 simulated contexts,
+  produced a threshold report, and recorded zero provider calls. Invalid provider
+  settings in the subprocess environment did not affect export or dry-run mode.
+- Default export/calibration output directories were verified ignored by Git.
+  No existing developer session/database was exported or modified, and `.env`
+  was not inspected or changed during verification. No real model/router calls,
+  checkpoint downloads, actual threshold calibration, or study approval are claimed.
+- Shell-wrapper follow-up: `scripts/calibrate.sh` and `scripts/export-csv.sh` passed
+  Bash syntax checks and six focused backend tests. Verified automatic interpreter
+  selection, execution from outside a checkout whose path contains spaces, quoted
+  argument forwarding, required explicit calibration modes, help, dependency/setup
+  errors, exit-code propagation, default/custom database selection, and unchanged
+  synthetic source bytes. Actual dry-run/export CLIs ran through the wrappers;
+  an additional direct wrapper smoke check ran from `/tmp` with temporary output.
+  No real calibration or export of developer data was performed. Actual macOS
+  wrapper execution was not available; syntax remains Bash 3.2 compatible.
+- Commands, artifacts, provisional criteria, and coverage limits are documented in
+  [offline tools](offline-tools.md). A synthetic dry-run cutoff is not a research
+  result; main-study selection still requires representative pilot/holdout evidence.
+
 ## #65 — expanded catalogs and participant copy (2026-10-24)
 
 - Regenerated catalog-v2, reference plans (including additional feasible examples),

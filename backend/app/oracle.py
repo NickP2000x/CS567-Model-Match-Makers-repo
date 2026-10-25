@@ -41,9 +41,10 @@ SUBMIT_TOOL = {"type": "function", "function": {
 
 
 class OracleFailed(Exception):
-    def __init__(self, size: str, calls: list[CallRecord]):
+    def __init__(self, size: str, calls: list[CallRecord], trace: list[dict] | None = None):
         super().__init__(f"{size} model call failed")
         self.size, self.calls = size, calls
+        self.trace = trace or []
 
 
 @dataclass
@@ -51,6 +52,7 @@ class Proposal:
     plan: dict | None
     passed: bool
     calls: list[CallRecord] = field(default_factory=list)
+    trace: list[dict] = field(default_factory=list)
 
 
 def oracle_prompt(scenario: dict, checkpoint: str, plan: dict) -> str:
@@ -82,11 +84,12 @@ def stage_passes(connection: sqlite3.Connection, scenario_id: str, checkpoint: s
 
 
 def propose(client: ChatClient, connection: sqlite3.Connection, scenario: dict, checkpoint: str,
-            plan: dict, max_steps: int) -> Proposal:
+            plan: dict, max_steps: int, question: str | None = None) -> Proposal:
     """Bounded tool loop that ends when the model calls submit_plan (or runs out of steps)."""
     tools = CatalogTools(connection, scenario["id"])
     messages = [{"role": "system", "content": oracle_prompt(scenario, checkpoint, plan)},
-                {"role": "user", "content": "Propose and submit the plan for this stage."}]
+                {"role": "user", "content": (question + "\n" if question else "")
+                 + "Propose and submit the plan for this stage."}]
     calls: list[CallRecord] = []
     for step in range(1, max_steps + 2):
         offered = [SUBMIT_TOOL] if step == max_steps + 1 else [*TOOLS, SUBMIT_TOOL]
@@ -95,10 +98,11 @@ def propose(client: ChatClient, connection: sqlite3.Connection, scenario: dict, 
             reply = client.chat(messages, offered)
         except ModelError as error:
             calls.append(CallRecord(step, False, int((time.monotonic() - started) * 1000), error=str(error)))
-            raise OracleFailed(client.size, calls) from None
+            raise OracleFailed(client.size, calls, messages) from None
         calls.append(CallRecord(step, True, int((time.monotonic() - started) * 1000),
                                 reply.prompt_tokens, reply.completion_tokens, [c.name for c in reply.tool_calls]))
         if not reply.tool_calls:
+            messages.append({"role": "assistant", "content": reply.content or ""})
             break
         messages.append({"role": "assistant", "content": reply.content or "", "tool_calls": [
             {"id": c.id, "type": "function", "function": {"name": c.name, "arguments": c.arguments}}
@@ -111,10 +115,10 @@ def propose(client: ChatClient, connection: sqlite3.Connection, scenario: dict, 
                                  "supplies": list(args.get("supplies") or [])}
                 except (ValueError, TypeError, AttributeError):
                     submitted = None
-                return Proposal(submitted, stage_passes(connection, scenario["id"], checkpoint, submitted), calls)
+                return Proposal(submitted, stage_passes(connection, scenario["id"], checkpoint, submitted), calls, messages)
             result = tools.run(tool_call.name, tool_call.arguments)
             messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)})
-    return Proposal(None, False, calls)
+    return Proposal(None, False, calls, messages)
 
 
 def record_oracle_calls(store: Store, clients: dict[str, ChatClient], context: dict,

@@ -43,6 +43,8 @@ scripts/
   run.sh                  API-mode development launcher with optional two-pane tmux mode
   stop.sh                 Stop the recorded launch using PID/start-time verification
   process-identity.sh     Stable Linux kernel / UTC macOS process identity helper
+  calibrate.sh            Backend-venv wrapper for explicit dry/real calibration
+  export-csv.sh           Backend-venv wrapper for read-only study CSV export
 .tools/                   Local runtimes/downloads, ignored by Git
 docs/
   project-structure.md     Repository boundaries
@@ -83,6 +85,9 @@ backend/
     router.py             Mock router and optional RouteLLM adapter
     oracle.py             Offline paired-output oracle (python -m app.oracle)
     records.py            Study records summary (python -m app.records)
+    export_csv.py         Read-only database snapshot to linked CSV datasets
+    calibrate.py          Synthetic paired-model evaluation and threshold report
+    offline.py            Shared output/snapshot helpers for offline commands
     config.py             Server-only settings with mock-mode defaults
     errors.py             Shared {"error": {code, message}} envelope
     fixtures/             Catalog/definitions exported from the frontend mock
