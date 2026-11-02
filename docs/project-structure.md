@@ -76,7 +76,7 @@ backend/
     routes.py             /api routes from the #31 HTTP draft
     study.py              Study rules ported from the frontend mock service
     store.py              Session allocation and per-request JSON state persistence
-    catalog.py            Catalog queries and the four constraint checks
+    catalog.py            Catalog queries and the five constraint checks
     db.py                 SQLite schema, catalog seeding, allocation slots
     definitions.py        Sequences, checkpoints, and provisional materials
     models.py             OpenAI-compatible small/large client (OpenAI, Ollama)

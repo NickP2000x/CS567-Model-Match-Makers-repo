@@ -103,7 +103,8 @@ def test_invalid_and_incomplete_plans_can_be_submitted(dev_client):
     participant.call("POST", "/tasks/task-1/finish", {"reason": "submitted"})
     task = participant.task("task-1")
     assert task["status"] == "submitted" and task["totalCostCents"] == 30000
-    assert task["constraints"] == {"budget": True, "capacity": True, "dietary": False, "accessibility": True}
+    assert task["constraints"] == {"budget": True, "capacity": True, "dietary": False, "accessibility": True,
+                                   "supplies": False}
     assert list(task["decisions"]) == ["Venue"]  # unvisited checkpoints are not fabricated
     participant.fail("POST", "/tasks/task-1/finish", {}, 409, "NO_ACTIVE_TASK")
     participant.fail("PUT", "/tasks/task-1/plan", {"plan": PLAN_A}, 409, "NO_ACTIVE_TASK")

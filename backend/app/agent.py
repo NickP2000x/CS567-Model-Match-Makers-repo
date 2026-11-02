@@ -28,12 +28,12 @@ TOOLS = [
     }},
     {"type": "function", "function": {
         "name": "inspect_item",
-        "description": "Get full details for one catalog item: capacity, wheelchair access, servings, dietary coverage.",
+        "description": "Get full details for one catalog item: capacity, wheelchair access, servings, dietary coverage, supplies provided.",
         "parameters": {"type": "object", "properties": {"item_id": {"type": "string"}}, "required": ["item_id"]},
     }},
     {"type": "function", "function": {
         "name": "check_plan",
-        "description": "Check a candidate plan against budget, capacity, dietary coverage, and wheelchair access.",
+        "description": "Check a candidate plan against budget, capacity, dietary coverage, wheelchair access, and required supplies.",
         "parameters": {"type": "object", "properties": {
             "venue": {"type": ["string", "null"]},
             "catering": {"type": ["string", "null"]},
@@ -83,7 +83,8 @@ def system_prompt(context: AgentContext) -> str:
         f"Event: {context.scenario['title']}. Requirements: {requirements['attendees']} guests; "
         f"budget {requirements['budgetCents'] / 100:.2f} USD for venue, catering, and supplies together; "
         f"dietary needs: {', '.join(requirements['dietaryNeeds'])}; wheelchair access "
-        f"{'required' if requirements['wheelchairRequired'] else 'not required'}.\n"
+        f"{'required' if requirements['wheelchairRequired'] else 'not required'}; "
+        f"required supplies: {', '.join(requirements['requiredSupplies'])}.\n"
         f"Current stage: {context.checkpoint} (stages: Venue, Catering, Supplies, Final constraint check). "
         "Focus on this stage.\n"
         f"Participant's current plan (item ids): {json.dumps(context.plan)}.\n"

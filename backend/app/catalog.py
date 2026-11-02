@@ -1,4 +1,4 @@
-"""Read-only catalog queries and the four constraint checks (ported from the frontend mock)."""
+"""Read-only catalog queries and the five constraint checks (ported from the frontend mock)."""
 
 import json
 import sqlite3
@@ -6,6 +6,7 @@ import sqlite3
 from .errors import ApiError
 
 SUMMARY_FIELDS = ("id", "scenarioId", "category", "name", "summary", "priceCents")
+CONSTRAINTS = ("budget", "capacity", "dietary", "accessibility", "supplies")
 
 
 def get_scenario(connection: sqlite3.Connection, scenario_id: str) -> dict:
@@ -33,7 +34,7 @@ def get_item(connection: sqlite3.Connection, item_id: str) -> dict | None:
 
 
 def evaluate(connection: sqlite3.Connection, task: dict) -> None:
-    """Recompute total cost and the four constraints for a task's current plan."""
+    """Recompute total cost and the five constraints for a task's current plan."""
     plan = task["plan"]
     chosen = [item_id for item_id in [plan["venue"], plan["catering"], *plan["supplies"]] if item_id]
     items = [item for item in (get_item(connection, item_id) for item_id in chosen) if item]
@@ -48,4 +49,5 @@ def evaluate(connection: sqlite3.Connection, task: dict) -> None:
         "dietary": (food or {}).get("servings", 0) >= requirements["attendees"]
         and all(need in (food or {}).get("dietaryCoverage", []) for need in requirements["dietaryNeeds"]),
         "accessibility": not requirements["wheelchairRequired"] or (venue or {}).get("wheelchairAccessible") is True,
+        "supplies": all(any(need in item.get("provides", []) for item in items) for need in requirements["requiredSupplies"]),
     }

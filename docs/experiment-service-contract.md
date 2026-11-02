@@ -103,10 +103,13 @@ distinct fictional vendor labels, with stable item IDs and unchanged feasible to
 Catalog-v2 keeps all original item IDs, prices, capacities, dietary/serving facts,
 and accessibility flags. A/B each add three venues, three catering options, and
 four supplies packages; practice remains at eight options. Additional researcher-only
-reference plans total $625/$890 for A and $1,025/$1,290 for B. The matched option
+reference plans total $675/$925 for A and $1,065/$1,315 for B. The matched option
 and distractor structures do not establish equal difficulty; pilot evaluation is
-still required. There are still exactly four constraints. Supplies are optional
-and affect only budget; availability, distance, and equipment are not requirements.
+still required. A fifth constraint, required supplies, is provisional pending researcher
+approval: each scenario lists `requiredSupplies` (practice: name cards; A: name cards and
+display boards; B: name cards and place settings), and the selected supplies packages'
+inspection-only `provides` lists must cover them. Availability and distance are not
+requirements.
 
 Frontend copy distinguishes `simulated`, `routerSimulated`, and
 `refreshRestartsDemo`: a backend may persist simulated replies or use live models,
@@ -126,7 +129,7 @@ These changes do not approve consent or add demographic questions.
   category's full list. Filtering never removes selected items from the plan.
 - Venue/catering selections replace the previous item. Supplies selections add
   distinct packages. Remove actions retain other selections; the service recomputes
-  integer-cent costs and the same four constraints used at submission.
+  integer-cent costs and the same five constraints used at submission.
 - Next-stage controls use `advanceCheckpoint`; conversation uses `sendMessage`.
   Stage-linked history and inspected items remain in service memory. Mutations are
   guarded while an operation is pending; failed messages keep the current draft.

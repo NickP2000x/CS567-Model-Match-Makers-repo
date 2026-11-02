@@ -90,8 +90,9 @@ def routing_prompt(scenario: dict, checkpoint: str, plan: dict, messages: list[d
         f"Help plan the {checkpoint} stage of an event: {scenario['title']}.",
         f"{requirements['attendees']} guests, total budget {requirements['budgetCents'] / 100:.2f} USD, "
         f"dietary needs {', '.join(requirements['dietaryNeeds'])}, wheelchair access "
-        f"{'required' if requirements['wheelchairRequired'] else 'not required'}.",
-        "Compare catalog options and check budget, capacity, dietary coverage, and accessibility.",
+        f"{'required' if requirements['wheelchairRequired'] else 'not required'}, "
+        f"required supplies {', '.join(requirements['requiredSupplies'])}.",
+        "Compare catalog options and check budget, capacity, dietary coverage, accessibility, and supplies.",
         f"Current plan: {json.dumps(plan)}.",
     ]
     if recent:

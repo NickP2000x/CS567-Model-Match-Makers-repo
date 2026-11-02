@@ -33,4 +33,4 @@ def canned_response(model: str, checkpoint: str) -> str:
     if model == "small":
         return f"[Simulated small model] {checkpoint}: inspect the catalog details before choosing."
     return (f"[Simulated large model] {checkpoint}: compare alternatives and review budget, "
-            "capacity, dietary coverage, and wheelchair access.")
+            "capacity, dietary coverage, wheelchair access, and required supplies.")

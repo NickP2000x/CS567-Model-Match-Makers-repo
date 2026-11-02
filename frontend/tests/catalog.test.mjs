@@ -21,7 +21,7 @@ async function experimentalTask(scenarioId) {
 test('expanded catalogs and preparation definitions match generated backend fixtures', () => {
   const fixture = name => JSON.parse(readFileSync(new URL(`../../backend/app/fixtures/${name}`, import.meta.url), 'utf8'));
   assert.deepEqual(fixture('catalog.json'), {
-    version: 'catalog-v2', source: 'frontend/src/mocks/scenarios.ts', scenarios, items: catalog,
+    version: 'catalog-v3', source: 'frontend/src/mocks/scenarios.ts', scenarios, items: catalog,
   });
   assert.deepEqual(fixture('reference-plans.json').plans, feasiblePlans);
   assert.deepEqual(fixture('reference-plans.json').alternatives, alternativeFeasiblePlans);
@@ -44,23 +44,24 @@ test('new options support distinct feasible plans, intended distractors, and cum
     const service = await experimentalTask(id);
     const task = () => service.getSnapshot().tasks['task-1'];
     const reference = feasiblePlans[id];
-    const expectedCosts = id === 'A' ? [80000, 62500, 89000] : [120000, 102500, 129000];
+    const expectedCosts = id === 'A' ? [80000, 67500, 92500] : [120000, 106500, 131500];
     for (const [index, plan] of [reference, ...alternativeFeasiblePlans[id]].entries()) {
       await service.updatePlan(plan);
       assert.equal(task().totalCostCents, expectedCosts[index]);
-      assert.deepEqual(task().constraints, { budget: true, capacity: true, dietary: true, accessibility: true });
+      assert.deepEqual(task().constraints, { budget: true, capacity: true, dietary: true, accessibility: true, supplies: true });
     }
     for (const [plan, constraint] of [
       [{ ...reference, venue: `${id}-venue-near-capacity` }, 'capacity'],
       [{ ...reference, catering: `${id}-food-partial` }, 'dietary'],
       [{ ...reference, supplies: [`${id}-supplies-bundle`, `${id}-supplies-good`] }, 'budget'],
+      [{ ...reference, supplies: [`${id}-supplies-stationery`] }, 'supplies'],
     ]) {
       await service.updatePlan(plan);
       assert.deepEqual(Object.entries(task().constraints).filter(([, met]) => !met).map(([key]) => key), [constraint]);
     }
-    // Supplies remain optional, not an implicit equipment/completeness constraint.
+    // Supplies are scored only by required items; with none selected, only that check fails.
     await service.updatePlan({ ...reference, supplies: [] });
-    assert.ok(Object.values(task().constraints).every(Boolean));
+    assert.deepEqual(Object.entries(task().constraints).filter(([, met]) => !met).map(([key]) => key), ['supplies']);
     const plan = { ...reference, supplies: [`${id}-supplies-presentation`, `${id}-supplies-tableware`] };
     await service.updatePlan(plan);
     assert.equal(task().totalCostCents, id === 'A' ? 79000 : 119000);

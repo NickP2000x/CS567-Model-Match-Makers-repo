@@ -1,7 +1,7 @@
 # Offline calibration and CSV export (#67–#68)
 
 These are local researcher tools, not participant-facing endpoints or a statistical pipeline.
-They preserve the four existing constraints and do not approve participant collection.
+They use the same five constraints as the app (the fifth, required supplies, is provisional) and do not approve participant collection.
 
 ## Shell shortcuts (repository root)
 

@@ -159,7 +159,7 @@ python -m app.records           # summary: allocation, tasks, routing, model usa
   from `routing_decisions`, asks the small and the large model for a complete plan
   (bounded tool loop ending in `submit_plan`), and checks it deterministically.
   Provisional pass rule: Venue needs capacity and access; Catering adds dietary
-  coverage; Supplies and Final need all four constraints, including budget.
+  coverage; Supplies and Final need all five constraints, including budget and required supplies.
 - Label: `small` if the small model passes, `large` if only the large model passes,
   `neither` otherwise. The neither case and any reliance formula are researcher decisions.
 - Results go to `oracle_results`; oracle calls are stored in `model_calls` with

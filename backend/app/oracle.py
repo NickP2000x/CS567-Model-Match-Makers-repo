@@ -26,8 +26,8 @@ from .store import Store
 STAGE_CHECKS = {
     "Venue": ("capacity", "accessibility"),
     "Catering": ("capacity", "accessibility", "dietary"),
-    "Supplies": ("budget", "capacity", "dietary", "accessibility"),
-    "Final constraint check": ("budget", "capacity", "dietary", "accessibility"),
+    "Supplies": ("budget", "capacity", "dietary", "accessibility", "supplies"),
+    "Final constraint check": ("budget", "capacity", "dietary", "accessibility", "supplies"),
 }
 SUBMIT_TOOL = {"type": "function", "function": {
     "name": "submit_plan",
@@ -61,7 +61,8 @@ def oracle_prompt(scenario: dict, checkpoint: str, plan: dict) -> str:
         f"You are planning an event: {scenario['title']}. Requirements: {requirements['attendees']} guests; "
         f"budget {requirements['budgetCents'] / 100:.2f} USD for venue, catering, and supplies together; "
         f"dietary needs: {', '.join(requirements['dietaryNeeds'])}; wheelchair access "
-        f"{'required' if requirements['wheelchairRequired'] else 'not required'}.\n"
+        f"{'required' if requirements['wheelchairRequired'] else 'not required'}; "
+        f"required supplies: {', '.join(requirements['requiredSupplies'])}.\n"
         f"Current stage: {checkpoint}. Current plan (item ids): {json.dumps(plan)}.\n"
         "Use the catalog tools to choose items for this stage and any earlier stage that is still "
         "missing or wrong, check the plan, then call submit_plan once with the complete plan."

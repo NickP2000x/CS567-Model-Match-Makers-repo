@@ -385,6 +385,11 @@ substitute for IRB approval.
   the "Router estimate" reasons.
 - **Oracle (#40):** the per-stage pass rule, the `neither` case, and any reliance formula.
 - **Records (#38):** latency and token-accounting definitions; raw events are kept.
+- **Fifth constraint (required supplies):** whether to add it at all (the paper has four),
+  the supply labels per scenario, and the `study-csv-v2` column rename (`all_met`).
+- **Model pair:** GPT-4 Turbo was scheduled for OpenAI shutdown on 2026-10-23 and Mixtral
+  8x7B needs ~32 GB locally; any cloud substitute (e.g. an Ollama Cloud pair) must be
+  approved and recorded here.
 - **Materials:** consent, demographics, practice treatment, catalog values, live
   constraint feedback, adapted NASA-TLX, feedback prompts, and the before-start
   "refreshing restarts" acknowledgement (true only in mock mode).
@@ -410,3 +415,31 @@ it is marked provisional pending researcher approval (root `AGENTS.md`).
 - Headless browser, production build: Submit Task 1 → ratings showed "Back to Task 1" →
   Task 1 returned with the timer running and the plan item and stage model kept →
   Submit Plan → ratings → Task 2 preparation; the backend recorded one return. No errors.
+
+## Required supplies: a fifth constraint (provisional)
+
+Requested by the backend owner: each scenario lists `requiredSupplies`, and the selected
+supplies packages' `provides` lists must cover them. `provides` is inspection-only, like
+capacity. This changes the paper's four-constraint design, so it is provisional pending
+researcher approval (root `AGENTS.md`).
+
+- Practice needs name cards; A needs name cards and display boards; B needs name cards and
+  place settings. No new items, IDs, or prices. Reference plans still pass (totals
+  $350/$800/$1,200). The stationery pack alone is the new detail-only distractor.
+  Alternative plans now pair stationery with presentation (A) or tableware (B): $675/$925
+  for A and $1,065/$1,315 for B.
+- Oracle stage rule: Supplies and Final add `supplies`. Agent, router, and oracle prompts
+  list the required supplies. CSV export is now `study-csv-v2`: it adds
+  `constraint_supplies` and renames `all_four_met` to `all_met`. The records summary
+  renames `allFourMet` to `allMet`. Older four-key records export `None` for the new
+  fields.
+
+### Recorded results — 2026-11-01
+
+- Fixtures regenerated as `catalog-v3` with `node backend/scripts/export_fixtures.mjs` (Node 24.14.0).
+- Backend: 130 tests passed. `bash scripts/calibrate.sh --dry-run` built its 24 contexts
+  with the new reference plans.
+- Frontend: type-check and build passed. Tests: 69 passed, 11 skipped, and 1 failed:
+  `launcher platform selection …`, which fails the same way on unmodified `origin/main`.
+- Not done: no browser check of the new "Required supplies" row and requirements line, and
+  no live-backend frontend run.

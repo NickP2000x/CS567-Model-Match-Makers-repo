@@ -29,17 +29,17 @@ export interface Assignment { scenarioId: 'A' | 'B'; condition: Condition }
 export interface Scenario {
   id: ScenarioId;
   title: string;
-  requirements: { budgetCents: number; attendees: number; dietaryNeeds: string[]; wheelchairRequired: boolean };
+  requirements: { budgetCents: number; attendees: number; dietaryNeeds: string[]; wheelchairRequired: boolean; requiredSupplies: string[] };
   provisional: true;
 }
 export interface CatalogSummary {
   id: string; scenarioId: ScenarioId; category: Category; name: string; summary: string; priceCents: number;
 }
 export interface CatalogItem extends CatalogSummary {
-  details: string; capacity?: number; wheelchairAccessible?: boolean; servings?: number; dietaryCoverage?: string[];
+  details: string; capacity?: number; wheelchairAccessible?: boolean; servings?: number; dietaryCoverage?: string[]; provides?: string[];
 }
 export interface Plan { venue: string | null; catering: string | null; supplies: string[] }
-export interface Constraints { budget: boolean; capacity: boolean; dietary: boolean; accessibility: boolean }
+export interface Constraints { budget: boolean; capacity: boolean; dietary: boolean; accessibility: boolean; supplies: boolean }
 export interface Decision {
   phase: 'choose' | 'locked' | 'awaiting-recommendation' | 'recommended' | 'committed';
   initialModel: Model | null; recommendedModel: Model | null; finalModel: Model | null;
