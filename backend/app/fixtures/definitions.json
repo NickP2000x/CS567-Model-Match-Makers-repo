@@ -231,7 +231,7 @@
     },
     "Final constraint check": {
       "model": "large",
-      "reason": "Simulated recommendation: review all four constraints together."
+      "reason": "Simulated recommendation: review all five constraints together."
     }
   }
 }

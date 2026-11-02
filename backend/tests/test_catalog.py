@@ -78,7 +78,7 @@ def test_inspection_reveals_details_and_records_item_once(dev_client):
 
 def test_expanded_catalog_plans_search_and_distractors(dev_client):
     alternatives = json.loads((FIXTURES / "reference-plans.json").read_text())["alternatives"]
-    for sequence, scenario, totals in ((1, "A", [62500, 89000]), (2, "B", [102500, 129000])):
+    for sequence, scenario, totals in ((1, "A", [67500, 92500]), (2, "B", [106500, 131500])):
         participant = Participant(dev_client, sequence)
         participant.through_practice()
         participant.start()
@@ -97,12 +97,12 @@ def test_expanded_catalog_plans_search_and_distractors(dev_client):
             (dict(reference, venue=f"{scenario}-venue-near-capacity"), "capacity"),
             (dict(reference, catering=f"{scenario}-food-partial"), "dietary"),
             (dict(reference, supplies=[f"{scenario}-supplies-bundle", f"{scenario}-supplies-good"]), "budget"),
+            (dict(reference, supplies=[f"{scenario}-supplies-stationery"]), "supplies"),
+            (dict(reference, supplies=[]), "supplies"),
         ]
         for plan, constraint in variants:
             participant.call("PUT", "/tasks/task-1/plan", {"plan": plan})
             assert [key for key, met in participant.task()["constraints"].items() if not met] == [constraint]
-        participant.call("PUT", "/tasks/task-1/plan", {"plan": dict(reference, supplies=[])})
-        assert all(participant.task()["constraints"].values())
         item = participant.call("POST", "/tasks/task-1/inspect", {"itemId": f"{scenario}-food-partial"})["item"]
         assert len(item["dietaryCoverage"]) == 1
         found = dev_client.get(prefix, params={"category": "catering", "query": item["name"].upper()}).json()

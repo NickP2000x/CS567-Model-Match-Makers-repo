@@ -134,17 +134,18 @@ test('each scenario supports independent constraint violations and incomplete su
       ['dietary', { ...reference, catering: `${scenarioId}-food-diet` }],
       ['dietary', { ...reference, catering: `${scenarioId}-food-servings` }],
       ['budget', { ...reference, supplies: [`${scenarioId}-supplies-cost`] }],
+      ['supplies', { ...reference, supplies: [] }],
     ];
     for (const [failedConstraint, plan] of variants) {
       await service.updatePlan(plan);
       assert.deepEqual(service.getSnapshot().tasks[id].constraints,
-        Object.fromEntries(['budget', 'capacity', 'dietary', 'accessibility'].map(key => [key, key !== failedConstraint])));
+        Object.fromEntries(['budget', 'capacity', 'dietary', 'accessibility', 'supplies'].map(key => [key, key !== failedConstraint])));
     }
     const scenario = await service.getScenario(scenarioId);
     const summaries = await service.searchCatalog(scenarioId);
     assert.ok(summaries.every(item => item.priceCents <= scenario.requirements.budgetCents));
     for (const item of summaries) {
-      for (const detail of ['details', 'capacity', 'wheelchairAccessible', 'servings', 'dietaryCoverage']) {
+      for (const detail of ['details', 'capacity', 'wheelchairAccessible', 'servings', 'dietaryCoverage', 'provides']) {
         assert.equal(detail in item, false);
       }
     }
@@ -207,7 +208,7 @@ test('documented contract walkthroughs preserve automatic/override and submissio
     await service.finishTask();
     const task = service.getSnapshot().tasks['task-1'];
     assert.equal(task.totalCostCents, 30000);
-    assert.deepEqual(task.constraints, { budget: true, capacity: true, dietary: false, accessibility: true });
+    assert.deepEqual(task.constraints, { budget: true, capacity: true, dietary: false, accessibility: true, supplies: false });
     assert.equal(task.decisions.Venue.finalModel, 'small');
     assert.equal(task.messages.at(-1).model, 'small');
     const raw = { mentalDemand: 25, physicalDemand: 0, temporalDemand: 50, performance: 75, effort: 25, frustration: 0 };

@@ -73,7 +73,8 @@ def test_stage_pass_rule_checks_only_planned_stages(connection):
 
 def test_proposal_uses_tools_then_submit(connection):
     scenario = {"id": "A", "title": "Company workshop", "requirements": {
-        "attendees": 40, "budgetCents": 100000, "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True}}
+        "attendees": 40, "budgetCents": 100000, "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True,
+        "requiredSupplies": ["name cards"]}}
     client = ScriptedClient("small", [tool("search_catalog", {"category": "venue"}), submit(GOOD)])
     proposal = propose(client, connection, scenario, "Final constraint check", GOOD | {"supplies": []}, 3)
     assert proposal.plan == GOOD and proposal.passed and [c.tools for c in proposal.calls] == [["search_catalog"], ["submit_plan"]]

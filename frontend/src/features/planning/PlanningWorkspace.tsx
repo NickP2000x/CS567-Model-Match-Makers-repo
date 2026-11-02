@@ -103,7 +103,8 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
           <p>
             {requirements.attendees} guests · Budget {money(requirements.budgetCents)} ·
             {' '}Dietary needs: {requirements.dietaryNeeds.join(', ')} ·
-            {' '}Wheelchair access {requirements.wheelchairRequired ? 'required' : 'not required'}
+            {' '}Wheelchair access {requirements.wheelchairRequired ? 'required' : 'not required'} ·
+            {' '}Required supplies: {requirements.requiredSupplies.join(', ')}
           </p>
         </div>
         {task ? <TaskCountdown task={task} onTimeout={() => onFinish(taskId, 'timed-out')} />

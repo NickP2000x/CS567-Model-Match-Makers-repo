@@ -52,7 +52,8 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
     assert "capacity" not in search[0]  # search returns summaries only
     assert item["capacity"] == 40 and item["wheelchairAccessible"] is True
     assert check == {"totalCostCents": 80000, "allConstraintsMet": True,
-                     "constraints": {"budget": True, "capacity": True, "dietary": True, "accessibility": True}}
+                     "constraints": {"budget": True, "capacity": True, "dietary": True, "accessibility": True,
+                                     "supplies": True}}
 
 
 def test_failed_check_is_reported_so_the_model_can_revise(connection):

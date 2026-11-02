@@ -10,7 +10,7 @@ interface PlanProps {
   onSubmit: () => void;
 }
 
-const constraintLabels = { budget: 'Budget', capacity: 'Venue capacity', dietary: 'Dietary coverage', accessibility: 'Wheelchair accessibility' } as const;
+const constraintLabels = { budget: 'Budget', capacity: 'Venue capacity', dietary: 'Dietary coverage', accessibility: 'Wheelchair accessibility', supplies: 'Required supplies' } as const;
 
 export function PlanPanel({ task, catalog, budgetCents, pending, onRemove, onSubmit }: PlanProps) {
   function selected(id: string) {
@@ -35,7 +35,7 @@ export function PlanPanel({ task, catalog, budgetCents, pending, onRemove, onSub
       {task.plan.supplies.length ? <ul className="plan-items">{task.plan.supplies.map(selected)}</ul> : <p>No supplies selected.</p>}
       <p className="plan-total">Total: {money(task.totalCostCents)} / {money(budgetCents)}</p>
       <div aria-live="polite" aria-atomic="true">
-        <h4>Four constraint checks</h4>
+        <h4>Constraint checks</h4>
         <ul className="constraint-list">
           {(Object.keys(constraintLabels) as (keyof typeof constraintLabels)[]).map(key => (
             <li key={key} className={task.constraints[key] ? 'constraint-met' : 'constraint-unmet'}>

@@ -10,7 +10,7 @@ const preparation = await import('../../frontend/src/services/studyPreparation.t
 const write = (name, value) => writeFileSync(new URL(`../app/fixtures/${name}`, import.meta.url), `${JSON.stringify(value, null, 2)}\n`);
 
 write('catalog.json', {
-  version: 'catalog-v2', source: 'frontend/src/mocks/scenarios.ts',
+  version: 'catalog-v3', source: 'frontend/src/mocks/scenarios.ts',
   scenarios: scenarios.scenarios, items: scenarios.catalog,
 });
 write('reference-plans.json', {

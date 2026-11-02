@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 from . import db
+from .catalog import CONSTRAINTS
 from .config import get_settings
 
 
@@ -43,7 +44,7 @@ def summarize(path: Path) -> dict:
                 "task": task_id, "scenario": task["scenarioId"], "condition": task["condition"],
                 "status": task["status"],
                 "elapsedSeconds": round((task["endedAt"] - task["startedAt"]) / 1000) if task["endedAt"] else None,
-                "constraintsMet": sum(task["constraints"].values()), "allFourMet": all(task["constraints"].values()),
+                "constraintsMet": sum(task["constraints"].values()), "allMet": all(task["constraints"].values()),
                 "checkpointsReached": len(task["decisions"]),
                 "overrideChanges": sum(1 for d in decisions if d["initialModel"] and d["finalModel"]
                                        and d["initialModel"] != d["finalModel"]),
@@ -90,7 +91,7 @@ def format_report(summary: dict) -> str:
         for task in participant["tasks"]:
             lines.append(
                 f"    {task['task']} {task['scenario']}/{task['condition']}: {task['status']}, "
-                f"{task['elapsedSeconds']}s, {task['constraintsMet']}/4 constraints, "
+                f"{task['elapsedSeconds']}s, {task['constraintsMet']}/{len(CONSTRAINTS)} constraints, "
                 f"{task['checkpointsReached']} checkpoints, {task['overrideChanges']} override changes, "
                 f"{task['messages']} messages, {task['reopens']} returns, workload {task['workloadScore']}")
     lines.append("Routing (applied): " + json.dumps(dict(summary["routing"])))

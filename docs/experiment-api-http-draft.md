@@ -360,7 +360,7 @@ POST /api/sessions/{sid}/tasks/task-1/messages { "checkpoint": "Venue", "text": 
 PUT /api/sessions/9f2c…/tasks/task-1/plan
 { "checkpoint": "Venue", "plan": { "venue": "A-venue-good", "catering": null, "supplies": [] } }
 → tasks["task-1"]: { "totalCostCents": 30000,
-    "constraints": { "budget": true, "capacity": true, "dietary": false, "accessibility": true } }
+    "constraints": { "budget": true, "capacity": true, "dietary": false, "accessibility": true, "supplies": false } }
 
 POST /api/sessions/9f2c…/tasks/task-1/finish { "reason": "submitted" }
 → tasks["task-1"]: { "status": "submitted", "endedAt": 1791504300000 }, step "tlx-1"

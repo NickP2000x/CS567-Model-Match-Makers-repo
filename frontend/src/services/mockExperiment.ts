@@ -57,7 +57,8 @@ function evaluate(task: Task) {
   task.constraints = { budget: task.totalCostCents <= r.budgetCents,
     capacity: (venue?.capacity ?? 0) >= r.attendees,
     dietary: (food?.servings ?? 0) >= r.attendees && r.dietaryNeeds.every(need => food?.dietaryCoverage?.includes(need)),
-    accessibility: !r.wheelchairRequired || venue?.wheelchairAccessible === true };
+    accessibility: !r.wheelchairRequired || venue?.wheelchairAccessible === true,
+    supplies: r.requiredSupplies.every(need => items.some(item => item.provides?.includes(need))) };
 }
 
 function endTask(state: StudyState, task: Task, reason: 'submitted' | 'timed-out', at: number) {
@@ -179,7 +180,7 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         startedAt: start, deadline: id === 'practice' ? null : start + EXPERIMENTAL_TASK_MS, endedAt: null,
         checkpoint: 'Venue', decisions: {}, messages: [], inspectedItems: [],
         plan: { venue: null, catering: null, supplies: [] }, totalCostCents: 0,
-        constraints: { budget: true, capacity: false, dietary: false, accessibility: false },
+        constraints: { budget: true, capacity: false, dietary: false, accessibility: false, supplies: false },
         survey: { answers: {}, metadata: id === 'practice' ? null : structuredClone(workloadSurveyDefinition), rawScore: null, submittedAt: null } };
       task.decisions.Venue = newDecision(task, start); draft.tasks[id] = task;
     }, 'begin'),

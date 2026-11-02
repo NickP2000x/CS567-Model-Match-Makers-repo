@@ -6,9 +6,10 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .catalog import CONSTRAINTS
 from .offline import BACKEND_DIR, new_run_directory, read_snapshot, write_csv, write_json
 
-VERSION = "study-csv-v1"
+VERSION = "study-csv-v2"
 DIMENSIONS = ("mentalDemand", "physicalDemand", "temporalDemand", "performance", "effort", "frustration")
 RELATIONAL = ("routing_decisions", "model_calls", "oracle_results")
 BASE_COLUMNS = {
@@ -19,8 +20,8 @@ BASE_COLUMNS = {
     "preparations": ("session_id", "preparation_id", "version", "confirmed_at_ms", "acknowledged_ids_json", "statements_json", "preparation_json"),
     "tasks": ("session_id", "task_id", "scenario_id", "condition", "status", "practice", "excluded_from_results",
         "checkpoint", "started_at_ms", "deadline_ms", "ended_at_ms", "elapsed_seconds", "total_cost_cents",
-        "constraint_budget", "constraint_capacity", "constraint_dietary", "constraint_accessibility",
-        "constraints_satisfied", "all_four_met", "survey_raw_score", "survey_version", "survey_submitted_at_ms",
+        *(f"constraint_{k}" for k in CONSTRAINTS),
+        "constraints_satisfied", "all_met", "survey_raw_score", "survey_version", "survey_submitted_at_ms",
         *(f"survey_{k}" for k in DIMENSIONS), "plan_json", "constraints_json", "survey_metadata_json", "survey_answers_json", "task_extra_json"),
     "plan_items": ("session_id", "task_id", "category", "position", "item_id", "item_name", "catalog_price_cents"),
     "messages": ("session_id", "task_id", "position", "message_id", "role", "checkpoint", "model", "text", "created_at_ms", "simulated", "message_json"),
@@ -135,8 +136,7 @@ def flatten_snapshot(connection: sqlite3.Connection, study_only=False) -> tuple[
             answers = mapping(survey.get("answers"))
             metadata = mapping(survey.get("metadata"))
             constraints = mapping(task.get("constraints"))
-            required = ("budget", "capacity", "dietary", "accessibility")
-            complete = all(isinstance(constraints.get(key), bool) for key in required)
+            complete = all(isinstance(constraints.get(key), bool) for key in CONSTRAINTS)
             data["tasks"].append({**linked, "scenario_id": task.get("scenarioId"), "condition": task.get("condition"),
                 "status": task.get("status"), "checkpoint": task.get("checkpoint"),
                 "started_at_ms": task.get("startedAt"), "deadline_ms": task.get("deadline"),
@@ -144,9 +144,9 @@ def flatten_snapshot(connection: sqlite3.Connection, study_only=False) -> tuple[
                 "elapsed_seconds": difference(task.get("endedAt"), task.get("startedAt"), 1000),
                 "total_cost_cents": task.get("totalCostCents"), "plan_json": task.get("plan"),
                 "constraints_json": task.get("constraints"),
-                **{f"constraint_{k}": constraints.get(k) for k in required},
-                "constraints_satisfied": sum(constraints[k] for k in required) if complete else None,
-                "all_four_met": all(constraints[k] for k in required) if complete else None,
+                **{f"constraint_{k}": constraints.get(k) for k in CONSTRAINTS},
+                "constraints_satisfied": sum(constraints[k] for k in CONSTRAINTS) if complete else None,
+                "all_met": all(constraints[k] for k in CONSTRAINTS) if complete else None,
                 "survey_raw_score": survey.get("rawScore"), "survey_version": metadata.get("version"),
                 "survey_submitted_at_ms": survey.get("submittedAt"), "survey_metadata_json": survey.get("metadata"),
                 "survey_answers_json": survey.get("answers"), **{f"survey_{k}": answers.get(k) for k in DIMENSIONS}})

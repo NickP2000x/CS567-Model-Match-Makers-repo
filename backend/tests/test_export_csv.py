@@ -105,7 +105,7 @@ def test_earlier_optional_schema_and_unfinished_tasks_are_not_fabricated(tmp_pat
     assert len(read_csv(output, "model_calls")) == 2
     assert read_csv(output, "model_calls")[0]["purpose"] == '\\N'
     assert read_csv(output, "tasks")[0]["elapsed_seconds"] == '\\N'
-    assert read_csv(output, "tasks")[0]["all_four_met"] == '\\N'
+    assert read_csv(output, "tasks")[0]["all_met"] == '\\N'
     assert len(read_csv(output, "tasks")) == 1
     assert read_csv(output, "preparations") == []
     assert read_csv(output, "checkpoint_choices") == []

@@ -1,5 +1,5 @@
 {
-  "version": "catalog-v2",
+  "version": "catalog-v3",
   "source": "frontend/src/mocks/scenarios.ts",
   "scenarios": [
     {
@@ -11,7 +11,10 @@
         "dietaryNeeds": [
           "vegetarian"
         ],
-        "wheelchairRequired": true
+        "wheelchairRequired": true,
+        "requiredSupplies": [
+          "name cards"
+        ]
       },
       "provisional": true
     },
@@ -25,7 +28,11 @@
           "vegetarian",
           "gluten-free"
         ],
-        "wheelchairRequired": true
+        "wheelchairRequired": true,
+        "requiredSupplies": [
+          "name cards",
+          "display boards"
+        ]
       },
       "provisional": true
     },
@@ -39,7 +46,11 @@
           "vegan",
           "nut-free"
         ],
-        "wheelchairRequired": true
+        "wheelchairRequired": true,
+        "requiredSupplies": [
+          "name cards",
+          "place settings"
+        ]
       },
       "provisional": true
     }
@@ -122,7 +133,10 @@
       "name": "Basic Supplies",
       "summary": "A coordinated set of stationery and table materials.",
       "priceCents": 5000,
-      "details": "Complete fixed-price supplies package: name cards, pens, table signs, and napkins. Optional; supplies contribute to the combined budget, not an additional scored requirement."
+      "provides": [
+        "name cards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, pens, and napkins. Its price counts toward the combined budget."
     },
     {
       "id": "practice-supplies-cost",
@@ -131,7 +145,10 @@
       "name": "Premium Supplies",
       "summary": "A presentation and table-decoration bundle.",
       "priceCents": 30000,
-      "details": "Complete fixed-price supplies package: display materials, printed programs, and table decorations. Optional; check the combined venue, catering, and supplies cost against the budget."
+      "provides": [
+        "name cards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
     },
     {
       "scenarioId": "A",
@@ -212,7 +229,11 @@
       "name": "Workshop Essentials",
       "summary": "A coordinated set of stationery and table materials.",
       "priceCents": 10000,
-      "details": "Complete fixed-price supplies package: name cards, pens, table signs, and napkins. Optional; supplies contribute to the combined budget, not an additional scored requirement."
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, display boards, pens, and napkins. Its price counts toward the combined budget."
     },
     {
       "id": "A-supplies-cost",
@@ -221,7 +242,11 @@
       "name": "Workshop Plus",
       "summary": "A presentation and table-decoration bundle.",
       "priceCents": 40000,
-      "details": "Complete fixed-price supplies package: display materials, printed programs, and table decorations. Optional; check the combined venue, catering, and supplies cost against the budget."
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, display boards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
     },
     {
       "scenarioId": "A",
@@ -303,8 +328,11 @@
       "category": "supplies",
       "name": "Workshop Stationery",
       "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
       "summary": "A set of name cards, pens, and notepads.",
-      "details": "One fixed-price stationery package. Optional; no minimum supply quantity is scored."
+      "details": "One fixed-price stationery package: name cards, pens, and notepads."
     },
     {
       "id": "A-supplies-presentation",
@@ -312,8 +340,11 @@
       "category": "supplies",
       "name": "Presentation Kit",
       "priceCents": 5000,
+      "provides": [
+        "display boards"
+      ],
       "summary": "Reusable display boards and presentation materials.",
-      "details": "One fixed-price display package with boards, markers, and printed agenda holders. Optional; equipment coverage is not a scored requirement."
+      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
     },
     {
       "id": "A-supplies-tableware",
@@ -321,8 +352,11 @@
       "category": "supplies",
       "name": "Table Service Set",
       "priceCents": 4000,
+      "provides": [
+        "place settings"
+      ],
       "summary": "Table coverings, reusable place settings, and napkins.",
-      "details": "One fixed-price table-service package. Optional; its price is added to other selected packages."
+      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
     },
     {
       "id": "A-supplies-bundle",
@@ -330,8 +364,13 @@
       "category": "supplies",
       "name": "Workshop Host Bundle",
       "priceCents": 25000,
+      "provides": [
+        "name cards",
+        "display boards",
+        "place settings"
+      ],
       "summary": "A combined display, stationery, and table-decoration set.",
-      "details": "One fixed-price host bundle. Some contents overlap with individual supplies packages; selecting both still adds both prices. Optional; consider the combined plan cost."
+      "details": "One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost."
     },
     {
       "scenarioId": "B",
@@ -412,7 +451,11 @@
       "name": "Celebration Essentials",
       "summary": "A coordinated set of stationery and table materials.",
       "priceCents": 10000,
-      "details": "Complete fixed-price supplies package: name cards, pens, table signs, and napkins. Optional; supplies contribute to the combined budget, not an additional scored requirement."
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, place settings, pens, and napkins. Its price counts toward the combined budget."
     },
     {
       "id": "B-supplies-cost",
@@ -421,7 +464,11 @@
       "name": "Celebration Plus",
       "summary": "A presentation and table-decoration bundle.",
       "priceCents": 40000,
-      "details": "Complete fixed-price supplies package: display materials, printed programs, and table decorations. Optional; check the combined venue, catering, and supplies cost against the budget."
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, place settings, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
     },
     {
       "scenarioId": "B",
@@ -503,8 +550,11 @@
       "category": "supplies",
       "name": "Celebration Stationery",
       "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
       "summary": "A set of name cards, pens, and notepads.",
-      "details": "One fixed-price stationery package. Optional; no minimum supply quantity is scored."
+      "details": "One fixed-price stationery package: name cards, pens, and notepads."
     },
     {
       "id": "B-supplies-presentation",
@@ -512,8 +562,11 @@
       "category": "supplies",
       "name": "Welcome Display Kit",
       "priceCents": 5000,
+      "provides": [
+        "display boards"
+      ],
       "summary": "Reusable display boards and presentation materials.",
-      "details": "One fixed-price display package with boards, markers, and printed agenda holders. Optional; equipment coverage is not a scored requirement."
+      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
     },
     {
       "id": "B-supplies-tableware",
@@ -521,8 +574,11 @@
       "category": "supplies",
       "name": "Reception Table Set",
       "priceCents": 4000,
+      "provides": [
+        "place settings"
+      ],
       "summary": "Table coverings, reusable place settings, and napkins.",
-      "details": "One fixed-price table-service package. Optional; its price is added to other selected packages."
+      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
     },
     {
       "id": "B-supplies-bundle",
@@ -530,8 +586,13 @@
       "category": "supplies",
       "name": "Celebration Host Bundle",
       "priceCents": 25000,
+      "provides": [
+        "name cards",
+        "display boards",
+        "place settings"
+      ],
       "summary": "A combined display, stationery, and table-decoration set.",
-      "details": "One fixed-price host bundle. Some contents overlap with individual supplies packages; selecting both still adds both prices. Optional; consider the combined plan cost."
+      "details": "One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost."
     }
   ]
 }

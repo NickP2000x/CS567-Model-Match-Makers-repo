@@ -29,14 +29,16 @@
         "venue": "A-venue-economy",
         "catering": "A-food-economy",
         "supplies": [
-          "A-supplies-stationery"
+          "A-supplies-stationery",
+          "A-supplies-presentation"
         ]
       },
       {
         "venue": "A-venue-premium",
         "catering": "A-food-buffet",
         "supplies": [
-          "A-supplies-tableware"
+          "A-supplies-stationery",
+          "A-supplies-presentation"
         ]
       }
     ],
@@ -45,13 +47,15 @@
         "venue": "B-venue-economy",
         "catering": "B-food-economy",
         "supplies": [
-          "B-supplies-stationery"
+          "B-supplies-stationery",
+          "B-supplies-tableware"
         ]
       },
       {
         "venue": "B-venue-premium",
         "catering": "B-food-buffet",
         "supplies": [
+          "B-supplies-stationery",
           "B-supplies-tableware"
         ]
       }
