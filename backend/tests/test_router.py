@@ -77,6 +77,14 @@ def test_routing_prompt_describes_stage_requirements_plan_and_questions():
     assert "q1" not in prompt
 
 
+def test_routing_prompt_is_stable_when_a_frozen_plan_is_reloaded_in_another_key_order():
+    scenario = {"title": "Synthetic", "requirements": {"attendees": 10, "budgetCents": 50000,
+                "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True, "requiredSupplies": ["name cards"]}}
+    a = {"venue": "v", "catering": None, "supplies": []}
+    b = {"supplies": [], "catering": None, "venue": "v"}
+    assert routing_prompt(scenario, "Venue", a, []) == routing_prompt(scenario, "Venue", b, [])
+
+
 @pytest.fixture
 def routed(make_client, tmp_path):
     def make(*scores, threshold=0.5):

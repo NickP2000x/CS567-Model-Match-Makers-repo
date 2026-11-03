@@ -1,7 +1,7 @@
 import pytest
 
 from app.config import Settings
-from app.models import ChatClient, ModelError, build_clients
+from app.models import CLIENT_USER_AGENT, ChatClient, ModelError, build_clients
 from tests.fakes import FakeOpenAIServer, completion
 
 
@@ -25,6 +25,7 @@ def test_openai_request_and_tool_call_parsing(fake_server):
     request = server.requests[0]
     assert request["path"] == "/v1/chat/completions"
     assert request["headers"]["Authorization"] == "Bearer sk-test-not-real"
+    assert request["headers"]["User-Agent"] == CLIENT_USER_AGENT
     assert request["body"]["model"] == "gpt-test" and request["body"]["tools"]
     assert request["body"]["messages"] == [{"role": "user", "content": "hi"}]
     assert reply.tool_calls[0].name == "search_catalog" and reply.tool_calls[0].arguments == '{"query": "hall"}'
@@ -37,6 +38,18 @@ def test_plain_answer_without_tools_or_key(fake_server):
     assert reply.content == "Pick Meadow Hall." and reply.tool_calls == []
     assert "Authorization" not in server.requests[0]["headers"]
     assert "tools" not in server.requests[0]["body"]
+
+
+@pytest.mark.parametrize("field", ["reasoning", "reasoning_content"])
+def test_provider_continuation_is_replayed_in_tool_history(fake_server, field):
+    first = completion(tool_calls=[("inspect_item", {"item_id": "A-venue-good"})])
+    first["choices"][0]["message"][field] = "synthetic internal continuation"
+    server = fake_server([(200, first), (200, completion(content="Final participant answer."))])
+    client = ChatClient("small", "ollama", "gpt-oss:20b-cloud", server.url, None, 5)
+    reply = client.chat([{"role": "user", "content": "Inspect the venue."}])
+    client.chat([reply.assistant_message(), {"role": "tool", "tool_call_id": "call-0", "content": "{}"}])
+    assert server.requests[1]["body"]["messages"][0][field] == "synthetic internal continuation"
+    assert "synthetic internal continuation" not in repr(reply)
 
 
 @pytest.mark.parametrize("response, expected", [

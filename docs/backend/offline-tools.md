@@ -116,7 +116,7 @@ addresses/keys as needed, and install `requirements-routellm.txt`. Then:
 # Small connectivity/evaluation sample first; not a representative calibration:
 python -m app.calibrate --real --limit 2
 # Full built-in synthetic pilot corpus:
-python -m app.calibrate --real --min-pass-rate 0.9
+python -m app.calibrate --real --min-pass-rate 0.95
 ```
 
 Both `--real` and real model configuration are required. Real runs use the existing
@@ -133,11 +133,35 @@ plans. It is a versioned synthetic pilot smoke corpus, not validated task-diffic
 ground truth. Each context is scored once per repeat; **both** models propose plans
 using the same context/question and read-only snapshot of the same catalog. Model
 evaluation order alternates to reduce a fixed first-model/warmup ordering effect.
-The original provisional oracle tool loop is reused; this evaluates proposed plans,
-not conversation usefulness or participant performance.
+The provisional oracle evaluates proposed plans, not conversation usefulness or
+participant performance. Its `bounded-stage-proposal-v6-structured-completion`
+protocol offers catalog tools and `submit_plan` for up to `AGENT_MAX_STEPS` calls.
+If the model has not submitted, the final call requests strict plan JSON without
+tools, using only the event/current plan and catalog/check results already retrieved.
+An earlier prose-only draft triggers that structured collection on the next call.
+The total remains at most `AGENT_MAX_STEPS + 1`; this does not add a second budget
+or inject uninspected catalog details. Malformed/missing plans and submitted plans
+that violate the stage checks remain failures. This collection protocol is offline;
+it is not the participant-facing conversational agent's response protocol.
+
+Provisional deterministic acceptance checks are capacity/accessibility at Venue;
+capacity/accessibility/dietary coverage at Catering; and all five constraints,
+including budget and required supplies, at Supplies and Final constraint check.
+The manifest versions and hashes these rules. A score from an earlier four-constraint
+rule or a different proposal-collection protocol is not directly comparable.
+
+The default corpus supplies **prior-stage routing history** separately from the
+model's current task question, matching routing before the new stage conversation.
+Custom cases can supply `routing_messages` as a list of prior `{role, text}` records
+(`user` or `assistant`); an empty list means no prior history. Legacy cases that omit
+it still use the question as a proxy, explicitly labelled `legacy-question-proxy`
+in each result. These contexts should not be treated as interchangeable. Plan JSON
+is canonicalized in router/oracle prompts so dictionary key order cannot change a
+replayed BERT score (`stage-context-v2-canonical-plan`).
 
 With the default four tool steps, a full repeat can make up to **240 model calls
 plus 24 router scorings**; these can consume cloud usage and embedding credits.
+An eight-step profile raises the ceiling to **432 model calls** for those 24 contexts.
 `--limit` and `--repeats` control the count. No participant database is opened:
 the catalog is loaded into memory, and all artifacts/usage are separate.
 
@@ -149,14 +173,20 @@ Default output is a new ignored `data/calibration/calibration-<UTC timestamp>/`:
 - `evaluations.jsonl`: one result per context/repeat, score, prompts, evaluation order,
   both proposed plans and tool/message transcripts, pass/failure status, latency
   and per-call tokens/tool names.
+  Exact terminal JSON requests are retained in `request_overrides` because they
+  differ from the tool-loop history. Internal provider continuation fields may be
+  retained in these offline traces; they are never participant answer text.
   Transport errors are normalized; raw provider exception bodies are not exported.
 - `thresholds.csv`: pilot threshold tradeoffs, large fraction/call counts, selected
   pass rate, always-small/always-large baselines, oracle-label agreement, token and
   timing measures. These are counterfactual selections from paired evaluations.
 - `report.json`: the grid, candidate cutoff, actual evaluation usage for **both**
   models (separate from selected-policy usage), holdout results if available, and limitations.
+  `outcome_diagnostics` separates passed plans, constraint failures, missing
+  submissions, and provider errors for each model and split.
 - `manifest.json`: tool/oracle versions, model specs, router method/published config,
   package versions, exposed router checkpoint reference/revision, hashes, limits,
+  proposal/routing protocol versions, oracle-rule hash, application User-Agent,
   status and error counts. Unknown immutable model or checkpoint revisions are null; pin/document them before
   research use rather than assuming aliases/package versions freeze the weights.
 
@@ -181,7 +211,8 @@ For a custom corpus, use `--cases contexts.json` and optionally `--catalog catal
 ```json
 {"version":"my-synthetic-pilot-v1","synthetic":true,"cases":[
   {"id":"A-venue-example","scenario_id":"A","checkpoint":"Venue","split":"pilot",
-   "plan":{"venue":null,"catering":null,"supplies":[]},"question":"Compare venue options."}
+    "plan":{"venue":null,"catering":null,"supplies":[]},"routing_messages":[],
+    "question":"Compare venue options."}
 ]}
 ```
 

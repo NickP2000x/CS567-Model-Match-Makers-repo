@@ -52,6 +52,7 @@ def test_default_corpus_covers_scenarios_stages_and_valid_frozen_plans(corpus):
     payload, connection, data, _ = corpus
     calibrate.validate_cases(data, payload, connection)
     assert len(data["cases"]) == 24
+    assert all(not case["routing_messages"] for case in data["cases"] if case["checkpoint"] == "Venue")
     assert {(c["scenario_id"], c["checkpoint"]) for c in data["cases"]} == {
         (sid, cp) for sid in ("A", "B") for cp in calibrate.CHECKPOINTS}
     assert calibrate.digest(data) == calibrate.digest(calibrate.default_cases(connection, payload)[0])
@@ -67,6 +68,8 @@ def test_pair_receives_identical_model_context_and_keeps_actual_proposals(corpus
     row = calibrate.evaluate_case(case, 0, 0, connection, {s["id"]: s for s in payload["scenarios"]},
                                   references, clients, lambda text: 0.5)
     assert row["ok"] and row["label"] == "small"
+    assert case["question"] not in row["router_prompt"]
+    assert "Participant's recent questions:" not in row["router_prompt"]
     assert clients["small"].requests == clients["large"].requests
     assert case["question"] in clients["small"].requests[0][0][1]["content"]
     assert row["small"]["plan"] == references["A"] and row["purpose"] == "calibration"
@@ -94,7 +97,8 @@ def test_provider_failures_still_evaluate_the_other_model_and_do_not_leak_messag
 def test_no_submitted_plan_is_a_quality_failure_not_a_transport_error(corpus):
     payload, connection, data, references = corpus
     clients = clients_for(references["A"])
-    clients["small"] = ScriptedClient("small", [answer("Here is advice without a submitted plan.")])
+    clients["small"] = ScriptedClient("small", [answer("Here is advice without a submitted plan."),
+                                               answer("Here is advice without a submitted plan.")])
     row = calibrate.evaluate_case(data["cases"][0], 0, 0, connection,
         {s["id"]: s for s in payload["scenarios"]}, references, clients, lambda text: .8)
     assert row["ok"] and row["label"] == "large"
@@ -136,6 +140,18 @@ def test_holdout_is_not_used_to_select_threshold_and_errors_prevent_recommendati
     assert calibrate.calibration_report(rows, [0, .5, 1], 1)["recommendation"] is None
 
 
+def test_outcome_report_separates_submission_validation_and_provider_failures():
+    rows = [result(.5, True, True, case_id=str(i)) for i in range(4)]
+    for row in rows:
+        row['small']['plan'] = {}
+        row['large']['plan'] = {}
+    rows[1]['small'].update(plan=None, passed=False)
+    rows[2]['small']['passed'] = False
+    rows[3]['small']['ok'] = rows[3]['ok'] = False
+    counts = calibrate.calibration_report(rows, [.5], .95)['outcome_diagnostics']['pilot']['small']
+    assert counts == {'total': 4, 'passed': 1, 'not_submitted': 1, 'constraint_failed': 1, 'provider_error': 1}
+
+
 def test_adaptive_grid_resolves_narrow_pilot_bands_without_holdout_leakage():
     rows = [result(.481, True, True), result(.489, False, True), result(.123, True, True, split="holdout")]
     assert calibrate.candidate_thresholds(rows) == [0, .485, 1]
@@ -157,6 +173,9 @@ def test_dry_run_is_explicit_deterministic_and_does_not_load_settings(tmp_path, 
     manifest = json.loads((output / "manifest.json").read_text())
     rows = [json.loads(line) for line in (output / "evaluations.jsonl").read_text().splitlines()]
     assert manifest["status"] == "complete" and manifest["configuration"]["mode"] == "dry-run"
+    assert manifest["oracle_version"] == "provisional-stage-pass-v2-required-supplies"
+    assert "supplies" in manifest["oracle_rules"]["Final constraint check"]
+    assert manifest["oracle_rules_sha256"] == calibrate.digest(calibrate.STAGE_CHECKS)
     assert len(rows) == 24 and all(r["simulated"] for r in rows)
     report = json.loads((output / "report.json").read_text())
     assert report["recommendation"]["selected_pass_rate"] >= .7

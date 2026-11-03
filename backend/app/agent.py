@@ -176,9 +176,7 @@ class ModelAgent:
             reply = call(step, with_tools=True)
             if not reply.tool_calls:
                 return AgentReply((reply.content or "").strip() or EMPTY_ANSWER, False, calls)
-            messages.append({"role": "assistant", "content": reply.content or "", "tool_calls": [
-                {"id": c.id, "type": "function", "function": {"name": c.name, "arguments": c.arguments}}
-                for c in reply.tool_calls]})
+            messages.append(reply.assistant_message())
             for tool_call in reply.tool_calls:
                 result = tools.run(tool_call.name, tool_call.arguments)
                 messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)})

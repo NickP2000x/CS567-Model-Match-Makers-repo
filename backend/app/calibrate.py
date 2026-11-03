@@ -15,12 +15,12 @@ from urllib.parse import urlsplit
 from .agent import CatalogTools
 from .config import Settings
 from .definitions import CHECKPOINTS, FIXTURES
-from .models import build_clients
+from .models import CLIENT_USER_AGENT, build_clients
 from .offline import BACKEND_DIR, json_text, new_run_directory, write_csv, write_json
-from .oracle import OracleFailed, STAGE_CHECKS, label, oracle_prompt, propose
-from .router import OPENAI_ROUTERS, load_routellm_scorer, routing_prompt
+from .oracle import OracleFailed, PROPOSAL_PROTOCOL_VERSION, STAGE_CHECKS, label, oracle_prompt, propose
+from .router import OPENAI_ROUTERS, ROUTING_PROMPT_VERSION, load_routellm_scorer, routing_prompt
 
-VERSION = "paired-routing-calibration-v1"
+VERSION = "paired-routing-calibration-v2"
 
 
 def scorer_metadata(scorer):
@@ -88,10 +88,12 @@ def default_cases(connection, payload):
             for variant, plan in (("initial", prefix), ("review", reference), ("repair", repair)):
                 cases.append({"id": f"{sid}-{checkpoint}-{variant}", "scenario_id": sid, "checkpoint": checkpoint,
                     "split": "pilot", "plan": plan,
+                    "routing_messages": [{"role": "user", "text": f"Compare the catalog options for {previous}."}
+                                         for previous in CHECKPOINTS[:CHECKPOINTS.index(checkpoint)]],
                     "question": f"Compare the catalog options for {checkpoint} and propose a plan that meets the requirements."})
     if len(references) != 2:
         raise ValueError("Calibration needs both A and B scenarios.")
-    return {"version": "synthetic-stage-contexts-v1", "synthetic": True, "cases": cases}, references
+    return {"version": "synthetic-stage-contexts-v2-prior-routing-history", "synthetic": True, "cases": cases}, references
 
 
 def validate_cases(corpus, payload, connection):
@@ -107,6 +109,10 @@ def validate_cases(corpus, payload, connection):
             raise ValueError("Contexts must use an experimental scenario and known checkpoint.")
         if case.get("split", "pilot") not in ("pilot", "holdout") or not isinstance(case.get("question"), str):
             raise ValueError("Contexts need a question and a pilot/holdout split.")
+        history = case.get("routing_messages", [])
+        if not isinstance(history, list) or any(not isinstance(m, dict) or m.get("role") not in ("user", "assistant")
+                or not isinstance(m.get("text"), str) for m in history):
+            raise ValueError("Routing messages must be prior user/assistant text records.")
         plan = case.get("plan")
         if not isinstance(plan, dict) or set(plan) != {"venue", "catering", "supplies"}:
             raise ValueError("Each context needs a complete plan shape (null choices are allowed).")
@@ -129,6 +135,7 @@ def proposal_record(proposal=None, failure=None):
     return {"ok": failure is None, "passed": proposal.passed if proposal else None,
             "plan": proposal.plan if proposal else None, "calls": records,
             "transcript": failure.trace if failure else proposal.trace,
+            "request_overrides": failure.request_overrides if failure else proposal.request_overrides,
             "latency_ms": sum(c.latency_ms for c in calls),
             "prompt_tokens": sum(c.prompt_tokens for c in calls) if calls and all(c.prompt_tokens is not None for c in calls) else None,
             "completion_tokens": sum(c.completion_tokens for c in calls) if calls and all(c.completion_tokens is not None for c in calls) else None}
@@ -136,10 +143,13 @@ def proposal_record(proposal=None, failure=None):
 
 def evaluate_case(case, index, repeat, connection, scenarios, references, clients=None, scorer=None, max_steps=4):
     scenario = scenarios[case["scenario_id"]]
+    history = case.get("routing_messages", [{"role": "user", "text": case["question"]}])
     row = {"purpose": "calibration", "case_id": case["id"], "repeat": repeat, "split": case.get("split", "pilot"),
            "scenario_id": case["scenario_id"], "checkpoint": case["checkpoint"], "plan": case["plan"],
            "question": case["question"], "simulated": clients is None,
-           "router_prompt": routing_prompt(scenario, case["checkpoint"], case["plan"], [{"role": "user", "text": case["question"]}]),
+           "routing_messages": history,
+           "routing_context_mode": "prior-history" if "routing_messages" in case else "legacy-question-proxy",
+           "router_prompt": routing_prompt(scenario, case["checkpoint"], case["plan"], history),
            "model_system_prompt": oracle_prompt(scenario, case["checkpoint"], case["plan"]),
            "model_user_prompt": case["question"] + "\nPropose and submit the plan for this stage.",
            "router_error": None}
@@ -209,8 +219,21 @@ def calibration_report(rows, thresholds, minimum):
             "known_prompt_tokens": sum(c["prompt_tokens"] for c in calls if c["prompt_tokens"] is not None),
             "known_completion_tokens": sum(c["completion_tokens"] for c in calls if c["completion_tokens"] is not None),
             "calls_missing_usage": sum(c["prompt_tokens"] is None or c["completion_tokens"] is None for c in calls)}
+    diagnostics = {}
+    for split in ("pilot", "holdout"):
+        subset = [r for r in rows if r["split"] == split]
+        diagnostics[split] = {}
+        for size in ("small", "large"):
+            counts = {"total": len(subset), "passed": 0, "constraint_failed": 0, "not_submitted": 0, "provider_error": 0}
+            for row in subset:
+                outcome = row[size]
+                kind = ("provider_error" if not outcome["ok"] else "not_submitted" if outcome.get("plan") is None
+                        else "passed" if outcome["passed"] else "constraint_failed")
+                counts[kind] += 1
+            diagnostics[split][size] = counts
     return {"version": VERSION, "minimum_pilot_pass_rate": minimum, "thresholds": grid,
         "actual_evaluation_usage": usage,
+        "outcome_diagnostics": diagnostics,
         "recommendation": best,
         "recommendation_rule": "Among error-free pilot candidates meeting the requested pass rate, minimize large fraction; tie-break by higher pass rate then lower threshold. Manual review required.",
         "holdout": threshold_metrics([r for r in rows if r["split"] == "holdout"], best["threshold"]) if best else None,
@@ -309,8 +332,11 @@ def main(argv=None):
             "catalog_version": payload.get("version"), "catalog_sha256": digest(payload), "corpus_sha256": digest(corpus),
             "configuration": config, "packages": packages, "repeats": args.repeats,
             "thresholds": args.thresholds, "minimum_pass_rate": args.min_pass_rate,
-            "oracle_rules": STAGE_CHECKS, "oracle_version": "provisional-stage-pass-v1",
+            "oracle_rules": STAGE_CHECKS, "oracle_version": "provisional-stage-pass-v2-required-supplies",
+            "oracle_rules_sha256": digest(STAGE_CHECKS),
+            "proposal_protocol_version": PROPOSAL_PROTOCOL_VERSION, "routing_prompt_version": ROUTING_PROMPT_VERSION,
             "model_temperature": 0,
+            "client_user_agent": CLIENT_USER_AGENT,
             "revision_note": "Model specs/package versions and exposed router checkpoint identity are recorded. Missing model/router revisions stay unknown; pin and document them before research use."}
         write_json(destination / "manifest.json", manifest)
         write_json(destination / "catalog.json", payload)
