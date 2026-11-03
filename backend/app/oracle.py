@@ -29,6 +29,7 @@ STAGE_CHECKS = {
     "Supplies": ("budget", "capacity", "dietary", "accessibility", "supplies"),
     "Final constraint check": ("budget", "capacity", "dietary", "accessibility", "supplies"),
 }
+PROPOSAL_PROTOCOL_VERSION = "bounded-stage-proposal-v6-structured-completion"
 SUBMIT_TOOL = {"type": "function", "function": {
     "name": "submit_plan",
     "description": "Submit your final complete plan (item ids). Call exactly once when done.",
@@ -41,10 +42,12 @@ SUBMIT_TOOL = {"type": "function", "function": {
 
 
 class OracleFailed(Exception):
-    def __init__(self, size: str, calls: list[CallRecord], trace: list[dict] | None = None):
+    def __init__(self, size: str, calls: list[CallRecord], trace: list[dict] | None = None,
+                 request_overrides: list[dict] | None = None):
         super().__init__(f"{size} model call failed")
         self.size, self.calls = size, calls
         self.trace = trace or []
+        self.request_overrides = request_overrides or []
 
 
 @dataclass
@@ -53,6 +56,7 @@ class Proposal:
     passed: bool
     calls: list[CallRecord] = field(default_factory=list)
     trace: list[dict] = field(default_factory=list)
+    request_overrides: list[dict] = field(default_factory=list)
 
 
 def oracle_prompt(scenario: dict, checkpoint: str, plan: dict) -> str:
@@ -63,7 +67,10 @@ def oracle_prompt(scenario: dict, checkpoint: str, plan: dict) -> str:
         f"dietary needs: {', '.join(requirements['dietaryNeeds'])}; wheelchair access "
         f"{'required' if requirements['wheelchairRequired'] else 'not required'}; "
         f"required supplies: {', '.join(requirements['requiredSupplies'])}.\n"
-        f"Current stage: {checkpoint}. Current plan (item ids): {json.dumps(plan)}.\n"
+        f"Current stage: {checkpoint}. Current plan (item ids): {json.dumps(plan, sort_keys=True)}.\n"
+        f"Checkpoint acceptance checks: {', '.join(STAGE_CHECKS[checkpoint])}. "
+        "Focus on this stage and earlier stages; later-stage choices may remain null or empty "
+        "when they are not needed by these acceptance checks.\n"
         "Use the catalog tools to choose items for this stage and any earlier stage that is still "
         "missing or wrong, check the plan, then call submit_plan once with the complete plan."
     )
@@ -84,42 +91,100 @@ def stage_passes(connection: sqlite3.Connection, scenario_id: str, checkpoint: s
     return all(result["constraints"][name] for name in STAGE_CHECKS[checkpoint])
 
 
+def parsed_plan(value) -> dict | None:
+    """Normalize nullable fields, but never invent IDs or repair a model's choices."""
+    if not isinstance(value, dict):
+        return None
+    supplies = value.get("supplies")
+    plan = {"venue": value.get("venue"), "catering": value.get("catering"),
+            "supplies": [] if supplies is None else supplies}
+    if any(item is not None and not isinstance(item, str) for item in (plan["venue"], plan["catering"])):
+        return None
+    if not isinstance(plan["supplies"], list) or any(not isinstance(item, str) for item in plan["supplies"]):
+        return None
+    if len(set(plan["supplies"])) != len(plan["supplies"]):
+        return None
+    return plan
+
+
+def final_plan_messages(scenario, checkpoint, plan, messages):
+    """Fresh terminal request using only facts the model actually retrieved."""
+    items, requests, checks = {}, {}, []
+    for message in messages:
+        for call in message.get("tool_calls", []):
+            requests[call["id"]] = call["function"]
+        if message["role"] != "tool":
+            continue
+        data = json.loads(message["content"])
+        for item in data if isinstance(data, list) else [data]:
+            if isinstance(item, dict) and "id" in item:
+                items.setdefault(item["id"], {}).update(item)
+        if isinstance(data, dict) and "constraints" in data:
+            request = requests.get(message.get("tool_call_id"), {})
+            checks.append({"plan": json.loads(request.get("arguments", "{}")), "result": data})
+    facts = {"event": scenario, "checkpoint": checkpoint, "acceptance_checks": STAGE_CHECKS[checkpoint],
+             "current_plan": plan, "observed_catalog_items": list(items.values()), "checked_candidates": checks}
+    return [{"role": "system", "content":
+        "Choose an event plan from the supplied fixed facts. Return exactly one JSON object with keys "
+        "venue (item ID or null), catering (item ID or null), and supplies (array of item IDs). "
+        "No prose or code fences. Use only observed IDs or current-plan IDs. Satisfy the listed "
+        "checkpoint acceptance checks; later-stage choices may remain null/empty. Do not request further information."},
+        {"role": "user", "content": json.dumps(facts, sort_keys=True)}]
+
+
 def propose(client: ChatClient, connection: sqlite3.Connection, scenario: dict, checkpoint: str,
             plan: dict, max_steps: int, question: str | None = None) -> Proposal:
-    """Bounded tool loop that ends when the model calls submit_plan (or runs out of steps)."""
+    """Bounded tool loop plus one strict JSON finalization call if not submitted earlier."""
     tools = CatalogTools(connection, scenario["id"])
     messages = [{"role": "system", "content": oracle_prompt(scenario, checkpoint, plan)},
                 {"role": "user", "content": (question + "\n" if question else "")
                  + "Propose and submit the plan for this stage."}]
     calls: list[CallRecord] = []
+    request_overrides: list[dict] = []
+    finalize_next = False
     for step in range(1, max_steps + 2):
-        offered = [SUBMIT_TOOL] if step == max_steps + 1 else [*TOOLS, SUBMIT_TOOL]
+        final = finalize_next or step == max_steps + 1
+        offered = None if final else [*TOOLS, SUBMIT_TOOL]
+        request_messages = messages
+        if final:
+            request_messages = final_plan_messages(scenario, checkpoint, plan, messages)
+            request_overrides.append({"step": step, "messages": request_messages, "format": "stage-plan-json-v1"})
         started = time.monotonic()
         try:
-            reply = client.chat(messages, offered)
+            reply = client.chat(request_messages, offered)
         except ModelError as error:
             calls.append(CallRecord(step, False, int((time.monotonic() - started) * 1000), error=str(error)))
-            raise OracleFailed(client.size, calls, messages) from None
+            raise OracleFailed(client.size, calls, messages, request_overrides) from None
         calls.append(CallRecord(step, True, int((time.monotonic() - started) * 1000),
                                 reply.prompt_tokens, reply.completion_tokens, [c.name for c in reply.tool_calls]))
-        if not reply.tool_calls:
-            messages.append({"role": "assistant", "content": reply.content or ""})
-            break
-        messages.append({"role": "assistant", "content": reply.content or "", "tool_calls": [
-            {"id": c.id, "type": "function", "function": {"name": c.name, "arguments": c.arguments}}
-            for c in reply.tool_calls]})
+        if final or not reply.tool_calls:
+            messages.append(reply.assistant_message())
+            try:
+                submitted = parsed_plan(json.loads(reply.content or ""))
+            except ValueError:
+                submitted = None
+            if submitted is not None or final:
+                return Proposal(submitted, stage_passes(connection, scenario["id"], checkpoint, submitted), calls, messages, request_overrides)
+            # A natural-language draft is not a scoreable plan. Use one remaining
+            # call for structured collection instead of silently treating it as a
+            # capability failure; never exceed max_steps + 1 total calls.
+            finalize_next = True
+            continue
+        messages.append(reply.assistant_message())
         for tool_call in reply.tool_calls:
+            if tool_call.name not in {t["function"]["name"] for t in offered}:
+                messages.append({"role": "tool", "tool_call_id": tool_call.id,
+                                 "content": json.dumps({"error": "Tool not available in this call."})})
+                continue
             if tool_call.name == "submit_plan":
                 try:
-                    args = json.loads(tool_call.arguments or "{}")
-                    submitted = {"venue": args.get("venue"), "catering": args.get("catering"),
-                                 "supplies": list(args.get("supplies") or [])}
-                except (ValueError, TypeError, AttributeError):
+                    submitted = parsed_plan(json.loads(tool_call.arguments or "{}"))
+                except ValueError:
                     submitted = None
-                return Proposal(submitted, stage_passes(connection, scenario["id"], checkpoint, submitted), calls, messages)
+                return Proposal(submitted, stage_passes(connection, scenario["id"], checkpoint, submitted), calls, messages, request_overrides)
             result = tools.run(tool_call.name, tool_call.arguments)
             messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)})
-    return Proposal(None, False, calls, messages)
+    return Proposal(None, False, calls, messages, request_overrides)
 
 
 def record_oracle_calls(store: Store, clients: dict[str, ChatClient], context: dict,

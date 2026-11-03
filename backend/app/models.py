@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 
 from .config import Settings, parse_model_spec
 
+CLIENT_USER_AGENT = "model-matchmakers/0.1"
+
 
 class ModelError(Exception):
     """A provider call failed. The message is safe to log: no keys or response bodies."""
@@ -27,6 +29,18 @@ class ModelReply:
     tool_calls: list[ToolCall] = field(default_factory=list)
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
+    continuation: dict[str, str] = field(default_factory=dict, repr=False)
+
+    def assistant_message(self) -> dict:
+        """Replay provider continuation state internally, never as participant text."""
+        message = {"role": "assistant", "content": self.content or ""}
+        for key in ("reasoning", "reasoning_content"):
+            if isinstance(self.continuation.get(key), str):
+                message[key] = self.continuation[key]
+        if self.tool_calls:
+            message["tool_calls"] = [{"id": call.id, "type": "function", "function": {
+                "name": call.name, "arguments": call.arguments}} for call in self.tool_calls]
+        return message
 
 
 class ChatClient:
@@ -41,7 +55,7 @@ class ChatClient:
         payload: dict = {"model": self.model, "messages": messages, "temperature": 0}
         if tools:
             payload["tools"] = tools
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json", "User-Agent": CLIENT_USER_AGENT}
         if self._api_key:
             headers["Authorization"] = f"Bearer {self._api_key}"
         request = urllib.request.Request(self._url, data=json.dumps(payload).encode(), headers=headers, method="POST")
@@ -61,7 +75,8 @@ class ChatClient:
         except (KeyError, IndexError, TypeError):
             raise ModelError(f"{self.provider} returned an unexpected response") from None
         usage = data.get("usage") or {}
-        return ModelReply(message.get("content"), calls, usage.get("prompt_tokens"), usage.get("completion_tokens"))
+        continuation = {key: message[key] for key in ("reasoning", "reasoning_content") if isinstance(message.get(key), str)}
+        return ModelReply(message.get("content"), calls, usage.get("prompt_tokens"), usage.get("completion_tokens"), continuation)
 
 
 def build_clients(settings: Settings) -> dict[str, ChatClient]:
@@ -75,4 +90,3 @@ def build_clients(settings: Settings) -> dict[str, ChatClient]:
             clients[size] = ChatClient(size, provider, model, f"{settings.ollama_base_url.rstrip('/')}/v1",
                                        None, settings.model_timeout_seconds)
     return clients
-

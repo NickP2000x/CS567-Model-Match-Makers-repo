@@ -1,5 +1,95 @@
 # Backend verification
 
+## #67 — GPT-OSS/Ollama and BERT follow-up (2026-11-02–03 UTC)
+
+- Verified Windows Ollama `0.40.3` from WSL using the existing Windows host endpoint,
+  with `ollama:gpt-oss:20b-cloud` as small and `ollama:gpt-oss:120b-cloud` as large.
+  Both passed basic text, structured `inspect_item`, and inspect/check-plan loops.
+  The aliases identify cloud models, not immutable weight revisions.
+- Repeated HTTP A/B probes isolated a Windows Ollama proxy problem: Python's default
+  User-Agent received 403 while the application User-Agent received 200. The client
+  now sends `model-matchmakers/0.1`. Provider `reasoning`/`reasoning_content` is replayed
+  internally through tool continuations, never used as participant answer text.
+  Regression tests verify request headers, replay, and participant-response privacy.
+- Canonical plan JSON fixes BERT score changes caused only by dictionary key order.
+  Calibration v2 separates prior routing history from the model's task question and
+  records prompt/proposal versions, oracle-rule hashes, and outcome diagnostics.
+  These results use `catalog-v3` and **five** constraints; required supplies remains
+  provisional. Earlier four-constraint/proposal-protocol results are not interchangeable.
+- An initial eight-step run evaluated 24 pilot and eight holdout contexts without
+  provider errors, but did not meet the 95% pilot target. Small passed 14/24 pilot
+  contexts and large 12/24; the best pilot routing policy passed 15/24 (62.5%), with
+  an oracle ceiling of 18/24. Missing final submissions dominated the failures.
+  Small used 245 calls (310,230 prompt / 18,959 completion tokens); large used 265
+  (347,598 / 16,611). All calls reported usage. Artifacts are local under
+  `backend/data/calibration/gpt-oss-bert-verification-20261102T090443.308608Z/`;
+  the original paired report is in `paired/calibration-20261102T090511.978813Z/`.
+- The offline proposal protocol now collects strict plan JSON after tool-budget
+  exhaustion or an early prose draft, still within `AGENT_MAX_STEPS + 1` calls.
+  It supplies only already retrieved item facts/check results and the original
+  event/plan, retaining the exact terminal request for audit. Tests cover bounded
+  completion, uninspected-detail exclusion, and rejection of invalid supply choices.
+  This is a revised offline measurement protocol, not proof of improved participant
+  conversational performance; see [offline tools](offline-tools.md).
+- The revised run completed a **conditional 24-context pilot plus eight fresh
+  holdout contexts**, with its 95% target unchanged:
+
+  | Split | Small pass | Large pass | Pilot-selected policy pass |
+  |---|---:|---:|---:|
+  | Pilot | 23/24 (95.83%) | 21/24 (87.5%) | 23/24 (95.83%) |
+  | Fresh holdout | 7/8 (87.5%) | 8/8 (100%) | 7/8 (87.5%) |
+
+  The pilot-selected threshold was **1.0**, selecting small on all observed scores;
+  it was frozen before holdout calls. The holdout missed 95%, so `selection.json`
+  records **no qualified cutoff** (`threshold: null`). The result does not demonstrate
+  useful BERT escalation for this pair, and the holdout is not used to retune it.
+  Missing submissions and provider errors were zero for both splits/models; the
+  remaining failures were submitted plans violating deterministic constraints.
+- To conserve calls, the revised pilot reused identical frozen tool observations
+  and unchanged earlier submissions from the initial run, plus the first eight
+  completed contexts from a preserved partial finalization run. Only changed
+  terminal calls were regenerated; the holdout was run fresh end-to-end. This is
+  **not an independent full pilot rerun**. Source hashes, per-result provenance,
+  terminal request overrides and fresh-holdout input are retained under
+  `backend/data/calibration/gpt-oss-bert-finalization-verification-20261103T014355.984706Z/`.
+  Its 525 effective calls comprise **151 new + 374 reused** observations; 12 of
+  the reused calls were newly made in the earlier partial finalization run
+  (`gpt-oss-bert-finalization-verification-20261103T013349.536135Z`). Do not sum
+  effective reports as independently billed runs. Original tool-loop evaluation
+  orders remain recorded; regenerated pilot terminal requests ran small then large.
+  Cloud alias revisions remain unpinned, and these small synthetic samples are not
+  statistical validation or an approved study configuration.
+- A separate read-only artifact audit recomputed all 32 paired outcomes and the
+  threshold report, verified frozen pilot selection, at-most-nine-call budgets,
+  accounting, and structured outputs using observed/current-plan IDs. Its
+  `artifact-audit.json` passed. Re-exporting the synthetic live database after the
+  changes produced **all 13 CSVs byte-for-byte identical** to the earlier export;
+  source database SHA-256 was unchanged (`repeat-audit.json` in the new export).
+- Live technical-path checks at **uncalibrated threshold 0.48** covered all four
+  counterbalanced sequences using six synthetic development sessions (no study
+  allocation slots consumed), 33 recorded BERT routings and 10 successful model
+  calls across five live messages. Both model roles were exercised in Automatic
+  and Override. Checks included concealment/initial lock, stage locking, choice
+  timestamps, surveys (mean 175/6), feedback, reopen/deadline behavior, timeout
+  rejection before a late model call, and absent choices for unvisited checkpoints.
+  The 13 linked CSVs matched SQLite and preserved source bytes; the saved audit is
+  `recording-verification.json` beside the isolated `sessions.sqlite3` and `exports/`.
+- An actual browser check in the same isolated artifact root passed live small-model
+  practice, automatic BERT selection, a selected-model reply, supplies display, and
+  refresh/deadline preservation (`browser.sqlite3`). This was performed before the
+  offline finalization revision; that revision does not change participant UI.
+- **141 backend tests passed**, isolated from `.env` and unrelated pytest plugins:
+
+  ```bash
+  # From backend/; uses mocks/scripted clients, not real providers.
+  PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 MODEL_MODE=mock ROUTER_MODE=mock .venv/bin/python -c \
+    'from app.config import Settings; Settings.model_config["env_file"] = None; import pytest; raise SystemExit(pytest.main([]))'
+  ```
+
+- Real verification used explicit `Settings(_env_file=None, ...)`; `.env` was not
+  read or edited. Existing working study data was not used. No macOS execution,
+  deployment, participant collection, or main-study cutoff validation is claimed.
+
 ## README quickstart verification (2026-10-25)
 
 - README now places shell commands, manual equivalents, and default database/CSV/

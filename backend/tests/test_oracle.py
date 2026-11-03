@@ -78,15 +78,62 @@ def test_proposal_uses_tools_then_submit(connection):
     client = ScriptedClient("small", [tool("search_catalog", {"category": "venue"}), submit(GOOD)])
     proposal = propose(client, connection, scenario, "Final constraint check", GOOD | {"supplies": []}, 3)
     assert proposal.plan == GOOD and proposal.passed and [c.tools for c in proposal.calls] == [["search_catalog"], ["submit_plan"]]
-    no_submit = propose(ScriptedClient("small", [answer("Pick Willow.")]), connection, scenario, "Venue", GOOD, 3)
+    no_submit = propose(ScriptedClient("small", [answer("Pick Willow."), answer("Still no structured plan.")]), connection, scenario, "Venue", GOOD, 3)
     assert (no_submit.plan, no_submit.passed) == (None, False)
     looping = ScriptedClient("small", [tool("search_catalog", {}) for _ in range(3)])
     bounded = propose(looping, connection, scenario, "Venue", GOOD, 2)
     assert bounded.plan is None and len(looping.requests) == 3
-    assert [t["function"]["name"] for t in looping.requests[-1][1]] == ["submit_plan"]  # last step: submit only
+    assert looping.requests[-1][1] is None  # Last call finalizes JSON, with no callable tools.
+    assert bounded.request_overrides == [{"step": 3, "messages": looping.requests[-1][0], "format": "stage-plan-json-v1"}]
+    facts = json.loads(looping.requests[-1][0][1]["content"])
+    assert facts["current_plan"] == GOOD
+    assert all("capacity" not in item for item in facts["observed_catalog_items"])  # No uninspected detail injection.
     bad = propose(ScriptedClient("small", [ModelReply(None, [ToolCall("x", "submit_plan", "not json")])]),
                   connection, scenario, "Venue", GOOD, 2)
     assert (bad.plan, bad.passed) == (None, False)
+
+
+def test_terminal_json_collects_a_real_proposal_without_an_extra_call(connection):
+    scenario = json.loads(connection.execute("SELECT data FROM catalog_scenarios WHERE id='A'").fetchone()[0])
+    partial = {"venue": "A-venue-good", "catering": None, "supplies": []}
+    client = ScriptedClient("small", [tool("search_catalog", {"category": "venue"}),
+        tool("inspect_item", {"item_id": "A-venue-good"}), answer(json.dumps(partial))])
+    proposal = propose(client, connection, scenario, "Venue", {"venue": None, "catering": None, "supplies": []}, 2)
+    assert proposal.passed and proposal.plan == partial and len(proposal.calls) == 3
+    assert client.requests[-1][1] is None
+    facts = json.loads(client.requests[-1][0][1]["content"])
+    by_id = {item["id"]: item for item in facts["observed_catalog_items"]}
+    assert by_id["A-venue-good"]["capacity"] == 40
+    assert "capacity" not in by_id["A-venue-capacity"]
+    assert "Pick Willow" not in client.requests[-1][0][0]["content"]
+
+
+def test_early_prose_gets_one_bounded_structured_completion(connection):
+    scenario = json.loads(connection.execute("SELECT data FROM catalog_scenarios WHERE id='A'").fetchone()[0])
+    client = ScriptedClient("small", [tool("inspect_item", {"item_id": "A-venue-good"}),
+        answer("Use the inspected venue."), answer(json.dumps(GOOD))])
+    proposal = propose(client, connection, scenario, "Venue", GOOD, 8)
+    assert proposal.passed and proposal.plan == GOOD and len(proposal.calls) == 3
+    assert client.requests[-1][1] is None
+    assert proposal.request_overrides[0]["step"] == 3
+    facts = json.loads(client.requests[-1][0][1]["content"])
+    assert [item["id"] for item in facts["observed_catalog_items"]] == ["A-venue-good"]
+    assert facts["observed_catalog_items"][0]["capacity"] == 40
+
+
+@pytest.mark.parametrize("supplies", ["A-supplies-good", 0, ["A-supplies-good", "A-supplies-good"]])
+def test_plan_parser_does_not_repair_invalid_supply_choices(supplies):
+    assert oracle.parsed_plan(dict(GOOD, supplies=supplies)) is None
+
+
+def test_proposal_replays_provider_continuation(connection):
+    scenario = json.loads(connection.execute("SELECT data FROM catalog_scenarios WHERE id='A'").fetchone()[0])
+    first = tool("inspect_item", {"item_id": "A-venue-good"})
+    first.continuation["reasoning"] = "synthetic continuation state"
+    client = ScriptedClient("small", [first, submit(GOOD)])
+    proposal = propose(client, connection, scenario, "Venue", GOOD, 4)
+    assert proposal.passed
+    assert client.requests[1][0][2]["reasoning"] == "synthetic continuation state"
 
 
 @pytest.fixture

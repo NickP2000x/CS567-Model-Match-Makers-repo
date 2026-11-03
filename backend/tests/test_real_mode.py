@@ -153,3 +153,20 @@ def test_real_mode_end_to_end_over_http(make_client, tmp_path):
         assert tool_message["role"] == "tool" and json.loads(tool_message["content"])["constraints"]["capacity"] is True
     finally:
         server.close()
+
+
+def test_internal_continuation_is_preserved_but_not_exposed_to_participant(make_client):
+    first = completion(tool_calls=[("inspect_item", {"item_id": "practice-venue-good"})])
+    first["choices"][0]["message"]["reasoning"] = "synthetic private continuation marker"
+    server = FakeOpenAIServer([(200, first), (200, completion(content="Meadow Hall fits the guest count."))])
+    try:
+        client = make_client(**REAL, small_model="openai:fake-small", large_model="openai:fake-large", openai_base_url=server.url)
+        participant = Participant(client, 1)
+        participant.introduction()
+        participant.start()
+        data = participant.call("POST", "/tasks/practice/messages", {"text": "Which venue fits?"})
+        assert server.requests[1]["body"]["messages"][2]["reasoning"] == "synthetic private continuation marker"
+        assert "synthetic private continuation marker" not in json.dumps(data)
+        assert participant.task()["messages"][-1]["text"] == "Meadow Hall fits the guest count."
+    finally:
+        server.close()

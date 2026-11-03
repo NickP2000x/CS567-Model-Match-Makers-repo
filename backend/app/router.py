@@ -22,6 +22,7 @@ ROUTELLM_REASONS = {
 }
 # RouteLLM routers that call the OpenAI embeddings API (and so need a real key).
 OPENAI_ROUTERS = ("mf", "sw_ranking")
+ROUTING_PROMPT_VERSION = "stage-context-v2-canonical-plan"
 
 
 class RouterError(Exception):
@@ -93,7 +94,7 @@ def routing_prompt(scenario: dict, checkpoint: str, plan: dict, messages: list[d
         f"{'required' if requirements['wheelchairRequired'] else 'not required'}, "
         f"required supplies {', '.join(requirements['requiredSupplies'])}.",
         "Compare catalog options and check budget, capacity, dietary coverage, accessibility, and supplies.",
-        f"Current plan: {json.dumps(plan)}.",
+        f"Current plan: {json.dumps(plan, sort_keys=True)}.",
     ]
     if recent:
         lines.append("Participant's recent questions: " + " | ".join(recent))
