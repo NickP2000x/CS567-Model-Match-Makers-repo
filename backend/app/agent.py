@@ -16,11 +16,21 @@ from .models import ChatClient, ModelError
 
 MAX_HISTORY_MESSAGES = 12
 EMPTY_ANSWER = "Sorry, I could not produce an answer. Please try rephrasing your question."
+CATEGORIES = ("venue", "catering", "supplies")
+TOOL_NAMES = ("search_catalog", "inspect_item", "check_plan")
+
+
+def is_answer(text: str | None) -> bool:
+    """False for empty text or a tool call written as text (JSON arguments, "We need to call check_plan")."""
+    text = (text or "").strip()
+    return bool(text) and not text.startswith("{") and not any(name in text for name in TOOL_NAMES)
 
 TOOLS = [
     {"type": "function", "function": {
         "name": "search_catalog",
-        "description": "Search this event's catalog. Returns item summaries (id, name, category, price in cents).",
+        "description": ("Search this event's catalog. Returns item summaries (id, name, category, price in cents). "
+                        "Summaries leave out key facts such as capacity, accessibility, dietary coverage, and "
+                        "what a supplies package contains, so list a category with an empty query and inspect items."),
         "parameters": {"type": "object", "properties": {
             "query": {"type": "string", "description": "Words to match in item names or summaries; empty for all."},
             "category": {"type": "string", "enum": ["venue", "catering", "supplies"]},
@@ -88,7 +98,10 @@ def system_prompt(context: AgentContext) -> str:
         f"Current stage: {context.checkpoint} (stages: Venue, Catering, Supplies, Final constraint check). "
         "Focus on this stage.\n"
         f"Participant's current plan (item ids): {json.dumps(context.plan)}.\n"
-        "Use the tools for facts; never invent items, prices, or details. Before recommending a "
+        "Use the tools for facts; never invent items, prices, or details. Look only at the current stage's "
+        "category unless the participant asks about another. Search matches only names and short summaries, "
+        "so a word missing from a summary does not mean no item has it: list the category with an empty query "
+        "and inspect only the candidates you need. Before recommending a "
         "combination, call check_plan and revise if a constraint fails. You cannot change the plan: "
         "tell the participant which items to add or remove. Answer in under 120 words, "
         "using item names rather than ids. Only discuss this event-planning task."
@@ -107,10 +120,17 @@ class CatalogTools:
         except ValueError:
             return {"error": "Arguments must be a JSON object."}
         if name == "search_catalog":
-            category = args.get("category")
-            if category not in (None, "venue", "catering", "supplies"):
-                return {"error": "Unknown category."}
-            return catalog.search(self.connection, self.scenario_id, str(args.get("query") or ""), category)
+            # Models often pass the stage name ("Supplies") or extra words ("Supplies Items").
+            raw = str(args.get("category") or "").strip().lower()
+            category = next((known for known in CATEGORIES if known in raw), None)
+            if raw and category is None:
+                return {"error": "Unknown category. Use venue, catering, or supplies."}
+            results = catalog.search(self.connection, self.scenario_id, str(args.get("query") or ""), category)
+            if not results and args.get("query"):
+                # Small models otherwise conclude that a feature found only in item details does not exist.
+                return {"results": [], "note": "No item names or summaries matched. Details are not searched: "
+                        "search this category with an empty query and inspect the items."}
+            return results
         if name == "inspect_item":
             item = catalog.get_item(self.connection, str(args.get("item_id", "")))
             if item is None or item["scenarioId"] != self.scenario_id:
@@ -161,10 +181,12 @@ class ModelAgent:
                     *context.history[-MAX_HISTORY_MESSAGES:], {"role": "user", "content": context.text}]
         calls: list[CallRecord] = []
 
-        def call(step: int, with_tools: bool):
+        facts: list[str] = []
+
+        def call(step: int, with_tools: bool, request: list[dict]):
             started = time.monotonic()
             try:
-                reply = client.chat(messages, TOOLS if with_tools else None)
+                reply = client.chat(request, TOOLS if with_tools else None)
             except ModelError as error:
                 calls.append(CallRecord(step, False, int((time.monotonic() - started) * 1000), error=str(error)))
                 raise AgentFailed(calls) from None
@@ -173,14 +195,20 @@ class ModelAgent:
             return reply
 
         for step in range(1, self.max_steps + 1):
-            reply = call(step, with_tools=True)
+            reply = call(step, True, messages)
             if not reply.tool_calls:
-                return AgentReply((reply.content or "").strip() or EMPTY_ANSWER, False, calls)
+                if is_answer(reply.content):
+                    return AgentReply(reply.content.strip(), False, calls)
+                break  # empty reply or a tool call written as text
             messages.append(reply.assistant_message())
             for tool_call in reply.tool_calls:
                 result = tools.run(tool_call.name, tool_call.arguments)
                 messages.append({"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)})
-        # Tool limit reached: one last call without tools forces a plain answer.
-        messages.append({"role": "system", "content": "Tool limit reached. Answer the participant now without tools."})
-        reply = call(self.max_steps + 1, with_tools=False)
-        return AgentReply((reply.content or "").strip() or EMPTY_ANSWER, False, calls)
+                facts.append(f"{tool_call.name}({tool_call.arguments}) -> {json.dumps(result)}")
+        # Tool limit reached or empty reply: one last call without tools forces a plain answer. It omits the
+        # tool-call history, after which some models (gpt-oss) answer only with another tool call.
+        final = [*messages[:len(context.history[-MAX_HISTORY_MESSAGES:]) + 2], {"role": "system", "content":
+                 "Catalog facts gathered so far:\n" + ("\n".join(facts) or "(none)")
+                 + "\nAnswer the participant now from these facts, without tools."}]
+        reply = call(len(calls) + 1, False, final)
+        return AgentReply(reply.content.strip() if is_answer(reply.content) else EMPTY_ANSWER, False, calls)

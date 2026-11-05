@@ -533,3 +533,22 @@ researcher approval (root `AGENTS.md`).
   `launcher platform selection …`, which fails the same way on unmodified `origin/main`.
 - Not done: no browser check of the new "Required supplies" row and requirements line, and
   no live-backend frontend run.
+
+## Planning agent with Ollama gpt-oss models
+
+Fixes for behaviour seen with `gpt-oss` through Ollama, on top of #71's reasoning
+continuation:
+
+- `search_catalog` accepts stage names or extra words as the category ("Supplies",
+  "Supplies Items"), and an empty search with a query tells the model that details are
+  not searched, so it lists the category and inspects items instead of concluding that
+  nothing matches. The tool description and system prompt say the same.
+- Empty replies and tool calls written as text (JSON arguments, "We need to call
+  check_plan") are never shown to participants. They trigger the final no-tools call,
+  which now gets the catalog facts gathered so far as text instead of the tool-call
+  history (after which gpt-oss tended to answer with another tool call).
+
+### Recorded results — 2026-11-05
+
+- Backend: 145 tests passed (4 new), alone and merged with the catalog-expansion branch.
+- Not done: no recorded real-model run for this change in this note.
