@@ -533,3 +533,31 @@ researcher approval (root `AGENTS.md`).
   `launcher platform selection …`, which fails the same way on unmodified `origin/main`.
 - Not done: no browser check of the new "Required supplies" row and requirements line, and
   no live-backend frontend run.
+
+## Larger, shuffled A/B catalogs (provisional)
+
+Requested by the backend owner: A and B now have 24 options per category (72 per
+scenario) instead of 6, and the catalog order is shuffled. Practice keeps its eight
+options. Scenario values remain provisional pending researcher approval.
+
+- The 18 existing A/B items keep their IDs, prices, and facts, so reference plans,
+  alternatives, and saved runs are unchanged. The 54 new options per scenario use
+  neutral IDs (`A-venue-07` … `B-supplies-24`) and are generated in
+  `frontend/src/mocks/scenarios.ts`: mostly feasible, plus detail-only distractors
+  (venue too small or upstairs, catering short or missing dietary coverage, supplies
+  covering only part of the requirement). Swapped into the reference plan, each new
+  option breaks at most one constraint.
+- The whole catalog goes through one fixed-seed shuffle, so every participant, the
+  API, the agent tools, and the oracle see the same mixed order (not a per-participant
+  order). Fixtures are `catalog-v4`. Calibration results recorded with `catalog-v3`
+  are not interchangeable with runs on this catalog.
+- The catalog panel's result list now fills the panel height (scrolling inside it)
+  instead of stopping at a fixed 24rem, which left empty space beside taller panels.
+
+### Recorded results — 2026-11-05
+
+- Fixtures regenerated with `node backend/scripts/export_fixtures.mjs`.
+- Backend: 141 tests passed. `python -m app.calibrate --dry-run` built its 24 contexts.
+- Frontend: type-check and build passed. Tests: 71 passed, 11 skipped, and 1 failed:
+  `launcher platform selection …`, which fails the same way on unmodified `origin/main`.
+- Not done: no browser check of the longer catalog list, and no live-backend frontend run.

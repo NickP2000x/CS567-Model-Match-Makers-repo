@@ -21,22 +21,54 @@ async function experimentalTask(scenarioId) {
 test('expanded catalogs and preparation definitions match generated backend fixtures', () => {
   const fixture = name => JSON.parse(readFileSync(new URL(`../../backend/app/fixtures/${name}`, import.meta.url), 'utf8'));
   assert.deepEqual(fixture('catalog.json'), {
-    version: 'catalog-v3', source: 'frontend/src/mocks/scenarios.ts', scenarios, items: catalog,
+    version: 'catalog-v4', source: 'frontend/src/mocks/scenarios.ts', scenarios, items: catalog,
   });
   assert.deepEqual(fixture('reference-plans.json').plans, feasiblePlans);
   assert.deepEqual(fixture('reference-plans.json').alternatives, alternativeFeasiblePlans);
   assert.deepEqual(fixture('definitions.json').preparations, preparationDefinition);
 });
 
-test('A/B each have six options per category while practice stays at eight options', () => {
-  assert.equal(new Set(catalog.map(item => item.id)).size, 44);
+test('A/B each have 24 options per category while practice stays at eight options', () => {
+  assert.equal(new Set(catalog.map(item => item.id)).size, 152);
   assert.equal(catalog.filter(item => item.scenarioId === 'practice').length, 8);
   for (const id of ['A', 'B']) {
     for (const category of ['venue', 'catering', 'supplies']) {
-      assert.equal(catalog.filter(item => item.scenarioId === id && item.category === category).length, 6);
+      assert.equal(catalog.filter(item => item.scenarioId === id && item.category === category).length, 24);
     }
   }
   assert.equal(new Set(catalog.map(item => item.name)).size, catalog.length);
+});
+
+test('catalog order is a fixed shuffle, not grouped by category or by original option order', () => {
+  for (const id of ['A', 'B']) {
+    const items = catalog.filter(item => item.scenarioId === id);
+    assert.equal(new Set(items.slice(0, 12).map(item => item.category)).size, 3, 'categories are interleaved');
+    const venues = items.filter(item => item.category === 'venue').map(item => item.id);
+    assert.notDeepEqual(venues.slice(0, 3), [`${id}-venue-good`, `${id}-venue-capacity`, `${id}-venue-access`]);
+    assert.ok(venues.filter(item => !/-\d\d$/.test(item)).some((_, index, legacy) => index > 0
+      && venues.indexOf(legacy[index]) - venues.indexOf(legacy[index - 1]) > 1), 'original options are spread out');
+  }
+});
+
+test('generated options include feasible choices and detail-only distractors for each constraint', async () => {
+  for (const id of ['A', 'B']) {
+    const service = await experimentalTask(id);
+    const task = () => service.getSnapshot().tasks['task-1'];
+    const reference = feasiblePlans[id];
+    const generated = catalog.filter(item => item.scenarioId === id && /-\d\d$/.test(item.id));
+    assert.equal(generated.length, 54);
+    const broken = new Set();
+    for (const item of generated) {
+      const plan = { ...reference, supplies: [...reference.supplies] };
+      if (item.category === 'supplies') plan.supplies = [item.id];
+      else plan[item.category === 'venue' ? 'venue' : 'catering'] = item.id;
+      await service.updatePlan(plan);
+      const failing = Object.entries(task().constraints).filter(([, met]) => !met).map(([key]) => key);
+      assert.ok(failing.length <= 1, `${item.id} breaks ${failing}`);
+      failing.forEach(key => broken.add(key));
+    }
+    assert.deepEqual([...broken].sort(), ['accessibility', 'capacity', 'dietary', 'supplies']);
+  }
 });
 
 test('new options support distinct feasible plans, intended distractors, and cumulative budget checks', async () => {
@@ -75,7 +107,7 @@ test('new option search and inspection keep constraint facts out of summaries', 
   for (const id of ['A', 'B']) {
     const service = await experimentalTask(id);
     const summaries = await service.searchCatalog(id);
-    assert.equal(summaries.length, 18);
+    assert.equal(summaries.length, 72);
     for (const item of summaries) {
       assert.deepEqual(Object.keys(item).sort(), ['id', 'scenarioId', 'category', 'name', 'summary', 'priceCents'].sort());
       assert.doesNotMatch(`${item.name} ${item.summary}`, /\b(vegan|vegetarian|gluten|nut-free|wheelchair|stairs|step-free|capacity|servings|fails|insufficient)\b/i);
