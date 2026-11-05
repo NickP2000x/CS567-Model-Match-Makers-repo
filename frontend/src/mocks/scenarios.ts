@@ -18,7 +18,102 @@ const additionalNames = {
   B: ['Marina Community Hall', 'Lighthouse Centre', 'Driftwood Meeting House', 'Tidal Table', 'Shoreline Buffet', 'Coral Catering', 'Celebration Stationery', 'Welcome Display Kit', 'Reception Table Set', 'Celebration Host Bundle'],
 };
 
-export const catalog: CatalogItem[] = scenarios.flatMap((scenario, index) => {
+// Generated A/B options bring each category to 24. IDs are neutral (e.g. A-venue-07) and each
+// kind is visible only in the details, like the original distractors.
+const generatedPlaces = {
+  A: ['Summit', 'Pinecrest', 'Northgate', 'Ridgeview', 'Brookside', 'Stonebridge', 'Hillcrest', 'Westfield', 'Oakmont', 'Highland', 'Foxglove', 'Ironwood', 'Silverlake', 'Clearwater', 'Redwood', 'Thornbury', 'Ashford', 'Kingsley'],
+  B: ['Anchor', 'Sandbar', 'Gullwing', 'Saltmarsh', 'Starfish', 'Breakwater', 'Seaglass', 'Bluewater', 'Compass', 'Mariner', 'Harborview', 'Tideline', 'Dune', 'Pelican', 'Wavecrest', 'Sailcloth', 'Kelpie', 'Moonstone'],
+};
+const venueStyles = [
+  ['Hall', 'An open hall with a raised stage and tall windows.'],
+  ['Room', 'A meeting room with built-in screens and a side table.'],
+  ['Loft', 'A converted loft with exposed brick and a coffee bar.'],
+  ['Pavilion', 'A pavilion with garden views and a covered terrace.'],
+  ['Suite', 'A conference suite with a cloakroom and lounge seating.'],
+  ['Centre', 'A community centre with a lobby for registration.'],
+];
+const cateringStyles = [
+  ['Catering', 'A plated lunch with a soup and salad starter.'],
+  ['Kitchen', 'A family-style lunch served on shared platters.'],
+  ['Table', 'A grazing table with hot and cold dishes.'],
+  ['Lunch Co.', 'Individually boxed lunches with a drink each.'],
+  ['Bistro', 'A two-course bistro menu with dessert.'],
+  ['Provisions', 'A deli spread with build-your-own options.'],
+];
+const supplyStyles = [
+  ['Event Kit', 'A boxed kit of materials for meetings and receptions.'],
+  ['Host Pack', 'A reusable set of hosting materials.'],
+  ['Desk Set', 'A tidy set of tabletop materials for each seat.'],
+  ['Room Pack', 'Materials for dressing a room before guests arrive.'],
+  ['Welcome Set', 'An assortment of materials for the welcome table.'],
+  ['Essentials Box', 'A compact box of everyday event materials.'],
+];
+// Cycles of nine: mostly feasible options with detail-only distractors mixed in.
+const venueKinds = ['ok', 'short', 'ok', 'stairs', 'ok', 'short', 'ok', 'stairs', 'ok'] as const;
+const cateringKinds = ['ok', 'short', 'ok', 'no-diet', 'ok', 'partial', 'ok', 'short', 'ok'] as const;
+const supplyKinds = ['full', 'first', 'second', 'other', 'full', 'none', 'first', 'second', 'full'] as const;
+const venueOffsets = [-8000, 4000, -3000, 12000, 6500, -6000, 15000, 1500, -4500, 9000, -1000, 18000, 3000, -7000, 11000, 500, 7500, -2000];
+const cateringOffsets = [-6000, 3500, 9000, -2000, 14000, -7500, 5500, 1000, -4000, 12000, 2500, -1500, 16000, 7000, -5500, 10500, 0, 4500];
+const supplyPrices = [12000, 3000, 4500, 3500, 8500, 2000, 2500, 6000, 19000, 7000, 4000, 3500, 4500, 15000, 3000, 1500, 5500, 24000];
+
+function generatedOptions(scenario: Scenario, venuePrice: number, cateringPrice: number): CatalogItem[] {
+  const { id, requirements: r } = scenario as Scenario & { id: 'A' | 'B' };
+  const places = generatedPlaces[id];
+  const [first, second] = r.requiredSupplies;
+  const other = id === 'A' ? 'place settings' : 'display boards';
+  return places.flatMap((place, i) => {
+    const number = String(i + 7).padStart(2, '0');
+    const venueKind = venueKinds[i % 9];
+    const capacity = venueKind === 'short' ? r.attendees - 2 - (i % 7) : r.attendees + (i * 3) % 25;
+    const [venueType, venueSummary] = venueStyles[i % 6];
+    const venueAccess = venueKind === 'stairs'
+      ? `Event room is on the ${i % 2 ? 'second' : 'third'} floor; no lift or step-free route.`
+      : 'Step-free entrance and accessible event room.';
+    const cateringKind = cateringKinds[i % 9];
+    const servings = cateringKind === 'short' ? r.attendees - 3 - (i % 5) : r.attendees + (i * 2) % 15;
+    const coverage = cateringKind === 'no-diet' ? [] : cateringKind === 'partial' ? [r.dietaryNeeds[i % 2]] : r.dietaryNeeds;
+    const [cateringType, cateringSummary] = cateringStyles[(i + 2) % 6];
+    const cateringFacts = cateringKind === 'no-diet'
+      ? `Serves ${servings}. Standard menu; none of the required dietary alternatives are included.`
+      : cateringKind === 'partial'
+        ? `Serves ${servings}. Covers ${coverage[0]} requirements only; ${r.dietaryNeeds[(i + 1) % 2]} coverage is not provided.`
+        : `Serves ${servings}; covers ${r.dietaryNeeds.join(', ')} requirements.`;
+    const supplyKind = supplyKinds[i % 9];
+    const provides = { full: [first, second], first: [first], second: [second], other: [other], none: [] }[supplyKind];
+    const [supplyType, supplySummary] = supplyStyles[(i + 4) % 6];
+    const contents = [...provides, ...(i % 2 ? ['pens', 'napkins'] : ['table decorations', 'signage'])];
+    return [
+      { id: `${id}-venue-${number}`, scenarioId: id, category: 'venue' as const, name: `${place} ${venueType}`, summary: venueSummary,
+        priceCents: venuePrice + venueOffsets[i], capacity, wheelchairAccessible: venueKind !== 'stairs',
+        details: `Seated capacity: ${capacity}. ${venueAccess} Fixed room-hire price.` },
+      { id: `${id}-food-${number}`, scenarioId: id, category: 'catering' as const, name: `${place} ${cateringType}`, summary: cateringSummary,
+        priceCents: cateringPrice + cateringOffsets[i], servings, dietaryCoverage: coverage,
+        details: `${cateringFacts} Fixed whole-package price.` },
+      { id: `${id}-supplies-${number}`, scenarioId: id, category: 'supplies' as const, name: `${place} ${supplyType}`, summary: supplySummary,
+        priceCents: supplyPrices[i], provides,
+        details: `One fixed-price supplies package: ${contents.join(', ')}. Its price is added to other selected packages.` },
+    ];
+  });
+}
+
+// Fixed-seed shuffle: the same mixed order for every participant, the API, and the agent tools.
+function shuffled<T>(items: T[], seed: number): T[] {
+  const result = [...items];
+  let state = seed;
+  const random = () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+const orderedCatalog: CatalogItem[] = scenarios.flatMap((scenario, index) => {
   const { id, requirements: r } = scenario;
   const names = vendorNames[id];
   const venuePrice = [10000, 30000, 50000][index];
@@ -51,8 +146,11 @@ export const catalog: CatalogItem[] = scenarios.flatMap((scenario, index) => {
     { id: `${id}-supplies-presentation`, scenarioId: id, category: 'supplies', name: extra[7], priceCents: 5000, provides: ['display boards'], summary: 'Reusable display boards and presentation materials.', details: 'One fixed-price display package: display boards, markers, and printed agenda holders.' },
     { id: `${id}-supplies-tableware`, scenarioId: id, category: 'supplies', name: extra[8], priceCents: 4000, provides: ['place settings'], summary: 'Table coverings, reusable place settings, and napkins.', details: 'One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages.' },
     { id: `${id}-supplies-bundle`, scenarioId: id, category: 'supplies', name: extra[9], priceCents: 25000, provides: ['name cards', 'display boards', 'place settings'], summary: 'A combined display, stationery, and table-decoration set.', details: 'One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost.' },
+    ...generatedOptions(scenario, venuePrice, cateringPrice),
   ];
 });
+
+export const catalog: CatalogItem[] = shuffled(orderedCatalog, 567);
 
 // Verification references only; never returned by the participant-facing service.
 export const feasiblePlans: Record<ScenarioId, Plan> = Object.fromEntries(

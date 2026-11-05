@@ -24,7 +24,7 @@ export function CatalogPanel({ results, details, expandedItem, plan, pending, on
   }
 
   return (
-    <section className="workspace-panel" aria-labelledby="catalog-title">
+    <section className="workspace-panel catalog-panel" aria-labelledby="catalog-title">
       <h3 id="catalog-title">Catalog</h3>
       <p className="field-help">Prices are for whole packages. Inspect details for capacity, dietary coverage, wheelchair access, and supplies provided before choosing.</p>
       <form onSubmit={search} className="catalog-search">
