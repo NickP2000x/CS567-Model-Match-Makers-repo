@@ -56,6 +56,25 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
                                      "supplies": True}}
 
 
+def test_empty_search_points_the_model_to_inspection(connection):
+    # Practice "Basic Supplies" lists name cards only in its details, not its summary.
+    tools = CatalogTools(connection, "practice")
+    missing = tools.run("search_catalog", json.dumps({"query": "name cards", "category": "supplies"}))
+    assert missing["results"] == [] and "inspect" in missing["note"]
+    listed = tools.run("search_catalog", json.dumps({"query": "", "category": "supplies"}))
+    assert sorted(item["id"] for item in listed) == ["practice-supplies-cost", "practice-supplies-good"]
+    assert "name cards" in tools.run("inspect_item", json.dumps({"item_id": "practice-supplies-good"}))["provides"]
+
+
+def test_search_accepts_stage_names_as_categories(connection):
+    # gpt-oss passes the capitalised stage name, or extra words, instead of the enum value.
+    tools = CatalogTools(connection, "A")
+    for category in ("Supplies", "Supplies Items"):
+        listed = tools.run("search_catalog", json.dumps({"query": "", "category": category}))
+        assert {item["category"] for item in listed} == {"supplies"}
+    assert "venue, catering, or supplies" in tools.run("search_catalog", json.dumps({"category": "decor"}))["error"]
+
+
 def test_failed_check_is_reported_so_the_model_can_revise(connection):
     agent, clients = agent_with([
         tool("check_plan", {"venue": "A-venue-access", "catering": None, "supplies": []}),
@@ -86,12 +105,30 @@ def test_loop_is_bounded_and_forces_a_final_answer(connection):
     reply = agent.reply("small", context(connection), connection)
     assert reply.text == "Final answer."
     assert len(clients["small"].requests) == 4
-    assert clients["small"].requests[-1][1] is None  # last call offers no tools
+    final_messages, final_tools = clients["small"].requests[-1]
+    assert final_tools is None  # last call offers no tools
+    assert not any(m["role"] == "tool" or m.get("tool_calls") for m in final_messages)  # nor tool history
+    assert "search_catalog({}) -> " in final_messages[-1]["content"]  # facts are passed as text
     assert [call.step for call in reply.calls] == [1, 2, 3, 4]
 
 
+def test_empty_reply_after_tools_falls_back_to_a_plain_answer(connection):
+    # gpt-oss via Ollama can return an empty message when it emits a tool call the provider cannot parse.
+    agent, clients = agent_with([tool("inspect_item", {"item_id": "A-food-good"}), answer(""), answer("Pick Orchard Catering.")])
+    reply = agent.reply("small", context(connection), connection)
+    assert reply.text == "Pick Orchard Catering." and [call.step for call in reply.calls] == [1, 2, 3]
+    assert "Orchard Catering" in clients["small"].requests[-1][0][-1]["content"]
+
+
+def test_tool_calls_written_as_text_are_not_shown(connection):
+    agent, _ = agent_with([answer('{"category":"Supplies","query":""}'), answer("We need to call check_plan.")])
+    assert agent.reply("small", context(connection), connection).text == EMPTY_ANSWER
+    agent, _ = agent_with([answer("We need to call search_catalog."), answer("Add Workshop Essentials.")])
+    assert agent.reply("small", context(connection), connection).text == "Add Workshop Essentials."
+
+
 def test_empty_answers_get_a_safe_fallback(connection):
-    agent, _ = agent_with([answer("   ")])
+    agent, _ = agent_with([answer("   "), answer("")])
     assert agent.reply("small", context(connection), connection).text == EMPTY_ANSWER
 
 
