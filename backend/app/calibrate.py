@@ -85,7 +85,13 @@ def default_cases(connection, payload):
                 repair["supplies"] = [f"{sid}-supplies-cost"]
             else:
                 repair["venue"] = f"{sid}-venue-access"
-            for variant, plan in (("initial", prefix), ("review", reference), ("repair", repair)):
+            variants = [("initial", prefix), ("review", reference), ("repair", repair)]
+            if checkpoint == "Venue":
+                # A wrong-area venue that fails only the location check.
+                elsewhere = sorted(item["id"] for item in payload["items"] if item["scenarioId"] == sid
+                                   and item["category"] == "venue" and item.get("areaId") != scenario["requirements"]["area"]["id"])
+                variants.append(("location-repair", dict(reference, venue=elsewhere[0])))
+            for variant, plan in variants:
                 cases.append({"id": f"{sid}-{checkpoint}-{variant}", "scenario_id": sid, "checkpoint": checkpoint,
                     "split": "pilot", "plan": plan,
                     "routing_messages": [{"role": "user", "text": f"Compare the catalog options for {previous}."}
@@ -93,7 +99,7 @@ def default_cases(connection, payload):
                     "question": f"Compare the catalog options for {checkpoint} and propose a plan that meets the requirements."})
     if len(references) != 2:
         raise ValueError("Calibration needs both A and B scenarios.")
-    return {"version": "synthetic-stage-contexts-v2-prior-routing-history", "synthetic": True, "cases": cases}, references
+    return {"version": "synthetic-stage-contexts-v3-location", "synthetic": True, "cases": cases}, references
 
 
 def validate_cases(corpus, payload, connection):
@@ -332,7 +338,7 @@ def main(argv=None):
             "catalog_version": payload.get("version"), "catalog_sha256": digest(payload), "corpus_sha256": digest(corpus),
             "configuration": config, "packages": packages, "repeats": args.repeats,
             "thresholds": args.thresholds, "minimum_pass_rate": args.min_pass_rate,
-            "oracle_rules": STAGE_CHECKS, "oracle_version": "provisional-stage-pass-v2-required-supplies",
+            "oracle_rules": STAGE_CHECKS, "oracle_version": "provisional-stage-pass-v3-location",
             "oracle_rules_sha256": digest(STAGE_CHECKS),
             "proposal_protocol_version": PROPOSAL_PROTOCOL_VERSION, "routing_prompt_version": ROUTING_PROMPT_VERSION,
             "model_temperature": 0,

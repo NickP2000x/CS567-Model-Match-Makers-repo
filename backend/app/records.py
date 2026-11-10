@@ -40,11 +40,14 @@ def summarize(path: Path) -> dict:
             if not task:
                 continue
             decisions = task["decisions"].values()
+            complete = all(isinstance(task["constraints"].get(key), bool) for key in CONSTRAINTS)
             tasks.append({
                 "task": task_id, "scenario": task["scenarioId"], "condition": task["condition"],
                 "status": task["status"],
                 "elapsedSeconds": round((task["endedAt"] - task["startedAt"]) / 1000) if task["endedAt"] else None,
-                "constraintsMet": sum(task["constraints"].values()), "allMet": all(task["constraints"].values()),
+                # Earlier records lack newer constraints (e.g. location): report unknown, never recompute.
+                "constraintsMet": sum(task["constraints"].values()) if complete else None,
+                "allMet": all(task["constraints"].values()) if complete else None,
                 "checkpointsReached": len(task["decisions"]),
                 "overrideChanges": sum(1 for d in decisions if d["initialModel"] and d["finalModel"]
                                        and d["initialModel"] != d["finalModel"]),
@@ -91,7 +94,7 @@ def format_report(summary: dict) -> str:
         for task in participant["tasks"]:
             lines.append(
                 f"    {task['task']} {task['scenario']}/{task['condition']}: {task['status']}, "
-                f"{task['elapsedSeconds']}s, {task['constraintsMet']}/{len(CONSTRAINTS)} constraints, "
+                f"{task['elapsedSeconds']}s, {'unknown' if task['constraintsMet'] is None else task['constraintsMet']}/{len(CONSTRAINTS)} constraints, "
                 f"{task['checkpointsReached']} checkpoints, {task['overrideChanges']} override changes, "
                 f"{task['messages']} messages, {task['reopens']} returns, workload {task['workloadScore']}")
     lines.append("Routing (applied): " + json.dumps(dict(summary["routing"])))

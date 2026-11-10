@@ -13,13 +13,16 @@ def test_scenarios_and_unknown_ids(client):
 
 
 def test_search_returns_summaries_only_in_fixture_order(client):
+    fixture = json.loads((FIXTURES / "catalog.json").read_text())["items"]
     results = client.get("/api/scenarios/practice/catalog").json()
     assert len(results) == 8
-    assert results[0]["id"] == "practice-venue-good"
+    assert [item["id"] for item in results] == [item["id"] for item in fixture if item["scenarioId"] == "practice"]
     assert set(results[0]) == {"id", "scenarioId", "category", "name", "summary", "priceCents"}
     venues = client.get("/api/scenarios/A/catalog", params={"category": "venue"}).json()
-    assert [item["id"] for item in venues] == ["A-venue-good", "A-venue-capacity", "A-venue-access",
-                                             "A-venue-economy", "A-venue-premium", "A-venue-near-capacity"]
+    assert [item["id"] for item in venues] == [item["id"] for item in fixture
+                                             if item["scenarioId"] == "A" and item["category"] == "venue"]
+    # The fixture order is shuffled, so the reference option is not simply listed first.
+    assert venues[0]["id"] != "A-venue-good"
     meadow = client.get("/api/scenarios/practice/catalog", params={"query": "MEADOW"}).json()
     assert [item["name"] for item in meadow] == ["Meadow Hall"]
     assert client.get("/api/scenarios/B/catalog", params={"query": "nothing-matches"}).json() == []
@@ -31,7 +34,7 @@ def test_seeding_twice_is_safe(tmp_path):
     init_db(path)
     import sqlite3
     connection = sqlite3.connect(path)
-    assert connection.execute("SELECT COUNT(*) FROM catalog_items").fetchone()[0] == 44
+    assert connection.execute("SELECT COUNT(*) FROM catalog_items").fetchone()[0] == 98
     assert connection.execute("SELECT COUNT(*) FROM allocation_slots").fetchone()[0] == 12
     connection.close()
 
@@ -85,7 +88,7 @@ def test_expanded_catalog_plans_search_and_distractors(dev_client):
         prefix = f"/api/scenarios/{scenario}/catalog"
         for category in ("venue", "catering", "supplies"):
             summaries = dev_client.get(prefix, params={"category": category}).json()
-            assert len(summaries) == 6
+            assert len(summaries) == 15
             assert all(set(item) == {"id", "scenarioId", "category", "name", "summary", "priceCents"}
                        for item in summaries)
         for plan, total in zip(alternatives[scenario], totals):
@@ -124,7 +127,7 @@ def test_reseeding_preserves_saved_sessions_and_legacy_catalog_facts(tmp_path):
         connection.execute("DELETE FROM catalog_items WHERE id LIKE '%-economy' OR id LIKE '%-premium' "
                            "OR id LIKE '%-near-capacity' OR id LIKE '%-buffet' OR id LIKE '%-partial' "
                            "OR id LIKE '%-stationery' OR id LIKE '%-presentation' OR id LIKE '%-tableware' "
-                           "OR id LIKE '%-bundle'")
+                           "OR id LIKE '%-bundle' OR id GLOB '*-[0-9][0-9]'")
         fields = ("priceCents", "capacity", "wheelchairAccessible", "servings", "dietaryCoverage")
         earlier = {row[0]: {key: json.loads(row[1])[key] for key in fields if key in json.loads(row[1])}
                    for row in connection.execute("SELECT id, data FROM catalog_items")}
@@ -135,4 +138,26 @@ def test_reseeding_preserves_saved_sessions_and_legacy_catalog_facts(tmp_path):
         for item_id, facts in earlier.items():
             item = json.loads(connection.execute("SELECT data FROM catalog_items WHERE id=?", (item_id,)).fetchone()[0])
             assert {key: item[key] for key in fields if key in item} == facts
-        assert connection.execute("SELECT COUNT(*) FROM catalog_items").fetchone()[0] == 44
+        assert connection.execute("SELECT COUNT(*) FROM catalog_items").fetchone()[0] == 98
+
+
+def test_location_passes_only_for_a_venue_in_the_required_area(dev_client):
+    items = json.loads((FIXTURES / "catalog.json").read_text())["items"]
+    scenarios = {s["id"]: s for s in json.loads((FIXTURES / "catalog.json").read_text())["scenarios"]}
+    assert all(item.get("areaId") for item in items if item["category"] == "venue")
+    assert not any("areaId" in item for item in items if item["category"] != "venue")
+    participant = Participant(dev_client, 1)
+    participant.through_practice()
+    participant.start()
+    reference = REFERENCE_PLANS["A"]
+    elsewhere = [item for item in items if item["scenarioId"] == "A" and item["category"] == "venue"
+                 and item["areaId"] != scenarios["A"]["requirements"]["area"]["id"]]
+    assert len(elsewhere) == 3
+    for item in elsewhere:
+        assert scenarios["A"]["requirements"]["area"]["name"] not in item["details"]
+        participant.call("PUT", "/tasks/task-1/plan", {"plan": dict(reference, venue=item["id"])})
+        assert [key for key, met in participant.task()["constraints"].items() if not met] == ["location"], item["id"]
+    participant.call("PUT", "/tasks/task-1/plan", {"plan": dict(reference, venue=None)})
+    assert participant.task()["constraints"]["location"] is False
+    participant.call("PUT", "/tasks/task-1/plan", {"plan": reference})
+    assert participant.task()["constraints"]["location"] is True

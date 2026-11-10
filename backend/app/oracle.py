@@ -24,10 +24,10 @@ from .store import Store
 
 # Provisional pass rule: constraints that must hold once each stage is planned.
 STAGE_CHECKS = {
-    "Venue": ("capacity", "accessibility"),
-    "Catering": ("capacity", "accessibility", "dietary"),
-    "Supplies": ("budget", "capacity", "dietary", "accessibility", "supplies"),
-    "Final constraint check": ("budget", "capacity", "dietary", "accessibility", "supplies"),
+    "Venue": ("capacity", "accessibility", "location"),
+    "Catering": ("capacity", "accessibility", "location", "dietary"),
+    "Supplies": ("budget", "capacity", "dietary", "accessibility", "supplies", "location"),
+    "Final constraint check": ("budget", "capacity", "dietary", "accessibility", "supplies", "location"),
 }
 PROPOSAL_PROTOCOL_VERSION = "bounded-stage-proposal-v6-structured-completion"
 SUBMIT_TOOL = {"type": "function", "function": {
@@ -66,7 +66,8 @@ def oracle_prompt(scenario: dict, checkpoint: str, plan: dict) -> str:
         f"budget {requirements['budgetCents'] / 100:.2f} USD for venue, catering, and supplies together; "
         f"dietary needs: {', '.join(requirements['dietaryNeeds'])}; wheelchair access "
         f"{'required' if requirements['wheelchairRequired'] else 'not required'}; "
-        f"required supplies: {', '.join(requirements['requiredSupplies'])}.\n"
+        f"required supplies: {', '.join(requirements['requiredSupplies'])}; "
+        f"the venue must be in {requirements['area']['name']}.\n"
         f"Current stage: {checkpoint}. Current plan (item ids): {json.dumps(plan, sort_keys=True)}.\n"
         f"Checkpoint acceptance checks: {', '.join(STAGE_CHECKS[checkpoint])}. "
         "Focus on this stage and earlier stages; later-stage choices may remain null or empty "

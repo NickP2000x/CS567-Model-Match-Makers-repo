@@ -38,7 +38,7 @@ records retain their saved wording/version. Research notices remain provisional.
 2. Standalone mock: consent first, simulated agent/routing labels, memory/refresh
    notice, no provider IDs. Check decline and preparation gates, six tutorial cards,
    no A/B answer leakage, and practice with eight options and no survey.
-3. A/B: 18 options, six in each category. Search/inspect new entries; confirm that
+3. A/B: 45 options, 15 in each category (since `catalog-v4`; order is shuffled). Search/inspect new entries; confirm that
    filtering retains the selected plan, costs are package totals, supplies do not
    duplicate, and an unmatched query gives an empty result.
 4. Exercise the additional reference plans and new near-capacity/partial-diet

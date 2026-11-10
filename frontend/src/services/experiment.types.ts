@@ -26,20 +26,23 @@ export interface SurveyMetadata {
 }
 
 export interface Assignment { scenarioId: 'A' | 'B'; condition: Condition }
+// Fictional event area. Only the venue's area is scored (provisional location constraint).
+export interface Area { id: string; name: string }
+
 export interface Scenario {
   id: ScenarioId;
   title: string;
-  requirements: { budgetCents: number; attendees: number; dietaryNeeds: string[]; wheelchairRequired: boolean; requiredSupplies: string[] };
+  requirements: { budgetCents: number; attendees: number; dietaryNeeds: string[]; wheelchairRequired: boolean; requiredSupplies: string[]; area: Area };
   provisional: true;
 }
 export interface CatalogSummary {
   id: string; scenarioId: ScenarioId; category: Category; name: string; summary: string; priceCents: number;
 }
 export interface CatalogItem extends CatalogSummary {
-  details: string; capacity?: number; wheelchairAccessible?: boolean; servings?: number; dietaryCoverage?: string[]; provides?: string[];
+  details: string; capacity?: number; wheelchairAccessible?: boolean; servings?: number; dietaryCoverage?: string[]; provides?: string[]; areaId?: string;
 }
 export interface Plan { venue: string | null; catering: string | null; supplies: string[] }
-export interface Constraints { budget: boolean; capacity: boolean; dietary: boolean; accessibility: boolean; supplies: boolean }
+export interface Constraints { budget: boolean; capacity: boolean; dietary: boolean; accessibility: boolean; supplies: boolean; location: boolean }
 export interface Decision {
   phase: 'choose' | 'locked' | 'awaiting-recommendation' | 'recommended' | 'committed';
   initialModel: Model | null; recommendedModel: Model | null; finalModel: Model | null;
