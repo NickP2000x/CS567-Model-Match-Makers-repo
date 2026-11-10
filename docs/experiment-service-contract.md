@@ -111,6 +111,20 @@ display boards; B: name cards and place settings), and the selected supplies pac
 inspection-only `provides` lists must cover them. Availability and distance are not
 requirements.
 
+### #72 catalog-v4 and venue location (provisional)
+
+A and B each have exactly 15 venues, 15 catering options, and 15 supplies packages
+(45 per scenario); practice stays at eight. Original items keep their IDs, prices, and
+scored facts; nine generated options per category use neutral IDs (`A-venue-07` …
+`A-venue-15`). The catalog order is one fixed-seed shuffle shared by every participant.
+A sixth constraint, venue location, is provisional pending researcher approval: each
+scenario has a required fictional area (practice: Riverside `riverside`; A: North Quarter
+`north-quarter`; B: Harbor Front `harbor-front`), every venue has an inspection-only
+`areaId` with "Located in …" detail text, and the check passes only when the selected
+venue is in the required area. Three venues per experimental scenario fail only this
+check (A: East Side, Old Town; B: Hillside, Market District). Catering and supplies have
+no scored location.
+
 Frontend copy distinguishes `simulated`, `routerSimulated`, and
 `refreshRestartsDemo`: a backend may persist simulated replies or use live models,
 and routing can be simulated independently of agent replies. No provider/model
@@ -129,7 +143,7 @@ These changes do not approve consent or add demographic questions.
   category's full list. Filtering never removes selected items from the plan.
 - Venue/catering selections replace the previous item. Supplies selections add
   distinct packages. Remove actions retain other selections; the service recomputes
-  integer-cent costs and the same five constraints used at submission.
+  integer-cent costs and the same six constraints used at submission.
 - Next-stage controls use `advanceCheckpoint`; conversation uses `sendMessage`.
   Stage-linked history and inspected items remain in service memory. Mutations are
   guarded while an operation is pending; failed messages keep the current draft.

@@ -50,12 +50,12 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
     fixture = json.loads((db.FIXTURES / "catalog.json").read_text())["items"]
     assert [entry["id"] for entry in search] == [item["id"] for item in fixture
                                                if item["scenarioId"] == "A" and item["category"] == "venue"]
-    assert len(search) == 24
+    assert len(search) == 15
     assert "capacity" not in search[0]  # search returns summaries only
     assert item["capacity"] == 40 and item["wheelchairAccessible"] is True
     assert check == {"totalCostCents": 80000, "allConstraintsMet": True,
                      "constraints": {"budget": True, "capacity": True, "dietary": True, "accessibility": True,
-                                     "supplies": True}}
+                                     "supplies": True, "location": True}}
 
 
 def test_failed_check_is_reported_so_the_model_can_revise(connection):

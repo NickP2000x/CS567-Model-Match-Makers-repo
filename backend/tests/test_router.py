@@ -68,18 +68,19 @@ def test_missing_routellm_package_gives_an_install_hint(monkeypatch):
 def test_routing_prompt_describes_stage_requirements_plan_and_questions():
     scenario = {"title": "Company workshop", "requirements": {
         "attendees": 40, "budgetCents": 100000, "dietaryNeeds": ["vegetarian", "gluten-free"], "wheelchairRequired": True,
-        "requiredSupplies": ["name cards", "display boards"]}}
+        "requiredSupplies": ["name cards", "display boards"], "area": {"id": "north-quarter", "name": "North Quarter"}}}
     messages = [{"role": "user", "text": f"q{i}"} for i in range(5)] + [{"role": "assistant", "text": "a"}]
     prompt = routing_prompt(scenario, "Catering", {"venue": "A-venue-good", "catering": None, "supplies": []}, messages)
     for expected in ("Catering stage", "Company workshop", "40 guests", "1000.00 USD", "vegetarian, gluten-free",
-                     "wheelchair access required", "required supplies name cards, display boards", '"venue": "A-venue-good"', "q2 | q3 | q4"):
+                     "wheelchair access required", "required supplies name cards, display boards", "venue in North Quarter", '"venue": "A-venue-good"', "q2 | q3 | q4"):
         assert expected in prompt, expected
     assert "q1" not in prompt
 
 
 def test_routing_prompt_is_stable_when_a_frozen_plan_is_reloaded_in_another_key_order():
     scenario = {"title": "Synthetic", "requirements": {"attendees": 10, "budgetCents": 50000,
-                "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True, "requiredSupplies": ["name cards"]}}
+                "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True, "requiredSupplies": ["name cards"],
+                "area": {"id": "riverside", "name": "Riverside"}}}
     a = {"venue": "v", "catering": None, "supplies": []}
     b = {"supplies": [], "catering": None, "venue": "v"}
     assert routing_prompt(scenario, "Venue", a, []) == routing_prompt(scenario, "Venue", b, [])

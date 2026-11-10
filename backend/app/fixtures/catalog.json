@@ -14,7 +14,11 @@
         "wheelchairRequired": true,
         "requiredSupplies": [
           "name cards"
-        ]
+        ],
+        "area": {
+          "id": "riverside",
+          "name": "Riverside"
+        }
       },
       "provisional": true
     },
@@ -32,7 +36,11 @@
         "requiredSupplies": [
           "name cards",
           "display boards"
-        ]
+        ],
+        "area": {
+          "id": "north-quarter",
+          "name": "North Quarter"
+        }
       },
       "provisional": true
     },
@@ -50,769 +58,16 @@
         "requiredSupplies": [
           "name cards",
           "place settings"
-        ]
+        ],
+        "area": {
+          "id": "harbor-front",
+          "name": "Harbor Front"
+        }
       },
       "provisional": true
     }
   ],
   "items": [
-    {
-      "id": "B-food-19",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Dune Table",
-      "summary": "A grazing table with hot and cold dishes.",
-      "priceCents": 76000,
-      "servings": 69,
-      "dietaryCoverage": [],
-      "details": "Serves 69. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
-    },
-    {
-      "id": "B-food-16",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Mariner Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 72000,
-      "servings": 63,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 63; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-food-22",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Sailcloth Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 70500,
-      "servings": 60,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 60; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "catering",
-      "priceCents": 60000,
-      "servings": 55,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "id": "B-food-servings",
-      "name": "Pier Kitchen",
-      "summary": "A boxed lunch collection with a shared dessert tray.",
-      "details": "Serves 55; covers vegan, nut-free requirements. The listed price is for the whole package."
-    },
-    {
-      "id": "A-venue-20",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Clearwater Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 23000,
-      "capacity": 54,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 54. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-17",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Foxglove Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 4000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "A",
-      "category": "catering",
-      "priceCents": 40000,
-      "servings": 40,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "id": "A-food-good",
-      "name": "Orchard Catering",
-      "summary": "A shared lunch menu with individually labelled dishes.",
-      "details": "Serves 40; covers vegetarian, gluten-free requirements. The listed price is for the whole package."
-    },
-    {
-      "id": "A-food-24",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Kingsley Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 44500,
-      "servings": 44,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 44; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-19",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Silverlake Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 4500,
-      "provides": [
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-bundle",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Workshop Host Bundle",
-      "priceCents": 25000,
-      "provides": [
-        "name cards",
-        "display boards",
-        "place settings"
-      ],
-      "summary": "A combined display, stationery, and table-decoration set.",
-      "details": "One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost."
-    },
-    {
-      "id": "B-supplies-08",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Sandbar Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 3000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-24",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Moonstone Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 48000,
-      "capacity": 61,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 61. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-22",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Sailcloth Host Pack",
-      "summary": "A reusable set of hosting materials.",
-      "priceCents": 1500,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 25000,
-      "capacity": 45,
-      "wheelchairAccessible": true,
-      "id": "A-venue-economy",
-      "name": "Aspen Community Hall",
-      "summary": "A community hall with a self-arranged seating layout.",
-      "details": "Seated capacity: 45. Step-free entrance and accessible event room. Room hire includes tables and chairs; participants arrange the layout."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 47500,
-      "capacity": 59,
-      "wheelchairAccessible": true,
-      "id": "B-venue-near-capacity",
-      "name": "Driftwood Meeting House",
-      "summary": "A meeting house with a furnished breakout corner.",
-      "details": "Seated capacity: 59. Step-free entrance and accessible event room. The breakout corner does not provide additional event seating."
-    },
-    {
-      "id": "B-venue-17",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Harborview Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 49000,
-      "capacity": 55,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 55. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-10",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Ridgeview Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 38000,
-      "servings": 46,
-      "dietaryCoverage": [],
-      "details": "Serves 46. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
-    },
-    {
-      "id": "A-venue-15",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Oakmont Loft",
-      "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 25500,
-      "capacity": 64,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 64. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-23",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Ashford Catering",
-      "summary": "A plated lunch with a soup and salad starter.",
-      "priceCents": 40000,
-      "servings": 36,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 36; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-food-16",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Highland Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 52000,
-      "servings": 43,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 43; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 50000,
-      "capacity": 60,
-      "wheelchairAccessible": true,
-      "id": "B-venue-good",
-      "name": "Harbor Events Hall",
-      "summary": "An event hall with an adjoining reception area.",
-      "details": "Seated capacity: 60. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-food-15",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Compass Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 56000,
-      "servings": 61,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 61; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-supplies-cost",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Celebration Plus",
-      "summary": "A presentation and table-decoration bundle.",
-      "priceCents": 40000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, place settings, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
-    },
-    {
-      "id": "A-supplies-stationery",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Workshop Stationery",
-      "priceCents": 2500,
-      "provides": [
-        "name cards"
-      ],
-      "summary": "A set of name cards, pens, and notepads.",
-      "details": "One fixed-price stationery package: name cards, pens, and notepads."
-    },
-    {
-      "id": "B-food-14",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Bluewater Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 61000,
-      "servings": 55,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 55; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-24",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Kingsley Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
-      "priceCents": 24000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-11",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Starfish Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 56500,
-      "capacity": 72,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 72. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-stationery",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Celebration Stationery",
-      "priceCents": 2500,
-      "provides": [
-        "name cards"
-      ],
-      "summary": "A set of name cards, pens, and notepads.",
-      "details": "One fixed-price stationery package: name cards, pens, and notepads."
-    },
-    {
-      "id": "B-venue-10",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Saltmarsh Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 62000,
-      "capacity": 69,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 69. Event room is on the second floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-23",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Ashford Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 37500,
-      "capacity": 63,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 63. Event room is on the third floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 50000,
-      "capacity": 60,
-      "wheelchairAccessible": false,
-      "id": "B-venue-access",
-      "name": "Seabreeze Suite",
-      "summary": "An event suite with a separate welcome area.",
-      "details": "Seated capacity: 60. Event room is upstairs; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 45000,
-      "capacity": 65,
-      "wheelchairAccessible": true,
-      "id": "B-venue-economy",
-      "name": "Marina Community Hall",
-      "summary": "A community hall with a self-arranged seating layout.",
-      "details": "Seated capacity: 65. Step-free entrance and accessible event room. Room hire includes tables and chairs; participants arrange the layout."
-    },
-    {
-      "id": "A-supplies-11",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Brookside Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 8500,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-venue-08",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Pinecrest Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 34000,
-      "capacity": 37,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 37. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-venue-21",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Wavecrest Loft",
-      "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 61000,
-      "capacity": 58,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 58. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-09",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Gullwing Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 4500,
-      "provides": [
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "A",
-      "category": "catering",
-      "priceCents": 40000,
-      "servings": 40,
-      "dietaryCoverage": [],
-      "id": "A-food-diet",
-      "name": "Market Table",
-      "summary": "A fixed-menu lunch with a selection of main dishes.",
-      "details": "Serves 40. Standard menu; none of the required dietary alternatives are included. The listed price is for the whole package."
-    },
-    {
-      "id": "B-venue-08",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Sandbar Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 54000,
-      "capacity": 57,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 57. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-food-20",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Pelican Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 67000,
-      "servings": 71,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 71; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-supplies-good",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Celebration Essentials",
-      "summary": "A coordinated set of stationery and table materials.",
-      "priceCents": 10000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, place settings, pens, and napkins. Its price counts toward the combined budget."
-    },
-    {
-      "id": "A-supplies-22",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Thornbury Host Pack",
-      "summary": "A reusable set of hosting materials.",
-      "priceCents": 1500,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 50000,
-      "capacity": 55,
-      "wheelchairAccessible": true,
-      "id": "B-venue-capacity",
-      "name": "Beacon Room",
-      "summary": "A meeting room with a central presentation area.",
-      "details": "Seated capacity: 55. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "catering",
-      "priceCents": 57500,
-      "servings": 60,
-      "dietaryCoverage": [
-        "vegan"
-      ],
-      "id": "B-food-partial",
-      "name": "Coral Catering",
-      "summary": "A seasonal lunch selection with individually packed portions.",
-      "details": "Serves 60. Covers vegan requirements only; nut-free coverage is not provided. Fixed whole-package price."
-    },
-    {
-      "id": "B-supplies-14",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Bluewater Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 6000,
-      "provides": [
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-cost",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Workshop Plus",
-      "summary": "A presentation and table-decoration bundle.",
-      "priceCents": 40000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, display boards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
-    },
-    {
-      "id": "B-food-21",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Wavecrest Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 54500,
-      "servings": 73,
-      "dietaryCoverage": [
-        "vegan"
-      ],
-      "details": "Serves 73. Covers vegan requirements only; nut-free coverage is not provided. Fixed whole-package price."
-    },
-    {
-      "id": "A-food-08",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Pinecrest Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 43500,
-      "servings": 36,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 36; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "A",
-      "category": "catering",
-      "priceCents": 35000,
-      "servings": 40,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "id": "A-food-economy",
-      "name": "Fieldstone Lunches",
-      "summary": "A self-service lunch with labelled individual portions.",
-      "details": "Serves 40; covers vegetarian, gluten-free requirements. Fixed package price; self-service presentation."
-    },
-    {
-      "id": "A-food-19",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Silverlake Table",
-      "summary": "A grazing table with hot and cold dishes.",
-      "priceCents": 56000,
-      "servings": 49,
-      "dietaryCoverage": [],
-      "details": "Serves 49. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "venue",
-      "priceCents": 60000,
-      "capacity": 75,
-      "wheelchairAccessible": true,
-      "id": "B-venue-premium",
-      "name": "Lighthouse Centre",
-      "summary": "A conference room with a furnished reception lounge.",
-      "details": "Seated capacity: 75. Step-free entrance and accessible event room. Fixed room-hire price includes the reception lounge."
-    },
-    {
-      "id": "B-food-13",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Seaglass Table",
-      "summary": "A grazing table with hot and cold dishes.",
-      "priceCents": 65500,
-      "servings": 72,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 72; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-07",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Summit Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 12000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "venue",
-      "priceCents": 10000,
-      "capacity": 10,
-      "wheelchairAccessible": true,
-      "id": "practice-venue-capacity",
-      "name": "Garden Room",
-      "summary": "A meeting room with a central presentation area.",
-      "details": "Seated capacity: 10. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-09",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Northgate Loft",
-      "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 27000,
-      "capacity": 46,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 46. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-20",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Clearwater Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 47000,
-      "servings": 51,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 51; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 30000,
-      "capacity": 35,
-      "wheelchairAccessible": true,
-      "id": "A-venue-capacity",
-      "name": "Birch Meeting Room",
-      "summary": "A meeting room with a central presentation area.",
-      "details": "Seated capacity: 35. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-venue-13",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Seaglass Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 65000,
-      "capacity": 78,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 78. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-16",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Mariner Host Pack",
-      "summary": "A reusable set of hosting materials.",
-      "priceCents": 7000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-venue-19",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Silverlake Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 33000,
-      "capacity": 51,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 51. Event room is on the third floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "B",
-      "category": "catering",
-      "priceCents": 65000,
-      "servings": 70,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "id": "B-food-buffet",
-      "name": "Shoreline Buffet",
-      "summary": "A buffet assortment with shared mains and side dishes.",
-      "details": "Serves 70; covers vegan, nut-free requirements. Fixed price includes all portions and dish labels."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 27500,
-      "capacity": 39,
-      "wheelchairAccessible": true,
-      "id": "A-venue-near-capacity",
-      "name": "Elm Meeting House",
-      "summary": "A meeting house with a furnished breakout corner.",
-      "details": "Seated capacity: 39. Step-free entrance and accessible event room. The breakout corner does not provide additional event seating."
-    },
-    {
-      "id": "B-venue-19",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Dune Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 53000,
-      "capacity": 71,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 71. Event room is on the third floor; no lift or step-free route. Fixed room-hire price."
-    },
     {
       "scenarioId": "A",
       "category": "catering",
@@ -827,260 +82,29 @@
       "details": "Serves 40. Covers vegetarian requirements only; gluten-free coverage is not provided. Fixed whole-package price."
     },
     {
-      "id": "A-supplies-20",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Clearwater Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 15000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-10",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Ridgeview Host Pack",
-      "summary": "A reusable set of hosting materials.",
-      "priceCents": 3500,
-      "provides": [
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-18",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Ironwood Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
-      "priceCents": 3500,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-11",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Starfish Catering",
-      "summary": "A plated lunch with a soup and salad starter.",
-      "priceCents": 74000,
-      "servings": 68,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 68; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "venue",
-      "priceCents": 10000,
-      "capacity": 15,
-      "wheelchairAccessible": false,
-      "id": "practice-venue-access",
-      "name": "Cedar Room",
-      "summary": "An event suite with a separate welcome area.",
-      "details": "Seated capacity: 15. Event room is upstairs; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-15",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Oakmont Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 36000,
-      "servings": 41,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 41; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "venue",
-      "priceCents": 10000,
-      "capacity": 15,
-      "wheelchairAccessible": true,
-      "id": "practice-venue-good",
-      "name": "Meadow Hall",
-      "summary": "An event hall with an adjoining reception area.",
-      "details": "Seated capacity: 15. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-12",
+      "id": "A-venue-15",
       "scenarioId": "A",
       "category": "venue",
-      "name": "Stonebridge Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 24000,
-      "capacity": 33,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 33. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-tableware",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Reception Table Set",
-      "priceCents": 4000,
-      "provides": [
-        "place settings"
-      ],
-      "summary": "Table coverings, reusable place settings, and napkins.",
-      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-supplies-21",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Wavecrest Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 3000,
-      "provides": [],
-      "details": "One fixed-price supplies package: table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-food-18",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Ironwood Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 38500,
-      "servings": 47,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 47; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-venue-22",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Sailcloth Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 50500,
-      "capacity": 80,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 80. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-15",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Compass Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 19000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-15",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Compass Loft",
+      "name": "Oakmont Loft",
       "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 45500,
-      "capacity": 84,
+      "priceCents": 31500,
+      "capacity": 64,
       "wheelchairAccessible": true,
-      "details": "Seated capacity: 84. Step-free entrance and accessible event room. Fixed room-hire price."
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 64. Step-free entrance and accessible event room. Located in North Quarter. Fixed room-hire price."
     },
     {
-      "id": "B-food-12",
-      "scenarioId": "B",
+      "scenarioId": "practice",
       "category": "catering",
-      "name": "Breakwater Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 52500,
-      "servings": 70,
+      "priceCents": 20000,
+      "servings": 10,
       "dietaryCoverage": [
-        "nut-free"
+        "vegetarian"
       ],
-      "details": "Serves 70. Covers nut-free requirements only; vegan coverage is not provided. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-21",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Redwood Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 3000,
-      "provides": [],
-      "details": "One fixed-price supplies package: table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-18",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Tideline Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 58500,
-      "servings": 67,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 67; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-23",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Ashford Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 5500,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-supplies-20",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Pelican Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 15000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-food-22",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Thornbury Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 50500,
-      "servings": 40,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 40; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-venue-14",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Bluewater Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 51500,
-      "capacity": 81,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 81. Event room is on the second floor; no lift or step-free route. Fixed room-hire price."
+      "id": "practice-food-servings",
+      "name": "Riverside Kitchen",
+      "summary": "A boxed lunch collection with a shared dessert tray.",
+      "details": "Serves 10; covers vegetarian requirements. The listed price is for the whole package."
     },
     {
       "id": "A-food-11",
@@ -1097,382 +121,6 @@
       "details": "Serves 48; covers vegetarian, gluten-free requirements. Fixed whole-package price."
     },
     {
-      "id": "A-supplies-12",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Stonebridge Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
-      "priceCents": 2000,
-      "provides": [],
-      "details": "One fixed-price supplies package: pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-18",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Tideline Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 68000,
-      "capacity": 68,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 68. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "practice-supplies-good",
-      "scenarioId": "practice",
-      "category": "supplies",
-      "name": "Basic Supplies",
-      "summary": "A coordinated set of stationery and table materials.",
-      "priceCents": 5000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, pens, and napkins. Its price counts toward the combined budget."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 30000,
-      "capacity": 40,
-      "wheelchairAccessible": true,
-      "id": "A-venue-good",
-      "name": "Willow Conference Hall",
-      "summary": "An event hall with an adjoining reception area.",
-      "details": "Seated capacity: 40. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-22",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Thornbury Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 30500,
-      "capacity": 60,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 60. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-11",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Starfish Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 8500,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 30000,
-      "capacity": 40,
-      "wheelchairAccessible": false,
-      "id": "A-venue-access",
-      "name": "Maple Suite",
-      "summary": "An event suite with a separate welcome area.",
-      "details": "Seated capacity: 40. Event room is upstairs; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-07",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Anchor Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 12000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-13",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Hillcrest Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 2500,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-10",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Saltmarsh Provisions",
-      "summary": "A deli spread with build-your-own options.",
-      "priceCents": 58000,
-      "servings": 66,
-      "dietaryCoverage": [],
-      "details": "Serves 66. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
-    },
-    {
-      "id": "B-food-08",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Sandbar Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 63500,
-      "servings": 56,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 56; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "B-venue-12",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Breakwater Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 44000,
-      "capacity": 53,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 53. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-17",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Foxglove Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 29000,
-      "capacity": 35,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 35. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-16",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Highland Host Pack",
-      "summary": "A reusable set of hosting materials.",
-      "priceCents": 7000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "A",
-      "category": "catering",
-      "priceCents": 45000,
-      "servings": 50,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "id": "A-food-buffet",
-      "name": "Grove Buffet",
-      "summary": "A buffet assortment with shared mains and side dishes.",
-      "details": "Serves 50; covers vegetarian, gluten-free requirements. Fixed price includes all portions and dish labels."
-    },
-    {
-      "scenarioId": "B",
-      "category": "catering",
-      "priceCents": 60000,
-      "servings": 60,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "id": "B-food-good",
-      "name": "Coastline Catering",
-      "summary": "A shared lunch menu with individually labelled dishes.",
-      "details": "Serves 60; covers vegan, nut-free requirements. The listed price is for the whole package."
-    },
-    {
-      "id": "B-supplies-13",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Seaglass Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 2500,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-supplies-23",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Kelpie Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 5500,
-      "provides": [
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: place settings, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-supplies-presentation",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Welcome Display Kit",
-      "priceCents": 5000,
-      "provides": [
-        "display boards"
-      ],
-      "summary": "Reusable display boards and presentation materials.",
-      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
-    },
-    {
-      "id": "B-food-23",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Kelpie Catering",
-      "summary": "A plated lunch with a soup and salad starter.",
-      "priceCents": 60000,
-      "servings": 56,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 56; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "catering",
-      "priceCents": 20000,
-      "servings": 15,
-      "dietaryCoverage": [],
-      "id": "practice-food-diet",
-      "name": "Classic Kitchen",
-      "summary": "A fixed-menu lunch with a selection of main dishes.",
-      "details": "Serves 15. Standard menu; none of the required dietary alternatives are included. The listed price is for the whole package."
-    },
-    {
-      "id": "A-venue-24",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Kingsley Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 28000,
-      "capacity": 41,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 41. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-09",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Northgate Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 4500,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-venue-10",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Ridgeview Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 42000,
-      "capacity": 49,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 49. Event room is on the second floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "A",
-      "category": "catering",
-      "priceCents": 40000,
-      "servings": 35,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "id": "A-food-servings",
-      "name": "Lakeside Catering",
-      "summary": "A boxed lunch collection with a shared dessert tray.",
-      "details": "Serves 35; covers vegetarian, gluten-free requirements. The listed price is for the whole package."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "catering",
-      "priceCents": 20000,
-      "servings": 15,
-      "dietaryCoverage": [
-        "vegetarian"
-      ],
-      "id": "practice-food-good",
-      "name": "Harvest Kitchen",
-      "summary": "A shared lunch menu with individually labelled dishes.",
-      "details": "Serves 15; covers vegetarian requirements. The listed price is for the whole package."
-    },
-    {
-      "id": "B-venue-07",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Anchor Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 42000,
-      "capacity": 60,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 60. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-13",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Hillcrest Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 45000,
-      "capacity": 58,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 58. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-08",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Pinecrest Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 3000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-food-13",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Hillcrest Table",
-      "summary": "A grazing table with hot and cold dishes.",
-      "priceCents": 45500,
-      "servings": 52,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 52; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-food-17",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Foxglove Catering",
-      "summary": "A plated lunch with a soup and salad starter.",
-      "priceCents": 42500,
-      "servings": 37,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 37; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
       "id": "A-food-07",
       "scenarioId": "A",
       "category": "catering",
@@ -1487,407 +135,16 @@
       "details": "Serves 40; covers vegetarian, gluten-free requirements. Fixed whole-package price."
     },
     {
-      "id": "B-supplies-10",
-      "scenarioId": "B",
+      "id": "A-supplies-10",
+      "scenarioId": "A",
       "category": "supplies",
-      "name": "Saltmarsh Host Pack",
+      "name": "Ridgeview Host Pack",
       "summary": "A reusable set of hosting materials.",
-      "priceCents": 3500,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-07",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Anchor Table",
-      "summary": "A grazing table with hot and cold dishes.",
-      "priceCents": 54000,
-      "servings": 60,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 60; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-food-12",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Stonebridge Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 32500,
-      "servings": 50,
-      "dietaryCoverage": [
-        "gluten-free"
-      ],
-      "details": "Serves 50. Covers gluten-free requirements only; vegetarian coverage is not provided. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-15",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Oakmont Event Kit",
-      "summary": "A boxed kit of materials for meetings and receptions.",
-      "priceCents": 19000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-09",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Gullwing Loft",
-      "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 47000,
-      "capacity": 66,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 66. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-14",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Westfield Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 31500,
-      "capacity": 61,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 61. Event room is on the second floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-09",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Northgate Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 49000,
-      "servings": 44,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 44; covers vegetarian, gluten-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-venue-18",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Ironwood Centre",
-      "summary": "A community centre with a lobby for registration.",
-      "priceCents": 48000,
-      "capacity": 48,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 48. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-24",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Moonstone Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
-      "priceCents": 24000,
-      "provides": [
-        "name cards",
-        "place settings"
-      ],
-      "details": "One fixed-price supplies package: name cards, place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-supplies-12",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Breakwater Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
-      "priceCents": 2000,
-      "provides": [],
-      "details": "One fixed-price supplies package: pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "practice-supplies-cost",
-      "scenarioId": "practice",
-      "category": "supplies",
-      "name": "Premium Supplies",
-      "summary": "A presentation and table-decoration bundle.",
-      "priceCents": 30000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
-    },
-    {
-      "id": "B-supplies-18",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Tideline Room Pack",
-      "summary": "Materials for dressing a room before guests arrive.",
       "priceCents": 3500,
       "provides": [
         "place settings"
       ],
       "details": "One fixed-price supplies package: place settings, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-venue-20",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Pelican Room",
-      "summary": "A meeting room with built-in screens and a side table.",
-      "priceCents": 43000,
-      "capacity": 74,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 74. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-14",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Westfield Essentials Box",
-      "summary": "A compact box of everyday event materials.",
-      "priceCents": 6000,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, pens, napkins. Its price is added to other selected packages."
-    },
-    {
-      "scenarioId": "B",
-      "category": "catering",
-      "priceCents": 55000,
-      "servings": 60,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "id": "B-food-economy",
-      "name": "Tidal Table",
-      "summary": "A self-service lunch with labelled individual portions.",
-      "details": "Serves 60; covers vegan, nut-free requirements. Fixed package price; self-service presentation."
-    },
-    {
-      "id": "A-venue-11",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Brookside Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 36500,
-      "capacity": 52,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 52. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-supplies-presentation",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Presentation Kit",
-      "priceCents": 5000,
-      "provides": [
-        "display boards"
-      ],
-      "summary": "Reusable display boards and presentation materials.",
-      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
-    },
-    {
-      "id": "B-venue-23",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Kelpie Suite",
-      "summary": "A conference suite with a cloakroom and lounge seating.",
-      "priceCents": 57500,
-      "capacity": 83,
-      "wheelchairAccessible": false,
-      "details": "Seated capacity: 83. Event room is on the third floor; no lift or step-free route. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-17",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Harborview Desk Set",
-      "summary": "A tidy set of tabletop materials for each seat.",
-      "priceCents": 4000,
-      "provides": [
-        "name cards"
-      ],
-      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "A-supplies-tableware",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Table Service Set",
-      "priceCents": 4000,
-      "provides": [
-        "place settings"
-      ],
-      "summary": "Table coverings, reusable place settings, and napkins.",
-      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-24",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Moonstone Kitchen",
-      "summary": "A family-style lunch served on shared platters.",
-      "priceCents": 64500,
-      "servings": 64,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 64; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "scenarioId": "practice",
-      "category": "catering",
-      "priceCents": 20000,
-      "servings": 10,
-      "dietaryCoverage": [
-        "vegetarian"
-      ],
-      "id": "practice-food-servings",
-      "name": "Riverside Kitchen",
-      "summary": "A boxed lunch collection with a shared dessert tray.",
-      "details": "Serves 10; covers vegetarian requirements. The listed price is for the whole package."
-    },
-    {
-      "id": "B-food-09",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Gullwing Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 69000,
-      "servings": 64,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 64; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-food-21",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Redwood Bistro",
-      "summary": "A two-course bistro menu with dessert.",
-      "priceCents": 34500,
-      "servings": 53,
-      "dietaryCoverage": [
-        "vegetarian"
-      ],
-      "details": "Serves 53. Covers vegetarian requirements only; gluten-free coverage is not provided. Fixed whole-package price."
-    },
-    {
-      "id": "A-supplies-good",
-      "scenarioId": "A",
-      "category": "supplies",
-      "name": "Workshop Essentials",
-      "summary": "A coordinated set of stationery and table materials.",
-      "priceCents": 10000,
-      "provides": [
-        "name cards",
-        "display boards"
-      ],
-      "details": "Complete fixed-price supplies package: name cards, display boards, pens, and napkins. Its price counts toward the combined budget."
-    },
-    {
-      "id": "A-venue-07",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Summit Hall",
-      "summary": "An open hall with a raised stage and tall windows.",
-      "priceCents": 22000,
-      "capacity": 40,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 40. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-venue-16",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Highland Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 39000,
-      "capacity": 42,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 42. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "B-supplies-19",
-      "scenarioId": "B",
-      "category": "supplies",
-      "name": "Dune Welcome Set",
-      "summary": "An assortment of materials for the welcome table.",
-      "priceCents": 4500,
-      "provides": [
-        "display boards"
-      ],
-      "details": "One fixed-price supplies package: display boards, table decorations, signage. Its price is added to other selected packages."
-    },
-    {
-      "id": "B-food-17",
-      "scenarioId": "B",
-      "category": "catering",
-      "name": "Harborview Catering",
-      "summary": "A plated lunch with a soup and salad starter.",
-      "priceCents": 62500,
-      "servings": 57,
-      "dietaryCoverage": [
-        "vegan",
-        "nut-free"
-      ],
-      "details": "Serves 57; covers vegan, nut-free requirements. Fixed whole-package price."
-    },
-    {
-      "id": "A-venue-21",
-      "scenarioId": "A",
-      "category": "venue",
-      "name": "Redwood Loft",
-      "summary": "A converted loft with exposed brick and a coffee bar.",
-      "priceCents": 41000,
-      "capacity": 38,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 38. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "scenarioId": "A",
-      "category": "venue",
-      "priceCents": 40000,
-      "capacity": 55,
-      "wheelchairAccessible": true,
-      "id": "A-venue-premium",
-      "name": "Juniper Centre",
-      "summary": "A conference room with a furnished reception lounge.",
-      "details": "Seated capacity: 55. Step-free entrance and accessible event room. Fixed room-hire price includes the reception lounge."
-    },
-    {
-      "id": "B-venue-16",
-      "scenarioId": "B",
-      "category": "venue",
-      "name": "Mariner Pavilion",
-      "summary": "A pavilion with garden views and a covered terrace.",
-      "priceCents": 59000,
-      "capacity": 62,
-      "wheelchairAccessible": true,
-      "details": "Seated capacity: 62. Step-free entrance and accessible event room. Fixed room-hire price."
-    },
-    {
-      "id": "A-food-14",
-      "scenarioId": "A",
-      "category": "catering",
-      "name": "Westfield Lunch Co.",
-      "summary": "Individually boxed lunches with a drink each.",
-      "priceCents": 41000,
-      "servings": 35,
-      "dietaryCoverage": [
-        "vegetarian",
-        "gluten-free"
-      ],
-      "details": "Serves 35; covers vegetarian, gluten-free requirements. Fixed whole-package price."
     },
     {
       "id": "B-supplies-bundle",
@@ -1904,6 +161,252 @@
       "details": "One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost."
     },
     {
+      "id": "B-supplies-presentation",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Welcome Display Kit",
+      "priceCents": 5000,
+      "provides": [
+        "display boards"
+      ],
+      "summary": "Reusable display boards and presentation materials.",
+      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
+    },
+    {
+      "id": "A-venue-09",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Northgate Loft",
+      "summary": "A converted loft with exposed brick and a coffee bar.",
+      "priceCents": 27000,
+      "capacity": 36,
+      "wheelchairAccessible": true,
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 36. Step-free entrance and accessible event room. Located in North Quarter. Fixed room-hire price."
+    },
+    {
+      "id": "B-venue-08",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Sandbar Room",
+      "summary": "A meeting room with built-in screens and a side table.",
+      "priceCents": 54000,
+      "capacity": 63,
+      "wheelchairAccessible": true,
+      "areaId": "market-district",
+      "details": "Seated capacity: 63. Step-free entrance and accessible event room. Located in Market District. Fixed room-hire price."
+    },
+    {
+      "id": "A-venue-12",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Stonebridge Centre",
+      "summary": "A community centre with a lobby for registration.",
+      "priceCents": 36500,
+      "capacity": 55,
+      "wheelchairAccessible": false,
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 55. Event room is on the second floor; no lift or step-free route. Located in North Quarter. Fixed room-hire price."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 45000,
+      "servings": 50,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-buffet",
+      "name": "Grove Buffet",
+      "summary": "A buffet assortment with shared mains and side dishes.",
+      "details": "Serves 50; covers vegetarian, gluten-free requirements. Fixed price includes all portions and dish labels."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "capacity": 40,
+      "wheelchairAccessible": false,
+      "id": "A-venue-access",
+      "name": "Maple Suite",
+      "summary": "An event suite with a separate welcome area.",
+      "details": "Seated capacity: 40. Event room is upstairs; no lift or step-free route. Fixed room-hire price. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "id": "B-supplies-08",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Sandbar Essentials Box",
+      "summary": "A compact box of everyday event materials.",
+      "priceCents": 3000,
+      "provides": [
+        "name cards"
+      ],
+      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-food-14",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Bluewater Lunch Co.",
+      "summary": "Individually boxed lunches with a drink each.",
+      "priceCents": 61000,
+      "servings": 55,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 55; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "capacity": 15,
+      "wheelchairAccessible": true,
+      "id": "practice-venue-good",
+      "name": "Meadow Hall",
+      "summary": "An event hall with an adjoining reception area.",
+      "details": "Seated capacity: 15. Step-free entrance and accessible event room. Fixed room-hire price. Located in Riverside.",
+      "areaId": "riverside"
+    },
+    {
+      "id": "A-food-13",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Hillcrest Table",
+      "summary": "A grazing table with hot and cold dishes.",
+      "priceCents": 45500,
+      "servings": 52,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "details": "Serves 52; covers vegetarian, gluten-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "practice-supplies-cost",
+      "scenarioId": "practice",
+      "category": "supplies",
+      "name": "Premium Supplies",
+      "summary": "A presentation and table-decoration bundle.",
+      "priceCents": 30000,
+      "provides": [
+        "name cards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "capacity": 60,
+      "wheelchairAccessible": false,
+      "id": "B-venue-access",
+      "name": "Seabreeze Suite",
+      "summary": "An event suite with a separate welcome area.",
+      "details": "Seated capacity: 60. Event room is upstairs; no lift or step-free route. Fixed room-hire price. Located in Harbor Front.",
+      "areaId": "harbor-front"
+    },
+    {
+      "id": "B-venue-15",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Compass Loft",
+      "summary": "A converted loft with exposed brick and a coffee bar.",
+      "priceCents": 51500,
+      "capacity": 84,
+      "wheelchairAccessible": true,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 84. Step-free entrance and accessible event room. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "id": "B-supplies-cost",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Celebration Plus",
+      "summary": "A presentation and table-decoration bundle.",
+      "priceCents": 40000,
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, place settings, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "capacity": 60,
+      "wheelchairAccessible": true,
+      "id": "B-venue-good",
+      "name": "Harbor Events Hall",
+      "summary": "An event hall with an adjoining reception area.",
+      "details": "Seated capacity: 60. Step-free entrance and accessible event room. Fixed room-hire price. Located in Harbor Front.",
+      "areaId": "harbor-front"
+    },
+    {
+      "id": "B-supplies-stationery",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Celebration Stationery",
+      "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
+      "summary": "A set of name cards, pens, and notepads.",
+      "details": "One fixed-price stationery package: name cards, pens, and notepads."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 45000,
+      "capacity": 65,
+      "wheelchairAccessible": true,
+      "id": "B-venue-economy",
+      "name": "Marina Community Hall",
+      "summary": "A community hall with a self-arranged seating layout.",
+      "details": "Seated capacity: 65. Step-free entrance and accessible event room. Room hire includes tables and chairs; participants arrange the layout. Located in Harbor Front.",
+      "areaId": "harbor-front"
+    },
+    {
+      "id": "B-supplies-13",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Seaglass Welcome Set",
+      "summary": "An assortment of materials for the welcome table.",
+      "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
+      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "servings": 40,
+      "dietaryCoverage": [],
+      "id": "A-food-diet",
+      "name": "Market Table",
+      "summary": "A fixed-menu lunch with a selection of main dishes.",
+      "details": "Serves 40. Standard menu; none of the required dietary alternatives are included. The listed price is for the whole package."
+    },
+    {
+      "id": "A-venue-14",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Westfield Room",
+      "summary": "A meeting room with built-in screens and a side table.",
+      "priceCents": 25500,
+      "capacity": 61,
+      "wheelchairAccessible": true,
+      "areaId": "old-town",
+      "details": "Seated capacity: 61. Step-free entrance and accessible event room. Located in Old Town. Fixed room-hire price."
+    },
+    {
       "scenarioId": "B",
       "category": "catering",
       "priceCents": 60000,
@@ -1913,6 +416,888 @@
       "name": "Bay Table",
       "summary": "A fixed-menu lunch with a selection of main dishes.",
       "details": "Serves 60. Standard menu; none of the required dietary alternatives are included. The listed price is for the whole package."
+    },
+    {
+      "id": "B-venue-14",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Bluewater Room",
+      "summary": "A meeting room with built-in screens and a side table.",
+      "priceCents": 45500,
+      "capacity": 81,
+      "wheelchairAccessible": true,
+      "areaId": "market-district",
+      "details": "Seated capacity: 81. Step-free entrance and accessible event room. Located in Market District. Fixed room-hire price."
+    },
+    {
+      "id": "B-venue-07",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Anchor Hall",
+      "summary": "An open hall with a raised stage and tall windows.",
+      "priceCents": 42000,
+      "capacity": 60,
+      "wheelchairAccessible": true,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 60. Step-free entrance and accessible event room. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "id": "B-venue-12",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Breakwater Centre",
+      "summary": "A community centre with a lobby for registration.",
+      "priceCents": 56500,
+      "capacity": 75,
+      "wheelchairAccessible": false,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 75. Event room is on the second floor; no lift or step-free route. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 47500,
+      "capacity": 59,
+      "wheelchairAccessible": true,
+      "id": "B-venue-near-capacity",
+      "name": "Driftwood Meeting House",
+      "summary": "A meeting house with a furnished breakout corner.",
+      "details": "Seated capacity: 59. Step-free entrance and accessible event room. The breakout corner does not provide additional event seating. Located in Harbor Front.",
+      "areaId": "harbor-front"
+    },
+    {
+      "id": "A-supplies-09",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Northgate Event Kit",
+      "summary": "A boxed kit of materials for meetings and receptions.",
+      "priceCents": 4500,
+      "provides": [
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: display boards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "capacity": 15,
+      "wheelchairAccessible": false,
+      "id": "practice-venue-access",
+      "name": "Cedar Room",
+      "summary": "An event suite with a separate welcome area.",
+      "details": "Seated capacity: 15. Event room is upstairs; no lift or step-free route. Fixed room-hire price. Located in Riverside.",
+      "areaId": "riverside"
+    },
+    {
+      "id": "B-food-11",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Starfish Catering",
+      "summary": "A plated lunch with a soup and salad starter.",
+      "priceCents": 74000,
+      "servings": 68,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 68; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "B-food-07",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Anchor Table",
+      "summary": "A grazing table with hot and cold dishes.",
+      "priceCents": 54000,
+      "servings": 60,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 60; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 55000,
+      "servings": 60,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-economy",
+      "name": "Tidal Table",
+      "summary": "A self-service lunch with labelled individual portions.",
+      "details": "Serves 60; covers vegan, nut-free requirements. Fixed package price; self-service presentation."
+    },
+    {
+      "id": "B-supplies-07",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Anchor Welcome Set",
+      "summary": "An assortment of materials for the welcome table.",
+      "priceCents": 12000,
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-venue-10",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Ridgeview Pavilion",
+      "summary": "A pavilion with garden views and a covered terrace.",
+      "priceCents": 42000,
+      "capacity": 49,
+      "wheelchairAccessible": true,
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 49. Step-free entrance and accessible event room. Located in North Quarter. Fixed room-hire price."
+    },
+    {
+      "id": "B-supplies-tableware",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Reception Table Set",
+      "priceCents": 4000,
+      "provides": [
+        "place settings"
+      ],
+      "summary": "Table coverings, reusable place settings, and napkins.",
+      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-cost",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Plus",
+      "summary": "A presentation and table-decoration bundle.",
+      "priceCents": 40000,
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, display boards, printed programs, and table decorations. Check the combined venue, catering, and supplies cost against the budget."
+    },
+    {
+      "id": "A-food-10",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Ridgeview Provisions",
+      "summary": "A deli spread with build-your-own options.",
+      "priceCents": 38000,
+      "servings": 46,
+      "dietaryCoverage": [],
+      "details": "Serves 46. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
+    },
+    {
+      "id": "B-food-15",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Compass Bistro",
+      "summary": "A two-course bistro menu with dessert.",
+      "priceCents": 56000,
+      "servings": 61,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 61; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "A-venue-13",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Hillcrest Hall",
+      "summary": "An open hall with a raised stage and tall windows.",
+      "priceCents": 45000,
+      "capacity": 58,
+      "wheelchairAccessible": true,
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 58. Step-free entrance and accessible event room. Located in North Quarter. Fixed room-hire price."
+    },
+    {
+      "id": "A-supplies-bundle",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Host Bundle",
+      "priceCents": 25000,
+      "provides": [
+        "name cards",
+        "display boards",
+        "place settings"
+      ],
+      "summary": "A combined display, stationery, and table-decoration set.",
+      "details": "One fixed-price host bundle: name cards, display boards, place settings, and table decorations. Some contents overlap with individual supplies packages; selecting both still adds both prices. Consider the combined plan cost."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "capacity": 35,
+      "wheelchairAccessible": true,
+      "id": "A-venue-capacity",
+      "name": "Birch Meeting Room",
+      "summary": "A meeting room with a central presentation area.",
+      "details": "Seated capacity: 35. Step-free entrance and accessible event room. Fixed room-hire price. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "id": "A-supplies-15",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Oakmont Event Kit",
+      "summary": "A boxed kit of materials for meetings and receptions.",
+      "priceCents": 19000,
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-14",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Westfield Essentials Box",
+      "summary": "A compact box of everyday event materials.",
+      "priceCents": 6000,
+      "provides": [
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: display boards, pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-venue-10",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Saltmarsh Pavilion",
+      "summary": "A pavilion with garden views and a covered terrace.",
+      "priceCents": 62000,
+      "capacity": 69,
+      "wheelchairAccessible": true,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 69. Step-free entrance and accessible event room. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "id": "A-supplies-13",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Hillcrest Welcome Set",
+      "summary": "An assortment of materials for the welcome table.",
+      "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
+      "details": "One fixed-price supplies package: name cards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-food-12",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Breakwater Kitchen",
+      "summary": "A family-style lunch served on shared platters.",
+      "priceCents": 52500,
+      "servings": 70,
+      "dietaryCoverage": [
+        "nut-free"
+      ],
+      "details": "Serves 70. Covers nut-free requirements only; vegan coverage is not provided. Fixed whole-package price."
+    },
+    {
+      "id": "B-food-08",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Sandbar Lunch Co.",
+      "summary": "Individually boxed lunches with a drink each.",
+      "priceCents": 63500,
+      "servings": 56,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 56; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "A-venue-11",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Brookside Suite",
+      "summary": "A conference suite with a cloakroom and lounge seating.",
+      "priceCents": 24000,
+      "capacity": 52,
+      "wheelchairAccessible": true,
+      "areaId": "east-side",
+      "details": "Seated capacity: 52. Step-free entrance and accessible event room. Located in East Side. Fixed room-hire price."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 40000,
+      "capacity": 55,
+      "wheelchairAccessible": true,
+      "id": "A-venue-premium",
+      "name": "Juniper Centre",
+      "summary": "A conference room with a furnished reception lounge.",
+      "details": "Seated capacity: 55. Step-free entrance and accessible event room. Fixed room-hire price includes the reception lounge. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 27500,
+      "capacity": 39,
+      "wheelchairAccessible": true,
+      "id": "A-venue-near-capacity",
+      "name": "Elm Meeting House",
+      "summary": "A meeting house with a furnished breakout corner.",
+      "details": "Seated capacity: 39. Step-free entrance and accessible event room. The breakout corner does not provide additional event seating. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "id": "practice-supplies-good",
+      "scenarioId": "practice",
+      "category": "supplies",
+      "name": "Basic Supplies",
+      "summary": "A coordinated set of stationery and table materials.",
+      "priceCents": 5000,
+      "provides": [
+        "name cards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, pens, and napkins. Its price counts toward the combined budget."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "venue",
+      "priceCents": 10000,
+      "capacity": 10,
+      "wheelchairAccessible": true,
+      "id": "practice-venue-capacity",
+      "name": "Garden Room",
+      "summary": "A meeting room with a central presentation area.",
+      "details": "Seated capacity: 10. Step-free entrance and accessible event room. Fixed room-hire price. Located in Riverside.",
+      "areaId": "riverside"
+    },
+    {
+      "id": "A-food-15",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Oakmont Bistro",
+      "summary": "A two-course bistro menu with dessert.",
+      "priceCents": 36000,
+      "servings": 41,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "details": "Serves 41; covers vegetarian, gluten-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "B-food-13",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Seaglass Table",
+      "summary": "A grazing table with hot and cold dishes.",
+      "priceCents": 65500,
+      "servings": 72,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 72; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "B-supplies-12",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Breakwater Room Pack",
+      "summary": "Materials for dressing a room before guests arrive.",
+      "priceCents": 2000,
+      "provides": [],
+      "details": "One fixed-price supplies package: pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-tableware",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Table Service Set",
+      "priceCents": 4000,
+      "provides": [
+        "place settings"
+      ],
+      "summary": "Table coverings, reusable place settings, and napkins.",
+      "details": "One fixed-price table-service package: table coverings, place settings, and napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-food-08",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Pinecrest Lunch Co.",
+      "summary": "Individually boxed lunches with a drink each.",
+      "priceCents": 43500,
+      "servings": 36,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "details": "Serves 36; covers vegetarian, gluten-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "B-supplies-14",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Bluewater Essentials Box",
+      "summary": "A compact box of everyday event materials.",
+      "priceCents": 6000,
+      "provides": [
+        "place settings"
+      ],
+      "details": "One fixed-price supplies package: place settings, pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-venue-11",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Starfish Suite",
+      "summary": "A conference suite with a cloakroom and lounge seating.",
+      "priceCents": 44000,
+      "capacity": 72,
+      "wheelchairAccessible": true,
+      "areaId": "hillside",
+      "details": "Seated capacity: 72. Step-free entrance and accessible event room. Located in Hillside. Fixed room-hire price."
+    },
+    {
+      "id": "B-venue-09",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Gullwing Loft",
+      "summary": "A converted loft with exposed brick and a coffee bar.",
+      "priceCents": 47000,
+      "capacity": 56,
+      "wheelchairAccessible": true,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 56. Step-free entrance and accessible event room. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "id": "A-supplies-presentation",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Presentation Kit",
+      "priceCents": 5000,
+      "provides": [
+        "display boards"
+      ],
+      "summary": "Reusable display boards and presentation materials.",
+      "details": "One fixed-price display package: display boards, markers, and printed agenda holders."
+    },
+    {
+      "id": "A-supplies-07",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Summit Welcome Set",
+      "summary": "An assortment of materials for the welcome table.",
+      "priceCents": 12000,
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 60000,
+      "servings": 55,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-servings",
+      "name": "Pier Kitchen",
+      "summary": "A boxed lunch collection with a shared dessert tray.",
+      "details": "Serves 55; covers vegan, nut-free requirements. The listed price is for the whole package."
+    },
+    {
+      "id": "A-venue-07",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Summit Hall",
+      "summary": "An open hall with a raised stage and tall windows.",
+      "priceCents": 22000,
+      "capacity": 40,
+      "wheelchairAccessible": true,
+      "areaId": "north-quarter",
+      "details": "Seated capacity: 40. Step-free entrance and accessible event room. Located in North Quarter. Fixed room-hire price."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 35000,
+      "servings": 40,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-economy",
+      "name": "Fieldstone Lunches",
+      "summary": "A self-service lunch with labelled individual portions.",
+      "details": "Serves 40; covers vegetarian, gluten-free requirements. Fixed package price; self-service presentation."
+    },
+    {
+      "id": "B-venue-13",
+      "scenarioId": "B",
+      "category": "venue",
+      "name": "Seaglass Hall",
+      "summary": "An open hall with a raised stage and tall windows.",
+      "priceCents": 65000,
+      "capacity": 78,
+      "wheelchairAccessible": true,
+      "areaId": "harbor-front",
+      "details": "Seated capacity: 78. Step-free entrance and accessible event room. Located in Harbor Front. Fixed room-hire price."
+    },
+    {
+      "id": "A-food-14",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Westfield Lunch Co.",
+      "summary": "Individually boxed lunches with a drink each.",
+      "priceCents": 41000,
+      "servings": 35,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "details": "Serves 35; covers vegetarian, gluten-free requirements. Fixed whole-package price."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 57500,
+      "servings": 60,
+      "dietaryCoverage": [
+        "vegan"
+      ],
+      "id": "B-food-partial",
+      "name": "Coral Catering",
+      "summary": "A seasonal lunch selection with individually packed portions.",
+      "details": "Serves 60. Covers vegan requirements only; nut-free coverage is not provided. Fixed whole-package price."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "catering",
+      "priceCents": 20000,
+      "servings": 15,
+      "dietaryCoverage": [],
+      "id": "practice-food-diet",
+      "name": "Classic Kitchen",
+      "summary": "A fixed-menu lunch with a selection of main dishes.",
+      "details": "Serves 15. Standard menu; none of the required dietary alternatives are included. The listed price is for the whole package."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "servings": 35,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-servings",
+      "name": "Lakeside Catering",
+      "summary": "A boxed lunch collection with a shared dessert tray.",
+      "details": "Serves 35; covers vegetarian, gluten-free requirements. The listed price is for the whole package."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 60000,
+      "servings": 60,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-good",
+      "name": "Coastline Catering",
+      "summary": "A shared lunch menu with individually labelled dishes.",
+      "details": "Serves 60; covers vegan, nut-free requirements. The listed price is for the whole package."
+    },
+    {
+      "id": "A-venue-08",
+      "scenarioId": "A",
+      "category": "venue",
+      "name": "Pinecrest Room",
+      "summary": "A meeting room with built-in screens and a side table.",
+      "priceCents": 34000,
+      "capacity": 43,
+      "wheelchairAccessible": true,
+      "areaId": "old-town",
+      "details": "Seated capacity: 43. Step-free entrance and accessible event room. Located in Old Town. Fixed room-hire price."
+    },
+    {
+      "id": "B-supplies-15",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Compass Event Kit",
+      "summary": "A boxed kit of materials for meetings and receptions.",
+      "priceCents": 19000,
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-stationery",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Stationery",
+      "priceCents": 2500,
+      "provides": [
+        "name cards"
+      ],
+      "summary": "A set of name cards, pens, and notepads.",
+      "details": "One fixed-price stationery package: name cards, pens, and notepads."
+    },
+    {
+      "id": "B-supplies-10",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Saltmarsh Host Pack",
+      "summary": "A reusable set of hosting materials.",
+      "priceCents": 3500,
+      "provides": [
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: display boards, pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-11",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Brookside Desk Set",
+      "summary": "A tidy set of tabletop materials for each seat.",
+      "priceCents": 8500,
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "One fixed-price supplies package: name cards, display boards, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-food-09",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Gullwing Bistro",
+      "summary": "A two-course bistro menu with dessert.",
+      "priceCents": 69000,
+      "servings": 64,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "details": "Serves 64; covers vegan, nut-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "A-supplies-good",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Workshop Essentials",
+      "summary": "A coordinated set of stationery and table materials.",
+      "priceCents": 10000,
+      "provides": [
+        "name cards",
+        "display boards"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, display boards, pens, and napkins. Its price counts toward the combined budget."
+    },
+    {
+      "id": "B-supplies-good",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Celebration Essentials",
+      "summary": "A coordinated set of stationery and table materials.",
+      "priceCents": 10000,
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "Complete fixed-price supplies package: name cards, place settings, pens, and napkins. Its price counts toward the combined budget."
+    },
+    {
+      "scenarioId": "practice",
+      "category": "catering",
+      "priceCents": 20000,
+      "servings": 15,
+      "dietaryCoverage": [
+        "vegetarian"
+      ],
+      "id": "practice-food-good",
+      "name": "Harvest Kitchen",
+      "summary": "A shared lunch menu with individually labelled dishes.",
+      "details": "Serves 15; covers vegetarian requirements. The listed price is for the whole package."
+    },
+    {
+      "scenarioId": "B",
+      "category": "catering",
+      "priceCents": 65000,
+      "servings": 70,
+      "dietaryCoverage": [
+        "vegan",
+        "nut-free"
+      ],
+      "id": "B-food-buffet",
+      "name": "Shoreline Buffet",
+      "summary": "A buffet assortment with shared mains and side dishes.",
+      "details": "Serves 70; covers vegan, nut-free requirements. Fixed price includes all portions and dish labels."
+    },
+    {
+      "id": "A-food-12",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Stonebridge Kitchen",
+      "summary": "A family-style lunch served on shared platters.",
+      "priceCents": 32500,
+      "servings": 50,
+      "dietaryCoverage": [
+        "gluten-free"
+      ],
+      "details": "Serves 50. Covers gluten-free requirements only; vegetarian coverage is not provided. Fixed whole-package price."
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 30000,
+      "capacity": 40,
+      "wheelchairAccessible": true,
+      "id": "A-venue-good",
+      "name": "Willow Conference Hall",
+      "summary": "An event hall with an adjoining reception area.",
+      "details": "Seated capacity: 40. Step-free entrance and accessible event room. Fixed room-hire price. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "scenarioId": "A",
+      "category": "venue",
+      "priceCents": 25000,
+      "capacity": 45,
+      "wheelchairAccessible": true,
+      "id": "A-venue-economy",
+      "name": "Aspen Community Hall",
+      "summary": "A community hall with a self-arranged seating layout.",
+      "details": "Seated capacity: 45. Step-free entrance and accessible event room. Room hire includes tables and chairs; participants arrange the layout. Located in North Quarter.",
+      "areaId": "north-quarter"
+    },
+    {
+      "id": "A-food-09",
+      "scenarioId": "A",
+      "category": "catering",
+      "name": "Northgate Bistro",
+      "summary": "A two-course bistro menu with dessert.",
+      "priceCents": 49000,
+      "servings": 44,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "details": "Serves 44; covers vegetarian, gluten-free requirements. Fixed whole-package price."
+    },
+    {
+      "id": "B-supplies-11",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Starfish Desk Set",
+      "summary": "A tidy set of tabletop materials for each seat.",
+      "priceCents": 8500,
+      "provides": [
+        "name cards",
+        "place settings"
+      ],
+      "details": "One fixed-price supplies package: name cards, place settings, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "B-food-10",
+      "scenarioId": "B",
+      "category": "catering",
+      "name": "Saltmarsh Provisions",
+      "summary": "A deli spread with build-your-own options.",
+      "priceCents": 58000,
+      "servings": 66,
+      "dietaryCoverage": [],
+      "details": "Serves 66. Standard menu; none of the required dietary alternatives are included. Fixed whole-package price."
+    },
+    {
+      "id": "A-supplies-12",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Stonebridge Room Pack",
+      "summary": "Materials for dressing a room before guests arrive.",
+      "priceCents": 2000,
+      "provides": [],
+      "details": "One fixed-price supplies package: pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "scenarioId": "A",
+      "category": "catering",
+      "priceCents": 40000,
+      "servings": 40,
+      "dietaryCoverage": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "id": "A-food-good",
+      "name": "Orchard Catering",
+      "summary": "A shared lunch menu with individually labelled dishes.",
+      "details": "Serves 40; covers vegetarian, gluten-free requirements. The listed price is for the whole package."
+    },
+    {
+      "id": "B-supplies-09",
+      "scenarioId": "B",
+      "category": "supplies",
+      "name": "Gullwing Event Kit",
+      "summary": "A boxed kit of materials for meetings and receptions.",
+      "priceCents": 4500,
+      "provides": [
+        "place settings"
+      ],
+      "details": "One fixed-price supplies package: place settings, table decorations, signage. Its price is added to other selected packages."
+    },
+    {
+      "id": "A-supplies-08",
+      "scenarioId": "A",
+      "category": "supplies",
+      "name": "Pinecrest Essentials Box",
+      "summary": "A compact box of everyday event materials.",
+      "priceCents": 3000,
+      "provides": [
+        "name cards"
+      ],
+      "details": "One fixed-price supplies package: name cards, pens, napkins. Its price is added to other selected packages."
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 60000,
+      "capacity": 75,
+      "wheelchairAccessible": true,
+      "id": "B-venue-premium",
+      "name": "Lighthouse Centre",
+      "summary": "A conference room with a furnished reception lounge.",
+      "details": "Seated capacity: 75. Step-free entrance and accessible event room. Fixed room-hire price includes the reception lounge. Located in Harbor Front.",
+      "areaId": "harbor-front"
+    },
+    {
+      "scenarioId": "B",
+      "category": "venue",
+      "priceCents": 50000,
+      "capacity": 55,
+      "wheelchairAccessible": true,
+      "id": "B-venue-capacity",
+      "name": "Beacon Room",
+      "summary": "A meeting room with a central presentation area.",
+      "details": "Seated capacity: 55. Step-free entrance and accessible event room. Fixed room-hire price. Located in Harbor Front.",
+      "areaId": "harbor-front"
     }
   ]
 }

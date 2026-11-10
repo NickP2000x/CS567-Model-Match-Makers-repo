@@ -230,7 +230,7 @@ Practice and each experimental task have an acknowledgement/preparation page and
 an explicit Start button. Requirements and experimental deadlines appear only after
 Start. Later pages show the current section and read-only study progress.
 
-Practice includes catalog inspection, plan editing, five constraint checks,
+Practice includes catalog inspection, plan editing, six constraint checks,
 four stages, and simulated conversation. Both experimental tasks include simulated
 automatic/override routing, a 15-minute countdown, permissive submission/timeout,
 and the reusable provisional five-point, fully labelled NASA-TLX adaptation.

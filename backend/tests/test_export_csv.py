@@ -65,6 +65,9 @@ def test_export_preserves_raw_values_linkage_and_database_bytes(recorded_databas
     assert tasks[0]["survey_raw_score"] == "37.5"  # Do not rescore/reverse the raw performance 75.
     assert tasks[0]["survey_performance"] == "75"
     assert tasks[0]["survey_mentalDemand"] == '\\N'
+    # An earlier record without newer checks (supplies, location) exports them as unknown, never recomputed.
+    assert tasks[0]["constraint_capacity"] == "1"
+    assert tasks[0]["constraint_location"] == tasks[0]["constraint_supplies"] == tasks[0]["all_met"] == "\\N"
     assert json.loads(tasks[0]["survey_metadata_json"])["items"]["performance"]["orientation"] == "lower-is-more-workload"
     assert read_csv(output, "plan_items")[0]["item_name"] == "Willow Conference Hall"
     assert read_csv(output, "messages")[0]["text"] == '\\\\N'  # Literal source \N escaped, not confused with NULL.

@@ -41,7 +41,7 @@ test('all catalogs have feasible plans and detail-only violations; summaries omi
     await intro(service);
     if (scenarioId !== 'practice') { await service.finishTask(); await startTask(service); }
     const summaries = await service.searchCatalog(scenarioId, '', 'venue');
-    assert.equal(summaries.length, scenarioId === 'practice' ? 3 : 24);
+    assert.equal(summaries.length, scenarioId === 'practice' ? 3 : 15);
     assert.equal('wheelchairAccessible' in summaries[0], false);
     assert.equal('details' in summaries[0], false);
     const hidden = await service.inspectItem(`${scenarioId}-venue-access`);
@@ -139,7 +139,7 @@ test('each scenario supports independent constraint violations and incomplete su
     for (const [failedConstraint, plan] of variants) {
       await service.updatePlan(plan);
       assert.deepEqual(service.getSnapshot().tasks[id].constraints,
-        Object.fromEntries(['budget', 'capacity', 'dietary', 'accessibility', 'supplies'].map(key => [key, key !== failedConstraint])));
+        Object.fromEntries(['budget', 'capacity', 'dietary', 'accessibility', 'supplies', 'location'].map(key => [key, key !== failedConstraint])));
     }
     const scenario = await service.getScenario(scenarioId);
     const summaries = await service.searchCatalog(scenarioId);
@@ -208,7 +208,7 @@ test('documented contract walkthroughs preserve automatic/override and submissio
     await service.finishTask();
     const task = service.getSnapshot().tasks['task-1'];
     assert.equal(task.totalCostCents, 30000);
-    assert.deepEqual(task.constraints, { budget: true, capacity: true, dietary: false, accessibility: true, supplies: false });
+    assert.deepEqual(task.constraints, { budget: true, capacity: true, dietary: false, accessibility: true, supplies: false, location: true });
     assert.equal(task.decisions.Venue.finalModel, 'small');
     assert.equal(task.messages.at(-1).model, 'small');
     const raw = { mentalDemand: 25, physicalDemand: 0, temporalDemand: 50, performance: 75, effort: 25, frustration: 0 };
@@ -285,7 +285,7 @@ test('practice and experimental catalogs have distinct vendor labels and service
   const names = catalogs.flatMap(items => items.map(item => item.name));
   assert.equal(new Set(names).size, names.length);
   for (const [index, items] of catalogs.entries()) {
-    assert.equal(items.length, index === 0 ? 8 : 72);
+    assert.equal(items.length, index === 0 ? 8 : 45);
     assert.deepEqual(new Set(items.map(item => item.category)), new Set(['venue', 'catering', 'supplies']));
     assert.ok(items.every(item => !('details' in item) && !('capacity' in item) && !('dietaryCoverage' in item)));
   }

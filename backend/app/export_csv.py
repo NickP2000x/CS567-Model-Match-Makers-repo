@@ -9,7 +9,7 @@ from pathlib import Path
 from .catalog import CONSTRAINTS
 from .offline import BACKEND_DIR, new_run_directory, read_snapshot, write_csv, write_json
 
-VERSION = "study-csv-v2"
+VERSION = "study-csv-v3"
 DIMENSIONS = ("mentalDemand", "physicalDemand", "temporalDemand", "performance", "effort", "frustration")
 RELATIONAL = ("routing_decisions", "model_calls", "oracle_results")
 BASE_COLUMNS = {

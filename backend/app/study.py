@@ -114,7 +114,7 @@ def begin_task(state: dict, task_id: str, now: int) -> None:
         "startedAt": now, "deadline": None if practice else now + EXPERIMENTAL_TASK_MS, "endedAt": None,
         "checkpoint": "Venue", "decisions": {}, "messages": [], "inspectedItems": [],
         "plan": {"venue": None, "catering": None, "supplies": []}, "totalCostCents": 0,
-        "constraints": {"budget": True, "capacity": False, "dietary": False, "accessibility": False, "supplies": False},
+        "constraints": {"budget": True, "capacity": False, "dietary": False, "accessibility": False, "supplies": False, "location": False},
         "survey": {"answers": {}, "metadata": None if practice else copy.deepcopy(CURRENT_SURVEY),
                    "rawScore": None, "submittedAt": None},
     }

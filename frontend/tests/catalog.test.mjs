@@ -28,12 +28,12 @@ test('expanded catalogs and preparation definitions match generated backend fixt
   assert.deepEqual(fixture('definitions.json').preparations, preparationDefinition);
 });
 
-test('A/B each have 24 options per category while practice stays at eight options', () => {
-  assert.equal(new Set(catalog.map(item => item.id)).size, 152);
+test('A/B each have 15 options per category while practice stays at eight options', () => {
+  assert.equal(new Set(catalog.map(item => item.id)).size, 98);
   assert.equal(catalog.filter(item => item.scenarioId === 'practice').length, 8);
   for (const id of ['A', 'B']) {
     for (const category of ['venue', 'catering', 'supplies']) {
-      assert.equal(catalog.filter(item => item.scenarioId === id && item.category === category).length, 24);
+      assert.equal(catalog.filter(item => item.scenarioId === id && item.category === category).length, 15);
     }
   }
   assert.equal(new Set(catalog.map(item => item.name)).size, catalog.length);
@@ -50,13 +50,39 @@ test('catalog order is a fixed shuffle, not grouped by category or by original o
   }
 });
 
+test('every venue has a fictional area in its details; summaries never reveal it', () => {
+  const areaNames = ['Riverside', 'North Quarter', 'East Side', 'Old Town', 'Harbor Front', 'Hillside', 'Market District'];
+  for (const item of catalog) {
+    if (item.category !== 'venue') { assert.equal(item.areaId, undefined, item.id); continue; }
+    assert.ok(item.areaId, item.id);
+    assert.ok(areaNames.some(name => item.details.includes(`Located in ${name}.`)), item.id);
+    assert.ok(!areaNames.some(name => item.summary.includes(name)), item.id);
+  }
+  for (const scenario of scenarios) {
+    const venues = catalog.filter(item => item.scenarioId === scenario.id && item.category === 'venue');
+    assert.equal(venues.filter(item => item.areaId !== scenario.requirements.area.id).length, scenario.id === 'practice' ? 0 : 3);
+  }
+});
+
+test('the practice reference plan passes all six constraints', async () => {
+  const service = createMockExperimentService({ sequenceId: 1 });
+  await service.recordConsent(true);
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await acknowledge(service, 'before-start');
+  await service.completeTutorial();
+  await startTask(service);
+  await service.updatePlan(feasiblePlans.practice);
+  assert.deepEqual(service.getSnapshot().tasks.practice.constraints,
+    { budget: true, capacity: true, dietary: true, accessibility: true, supplies: true, location: true });
+});
+
 test('generated options include feasible choices and detail-only distractors for each constraint', async () => {
   for (const id of ['A', 'B']) {
     const service = await experimentalTask(id);
     const task = () => service.getSnapshot().tasks['task-1'];
     const reference = feasiblePlans[id];
     const generated = catalog.filter(item => item.scenarioId === id && /-\d\d$/.test(item.id));
-    assert.equal(generated.length, 54);
+    assert.equal(generated.length, 27);
     const broken = new Set();
     for (const item of generated) {
       const plan = { ...reference, supplies: [...reference.supplies] };
@@ -67,7 +93,7 @@ test('generated options include feasible choices and detail-only distractors for
       assert.ok(failing.length <= 1, `${item.id} breaks ${failing}`);
       failing.forEach(key => broken.add(key));
     }
-    assert.deepEqual([...broken].sort(), ['accessibility', 'capacity', 'dietary', 'supplies']);
+    assert.deepEqual([...broken].sort(), ['accessibility', 'capacity', 'dietary', 'location', 'supplies']);
   }
 });
 
@@ -80,7 +106,7 @@ test('new options support distinct feasible plans, intended distractors, and cum
     for (const [index, plan] of [reference, ...alternativeFeasiblePlans[id]].entries()) {
       await service.updatePlan(plan);
       assert.equal(task().totalCostCents, expectedCosts[index]);
-      assert.deepEqual(task().constraints, { budget: true, capacity: true, dietary: true, accessibility: true, supplies: true });
+      assert.deepEqual(task().constraints, { budget: true, capacity: true, dietary: true, accessibility: true, supplies: true, location: true });
     }
     for (const [plan, constraint] of [
       [{ ...reference, venue: `${id}-venue-near-capacity` }, 'capacity'],
@@ -107,7 +133,7 @@ test('new option search and inspection keep constraint facts out of summaries', 
   for (const id of ['A', 'B']) {
     const service = await experimentalTask(id);
     const summaries = await service.searchCatalog(id);
-    assert.equal(summaries.length, 72);
+    assert.equal(summaries.length, 45);
     for (const item of summaries) {
       assert.deepEqual(Object.keys(item).sort(), ['id', 'scenarioId', 'category', 'name', 'summary', 'priceCents'].sort());
       assert.doesNotMatch(`${item.name} ${item.summary}`, /\b(vegan|vegetarian|gluten|nut-free|wheelchair|stairs|step-free|capacity|servings|fails|insufficient)\b/i);

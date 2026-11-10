@@ -73,9 +73,9 @@ rather than duplicating them.
 - Practice uses a distinct scenario and is excluded from experimental records.
   There is no survey after practice. Document its provisional demonstration treatment.
 - The constraints are budget, venue capacity, dietary coverage, wheelchair
-  accessibility, and required supplies. The fifth (required supplies) is provisional,
-  pending researcher approval; the paper describes four. A/B need feasible reference
-  plans and detail-only distractors.
+  accessibility, required supplies, and venue location. The fifth (required supplies)
+  and sixth (venue location) are provisional, pending researcher approval; the paper
+  describes four. A/B need feasible reference plans and detail-only distractors.
 - Checkpoints: Venue → Catering → Supplies → Final constraint check. Route at every
   reached experimental checkpoint and fix the selected model throughout its stage.
 - Automatic: show simulated recommendation/reason and apply directly, without a

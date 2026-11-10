@@ -6,7 +6,7 @@ import pytest
 
 from app import db, oracle, records
 from app.models import ModelError, ModelReply, ToolCall
-from app.oracle import evaluate_pending, label, propose, stage_passes
+from app.oracle import STAGE_CHECKS, evaluate_pending, label, propose, stage_passes
 from tests.conftest import Participant
 from tests.fakes import ScriptedClient, answer, tool
 
@@ -71,10 +71,17 @@ def test_stage_pass_rule_checks_only_planned_stages(connection):
     assert not stage_passes(connection, "A", "Venue", None)
 
 
+def test_location_is_checked_at_every_stage(connection):
+    assert all("location" in checks for checks in STAGE_CHECKS.values())
+    elsewhere = dict(GOOD, venue="A-venue-08")  # North Quarter is required; this venue is in Old Town
+    for checkpoint in STAGE_CHECKS:
+        assert not stage_passes(connection, "A", checkpoint, elsewhere), checkpoint
+
+
 def test_proposal_uses_tools_then_submit(connection):
     scenario = {"id": "A", "title": "Company workshop", "requirements": {
         "attendees": 40, "budgetCents": 100000, "dietaryNeeds": ["vegetarian"], "wheelchairRequired": True,
-        "requiredSupplies": ["name cards"]}}
+        "requiredSupplies": ["name cards"], "area": {"id": "north-quarter", "name": "North Quarter"}}}
     client = ScriptedClient("small", [tool("search_catalog", {"category": "venue"}), submit(GOOD)])
     proposal = propose(client, connection, scenario, "Final constraint check", GOOD | {"supplies": []}, 3)
     assert proposal.plan == GOOD and proposal.passed and [c.tools for c in proposal.calls] == [["search_catalog"], ["submit_plan"]]

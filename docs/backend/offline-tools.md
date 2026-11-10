@@ -1,7 +1,7 @@
 # Offline calibration and CSV export (#67–#68)
 
 These are local researcher tools, not participant-facing endpoints or a statistical pipeline.
-They use the same five constraints as the app (the fifth, required supplies, is provisional) and do not approve participant collection.
+They use the same six constraints as the app (the fifth, required supplies, and sixth, venue location, are provisional) and do not approve participant collection.
 
 ## Shell shortcuts (repository root)
 
@@ -144,11 +144,13 @@ or inject uninspected catalog details. Malformed/missing plans and submitted pla
 that violate the stage checks remain failures. This collection protocol is offline;
 it is not the participant-facing conversational agent's response protocol.
 
-Provisional deterministic acceptance checks are capacity/accessibility at Venue;
-capacity/accessibility/dietary coverage at Catering; and all five constraints,
-including budget and required supplies, at Supplies and Final constraint check.
-The manifest versions and hashes these rules. A score from an earlier four-constraint
-rule or a different proposal-collection protocol is not directly comparable.
+Provisional deterministic acceptance checks are capacity/accessibility/location at Venue;
+capacity/accessibility/location/dietary coverage at Catering; and all six constraints,
+including budget, required supplies, and venue location, at Supplies and Final constraint
+check. The default corpus adds a location repair case (a wrong-area venue) at each
+Venue checkpoint, so it has 26 contexts. The manifest versions and hashes these rules.
+A score from an earlier four- or five-constraint rule, an earlier catalog, or a different
+proposal-collection protocol is not directly comparable.
 
 The default corpus supplies **prior-stage routing history** separately from the
 model's current task question, matching routing before the new stage conversation.
