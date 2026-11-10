@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { checkpoints } from '../../services/experiment.types';
+import { AgentActivity } from './AgentActivity';
 import type { Task } from '../../services/experiment.types';
 
 interface ConversationProps {
@@ -8,11 +9,13 @@ interface ConversationProps {
   pending: boolean;
   routing: ReactNode;
   simulated: boolean;
+  /** Id of the message request in progress for this task and checkpoint, or null. */
+  agentWorking: number | null;
   onSend: (text: string) => Promise<boolean>;
   onAdvance: () => void;
 }
 
-export function ConversationPanel({ task, pending, routing, simulated, onSend, onAdvance }: ConversationProps) {
+export function ConversationPanel({ task, pending, routing, simulated, agentWorking, onSend, onAdvance }: ConversationProps) {
   const [message, setMessage] = useState('');
   const checkpointTitle = useRef<HTMLHeadingElement>(null);
   const previousCheckpoint = useRef(task.checkpoint);
@@ -65,6 +68,7 @@ export function ConversationPanel({ task, pending, routing, simulated, onSend, o
           onChange={event => setMessage(event.target.value)} />
         <button type="submit" disabled={pending || !model}>Send message</button>
       </form>
+      {agentWorking !== null && <AgentActivity key={agentWorking} />}
       <div className="stage-actions">
         {next ? (
           <button type="button" className="secondary" disabled={pending || !model} onClick={onAdvance}>Continue to {next}</button>

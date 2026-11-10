@@ -173,6 +173,27 @@ Optional contract check against a running backend (mock mode, `DEV_CONTROLS=true
 `MM_API_URL=http://127.0.0.1:8000 bash scripts/frontend.sh test`. Without
 `MM_API_URL` those integration tests are skipped.
 
+## Editing agent activity phrases
+
+While the agent works on a participant's message, the conversation panel shows the
+stable label "Agent is working on your message..." and a secondary phrase that changes
+every four seconds. Edit the phrases in
+`frontend/src/features/planning/agentStatusMessages.ts`; no other code changes:
+
+```ts
+export const AGENT_STATUS_MESSAGES = [
+  'Thinking...',
+  'Checking the catalog shelves...',  // humorous phrases are fine
+];
+```
+
+Phrases are plain text (never HTML) and are presentation only, not model reasoning or
+tool progress. They are not saved, exported, or sent to the models. With one phrase the
+text stays fixed; with none, only the label shows. Keep the wording fixed during a study
+and record any change in the "Agent activity phrases" row of
+[`../experiment-service-contract.md`](../experiment-service-contract.md), because it can
+affect perceived workload or trust.
+
 ## AI-assisted work
 
 Read [root `AGENTS.md`](../../AGENTS.md),

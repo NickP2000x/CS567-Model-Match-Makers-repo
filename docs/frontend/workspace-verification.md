@@ -84,3 +84,26 @@ results are in [study-flow verification](study-flow-verification.md).
 - Actual Windows-browser/macOS and screen-reader checks were not performed. No
   backend integration or real model behavior was tested. Technical demo readiness
   does not approve the provisional study materials for participant collection.
+
+## #73 agent activity indicator
+
+While a participant's message request is pending, the conversation panel shows a
+stable `role="status"` label ("Agent is working on your message...") and an
+`aria-hidden` secondary phrase from `agentStatusMessages.ts`, rotating every 4 s from
+the first phrase. Only `sendMessage` starts it, from inside the operation `perform`
+runs, so the duplicate-send guard is unchanged. It clears when the request settles,
+and it is hidden (unmounting its timer) when the task ends or times out or the
+checkpoint or task changes. Each request has an id, so a late response cannot
+restart it. Services, backend, messages, prompts, and CSV are unchanged.
+
+### Recorded results — 2026-11-05
+
+- `frontend/tests/agent-activity.test.mjs` (fake timers): immediate first phrase,
+  4 s rotation and wrap-around, restart from the first phrase, no updates after stop,
+  no timer for one or zero phrases (label fallback), plain-text pass-through, and no
+  activity text in stored messages.
+- Frontend: type-check and build passed. Tests: 75 passed, 11 skipped, 1 failed
+  (`launcher platform selection …`, which also fails on unmodified `origin/main`). The
+  React render conditions (success, failure, timeout, checkpoint change, unmount) have
+  no DOM test harness in this repository and were checked by code review only.
+- Not done: manual browser and screen-reader checks with a delayed response.
