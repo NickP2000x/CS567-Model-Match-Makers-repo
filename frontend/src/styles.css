@@ -390,8 +390,15 @@ th, td {
   font-size: 0.85rem;
 }
 
+/* The list fills whatever height the row gives the panel and scrolls inside it. */
+.catalog-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .catalog-results {
-  max-height: 24rem;
+  flex: 1 1 24rem;
+  min-height: 0;
   overflow-y: auto;
   padding: 0.25rem;
 }

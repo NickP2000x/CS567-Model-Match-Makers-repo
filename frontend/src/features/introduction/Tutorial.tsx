@@ -4,7 +4,7 @@ const guide = [
   { title: 'Requirements and time', text: 'Read the guest count, budget, dietary needs, and access requirements. Each study task has up to 15 minutes.', area: [12, 12, 676, 54] },
   { title: 'Catalog', text: 'Search venues, catering, and supplies. Inspect details before choosing; summaries may leave out important facts.', area: [12, 76, 218, 220] },
   { title: 'AI planning agent', text: 'The agent suggests options; you add or remove items in the plan. Automatic applies the recommendation directly. Override: choose independently, lock, then see the recommendation and retain/change before confirming.', area: [240, 76, 218, 220] },
-  { title: 'Current event plan', text: 'Add or remove items and review the combined cost and five constraint checks. You can revise plan items at any stage.', area: [468, 76, 220, 220] },
+  { title: 'Current event plan', text: 'Add or remove items and review the combined cost and six constraint checks. You can revise plan items at any stage.', area: [468, 76, 220, 220] },
   { title: 'Checkpoints', text: 'Venue → Catering → Supplies → Final constraint check. Move forward through stages; each chosen model stays fixed throughout its stage.', area: [250, 113, 198, 39] },
   { title: 'Submit plan', text: 'Submit at any checkpoint, even with an incomplete or invalid plan. Submission or timeout leads to the task’s workload survey. Practice is untimed and has no survey.', area: [548, 305, 140, 32] },
 ];

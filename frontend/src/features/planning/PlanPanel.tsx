@@ -10,7 +10,7 @@ interface PlanProps {
   onSubmit: () => void;
 }
 
-const constraintLabels = { budget: 'Budget', capacity: 'Venue capacity', dietary: 'Dietary coverage', accessibility: 'Wheelchair accessibility', supplies: 'Required supplies' } as const;
+const constraintLabels = { budget: 'Budget', capacity: 'Venue capacity', dietary: 'Dietary coverage', accessibility: 'Wheelchair accessibility', supplies: 'Required supplies', location: 'Venue location' } as const;
 
 export function PlanPanel({ task, catalog, budgetCents, pending, onRemove, onSubmit }: PlanProps) {
   function selected(id: string) {

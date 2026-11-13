@@ -47,13 +47,15 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
     assert [call.tools for call in reply.calls] == [["search_catalog"], ["inspect_item"], ["check_plan"], []]
     assert all(call.ok for call in reply.calls) and reply.calls[0].prompt_tokens == 20
     search, item, check = tool_results(clients["large"])
-    assert [entry["id"] for entry in search] == ["A-venue-good", "A-venue-capacity", "A-venue-access",
-                                               "A-venue-economy", "A-venue-premium", "A-venue-near-capacity"]
+    fixture = json.loads((db.FIXTURES / "catalog.json").read_text())["items"]
+    assert [entry["id"] for entry in search] == [item["id"] for item in fixture
+                                               if item["scenarioId"] == "A" and item["category"] == "venue"]
+    assert len(search) == 15
     assert "capacity" not in search[0]  # search returns summaries only
     assert item["capacity"] == 40 and item["wheelchairAccessible"] is True
     assert check == {"totalCostCents": 80000, "allConstraintsMet": True,
                      "constraints": {"budget": True, "capacity": True, "dietary": True, "accessibility": True,
-                                     "supplies": True}}
+                                     "supplies": True, "location": True}}
 
 
 def test_empty_search_points_the_model_to_inspection(connection):

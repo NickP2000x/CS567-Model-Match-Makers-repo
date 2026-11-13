@@ -51,7 +51,7 @@ def test_router_metadata_captures_exposed_checkpoint_identity_only():
 def test_default_corpus_covers_scenarios_stages_and_valid_frozen_plans(corpus):
     payload, connection, data, _ = corpus
     calibrate.validate_cases(data, payload, connection)
-    assert len(data["cases"]) == 24
+    assert len(data["cases"]) == 26  # 3 per stage and scenario, plus a location repair at each Venue
     assert all(not case["routing_messages"] for case in data["cases"] if case["checkpoint"] == "Venue")
     assert {(c["scenario_id"], c["checkpoint"]) for c in data["cases"]} == {
         (sid, cp) for sid in ("A", "B") for cp in calibrate.CHECKPOINTS}
@@ -173,10 +173,10 @@ def test_dry_run_is_explicit_deterministic_and_does_not_load_settings(tmp_path, 
     manifest = json.loads((output / "manifest.json").read_text())
     rows = [json.loads(line) for line in (output / "evaluations.jsonl").read_text().splitlines()]
     assert manifest["status"] == "complete" and manifest["configuration"]["mode"] == "dry-run"
-    assert manifest["oracle_version"] == "provisional-stage-pass-v2-required-supplies"
+    assert manifest["oracle_version"] == "provisional-stage-pass-v3-location"
     assert "supplies" in manifest["oracle_rules"]["Final constraint check"]
     assert manifest["oracle_rules_sha256"] == calibrate.digest(calibrate.STAGE_CHECKS)
-    assert len(rows) == 24 and all(r["simulated"] for r in rows)
+    assert len(rows) == 26 and all(r["simulated"] for r in rows)
     report = json.loads((output / "report.json").read_text())
     assert report["recommendation"]["selected_pass_rate"] >= .7
     assert report["actual_evaluation_usage"]["small"]["actual_calls"] == 0
