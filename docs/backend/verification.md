@@ -534,43 +534,21 @@ researcher approval (root `AGENTS.md`).
 - Not done: no browser check of the new "Required supplies" row and requirements line, and
   no live-backend frontend run.
 
-## #72 — 15-option catalogs and venue location (provisional)
+## Planning agent with Ollama gpt-oss models
 
-A and B now have exactly 15 options per category (45 per scenario); practice keeps its
-eight options. A sixth constraint, venue location, is added. Both are provisional
-pending researcher approval; all scenario values are fictional.
+Fixes for behaviour seen with `gpt-oss` through Ollama, on top of #71's reasoning
+continuation:
 
-- The 18 existing A/B items keep their IDs, prices, and scored facts, so reference
-  plans, alternatives, and saved runs are unchanged. Nine generated options per
-  category and scenario use neutral IDs (`A-venue-07` … `B-supplies-15`) and the same
-  kind pattern for A and B (`frontend/src/mocks/scenarios.ts`): venues 4 feasible,
-  3 wrong area, 1 too small, 1 upstairs; catering 5 feasible, 2 short, 1 no dietary
-  coverage, 1 partial; supplies 3 complete, 4 partial, 1 unrelated, 1 decorative only.
-  Swapped into the reference plan, each breaks at most one constraint.
-- Areas (`requirements.area`): practice Riverside `riverside`, A North Quarter
-  `north-quarter`, B Harbor Front `harbor-front`. Every venue has an `areaId` and
-  "Located in …" detail text; every existing venue is in the required area. Wrong-area
-  venues use East Side/Old Town (A) and Hillside/Market District (B). Summaries never
-  name an area. Catering and supplies were reviewed and have no scored location.
-- `location` passes only when the selected venue is in the required area (fails with no
-  venue or another area). The oracle checks it at all four stages
-  (`provisional-stage-pass-v3-location`). Agent, router, and oracle prompts name the
-  required area, so router scores are not comparable with earlier runs.
-- The catalog order is one fixed-seed shuffle shared by every participant, the API, the
-  agent tools, and the oracle. The catalog panel's list now fills the panel height.
-- Fixtures are `catalog-v4`. CSV export is `study-csv-v3` (adds `constraint_location`).
-  Earlier records are never recomputed: missing checks export as null, and the records
-  summary reports their constraint count and all-met as unknown.
-- The default calibration corpus is `synthetic-stage-contexts-v3-location` (26
-  contexts: a location repair case at each Venue). Earlier calibration does not validate
-  this catalog or these rules; no real calibration was run and the threshold is unchanged.
+- `search_catalog` accepts stage names or extra words as the category ("Supplies",
+  "Supplies Items"), and an empty search with a query tells the model that details are
+  not searched, so it lists the category and inspects items instead of concluding that
+  nothing matches. The tool description and system prompt say the same.
+- Empty replies and tool calls written as text (JSON arguments, "We need to call
+  check_plan") are never shown to participants. They trigger the final no-tools call,
+  which now gets the catalog facts gathered so far as text instead of the tool-call
+  history (after which gpt-oss tended to answer with another tool call).
 
 ### Recorded results — 2026-11-05
 
-- Fixtures regenerated with `node backend/scripts/export_fixtures.mjs` (Node 24.14.0).
-- Backend: 143 tests passed (with `MODEL_MODE=mock`, since a local `.env` selected real
-  mode). `python -m app.calibrate --dry-run` built and validated its 26 contexts.
-- Frontend: type-check and build passed. Tests: 73 passed, 11 skipped, and 1 failed:
-  `launcher platform selection …`, which fails the same way on unmodified `origin/main`.
-- Not done: no browser walkthrough of catalog browsing, inspection, and plan feedback
-  with the new catalog, and no real-model run.
+- Backend: 145 tests passed (4 new), alone and merged with the catalog-expansion branch.
+- Not done: no recorded real-model run for this change in this note.
