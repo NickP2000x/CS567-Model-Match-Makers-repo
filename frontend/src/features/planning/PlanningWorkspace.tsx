@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CatalogItem, CatalogSummary, Category, ExperimentService, Scenario, TaskId } from '../../services/experiment.types';
+import type { CatalogItem, CatalogSummary, Category, Checkpoint, ExperimentService, Scenario, TaskId } from '../../services/experiment.types';
 import { useExperiment } from '../../services/useExperiment';
 import { RoutingPanel } from '../routing/RoutingPanel';
 import { TaskCountdown } from '../study/TaskCountdown';
@@ -26,6 +26,9 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
   const [loadFailed, setLoadFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const starting = useRef(false);
+  // The message request the agent is working on; only sendMessage sets it (#73).
+  const [agentRequest, setAgentRequest] = useState<{ id: number; taskId: TaskId; checkpoint: Checkpoint } | null>(null);
+  const requestCount = useRef(0);
   const task = state.tasks[taskId];
   const pending = actionPending || state.pendingOperations > 0;
 
@@ -128,7 +131,18 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
           routing={<RoutingPanel key={`${task.id}-${task.checkpoint}`} task={task}
             service={service} pending={pending} perform={perform}
             routerSimulated={state.routerSimulated !== false} agentSimulated={state.simulated} />}
-          onSend={text => perform(() => service.sendMessage(text))}
+          agentWorking={agentRequest !== null && agentRequest.taskId === taskId
+            && agentRequest.checkpoint === task.checkpoint && task.status === 'active' ? agentRequest.id : null}
+          onSend={text => perform(async () => {
+            // Set inside the operation, so a send blocked by the duplicate guard shows nothing.
+            const id = ++requestCount.current;
+            setAgentRequest({ id, taskId, checkpoint: service.getSnapshot().tasks[taskId]!.checkpoint });
+            try {
+              await service.sendMessage(text);
+            } finally {
+              setAgentRequest(current => current?.id === id ? null : current);
+            }
+          })}
           onAdvance={() => { void perform(() => service.advanceCheckpoint()); }} />
         <PlanPanel task={task} catalog={data.catalog} pending={pending}
           budgetCents={requirements.budgetCents} onRemove={removeItem}

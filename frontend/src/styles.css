@@ -386,6 +386,23 @@ th, td {
   margin-top: 0.5rem;
 }
 
+/* Agent activity (#73): plain text that wraps; no animation needed to understand it. */
+.agent-activity {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid #818b96;
+  overflow-wrap: anywhere;
+}
+
+.workspace-panel .agent-activity p {
+  margin: 0.25rem 0;
+}
+
+.agent-activity-phrase {
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 .catalog-count, .catalog-summary, .item-price, .message-label {
   font-size: 0.85rem;
 }
