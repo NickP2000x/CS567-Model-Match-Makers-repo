@@ -472,7 +472,8 @@ substitute for IRB approval.
   suggests but never edits the plan.
 - **Router (#37):** which RouteLLM router (`mf` matches the paper's model pair) and the
   threshold (scores clustered in 0.38–0.50 here, so calibrate in the pilot); wording of
-  the "Router estimate" reasons.
+  the "Router estimate" reasons. A provisional `bert` router and threshold for the gpt-oss
+  pair are recorded under "gpt-oss pair calibration" below.
 - **Oracle (#40):** the per-stage pass rule, the `neither` case, and any reliance formula.
 - **Records (#38):** latency and token-accounting definitions; raw events are kept.
 - **Fifth constraint (required supplies):** whether to add it at all (the paper has four),
@@ -552,3 +553,49 @@ continuation:
 
 - Backend: 145 tests passed (4 new), alone and merged with the catalog-expansion branch.
 - Not done: no recorded real-model run for this change in this note.
+
+## gpt-oss pair calibration (provisional)
+
+The backend owner calibrated the Ollama Cloud pair on the merged #72 catalog
+(`catalog-v4`, six constraints). The model pair, router, and threshold below are
+substitutions for the paper's setup. They need researcher approval before participant
+collection.
+
+- Models: small `ollama:gpt-oss:20b-cloud`, large `ollama:gpt-oss:120b-cloud`, instead of
+  Mixtral 8x7B and GPT-4 Turbo (see the model pair decision above). Ollama does not report
+  an immutable revision for these cloud aliases, so the manifest stores null. Record the
+  run date with any result.
+- Router: RouteLLM `bert`. It needs no OpenAI key. `mf`, which the paper's model pair
+  matches, needs OpenAI embeddings and was not used.
+- Provisional live configuration in `backend/.env`: `ROUTER_MODE=routellm`,
+  `ROUTELLM_ROUTER=bert`, `ROUTER_THRESHOLD=0.515`, `DEV_CONTROLS=false`.
+
+### Recorded results — 2026-11-13
+
+- Command: `ROUTELLM_ROUTER=bert bash scripts/calibrate.sh --real --min-pass-rate 0.95`
+  (default corpus `synthetic-stage-contexts-v3-location`, 26 pilot contexts, one repeat,
+  `AGENT_MAX_STEPS=4`). Report `calibration-20261113T192817.371432Z` (ignored local
+  artifacts under `backend/data/calibration/`). Status complete, 0 error contexts,
+  258 model calls. A `--limit 2` check ran first with no errors.
+- Router scores fell between 0.40 and 0.53.
+
+| Policy | Pass rate | Routed large |
+|---|---|---|
+| Always small (20b) | 88% (23/26) | 0% |
+| Always large (120b) | 77% (20/26) | 100% |
+| Threshold 0.515 | 92% (24/26) | 15% |
+| Oracle (either model passes) | 96% (25/26) | — |
+
+- No threshold met the requested 0.95 pass rate, so the tool recommended none.
+  Threshold 0.515 is the highest pass rate with the lowest large fraction in the grid. It
+  is a manual, provisional choice from 26 synthetic contexts, not a validated threshold.
+- The large model passed fewer contexts than the small model. Large failures: dietary
+  coverage (2, B Catering), accessibility (2, Final), capacity (1, A Final repair), and a
+  removed venue (1, A Venue location repair). Small failures: no venue submitted (1,
+  A Venue) and the dietary distractor `B-food-diet` (2, B Final). Both models failed only
+  B Final review. This weakens the premise that the large model is the better choice and
+  needs researcher review.
+- Live check: with these settings the backend started on a spare port with a temporary
+  database, and `/api/health` returned `{"status":"ok","mode":"real","router":"routellm"}`.
+- Not done: no holdout split, no repeated runs, and no real participant-style session
+  through the routed app.
