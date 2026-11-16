@@ -567,6 +567,9 @@ collection.
   run date with any result.
 - Router: RouteLLM `bert`. It needs no OpenAI key. `mf`, which the paper's model pair
   matches, needs OpenAI embeddings and was not used.
+- Pilot target: the backend owner set the pass-rate target to 0.92, down from 0.95,
+  because no threshold reached 0.95 with this pair. `app.calibrate` now defaults to
+  `--min-pass-rate 0.92`. The target is provisional, pending researcher approval.
 - Provisional live configuration in `backend/.env`: `ROUTER_MODE=routellm`,
   `ROUTELLM_ROUTER=bert`, `ROUTER_THRESHOLD=0.515`, `DEV_CONTROLS=false`.
 
@@ -586,15 +589,20 @@ collection.
 | Threshold 0.515 | 92% (24/26) | 15% |
 | Oracle (either model passes) | 96% (25/26) | — |
 
-- No threshold met the requested 0.95 pass rate, so the tool recommended none.
-  Threshold 0.515 is the highest pass rate with the lowest large fraction in the grid. It
-  is a manual, provisional choice from 26 synthetic contexts, not a validated threshold.
+- The run requested 0.95, and no threshold met it. Recomputed from the same evaluations
+  at the 0.92 target (no new model calls), the tool's rule recommends 0.5154: 92% pass,
+  15% routed large. `ROUTER_THRESHOLD=0.515` routes every pilot context the same way.
+  It is a provisional choice from 26 synthetic contexts, not a validated threshold.
 - The large model passed fewer contexts than the small model. Large failures: dietary
   coverage (2, B Catering), accessibility (2, Final), capacity (1, A Final repair), and a
   removed venue (1, A Venue location repair). Small failures: no venue submitted (1,
   A Venue) and the dietary distractor `B-food-diet` (2, B Final). Both models failed only
   B Final review. This weakens the premise that the large model is the better choice and
   needs researcher review.
+- 50 of the 52 proposals used all four tool steps and then the forced final answer.
+  With 15 options per category, `AGENT_MAX_STEPS=4` may be too few for the models to
+  inspect the candidates. A run with eight steps was started and stopped before it
+  finished, so its effect is unknown. The live agent uses the same step limit.
 - Live check: with these settings the backend started on a spare port with a temporary
   database, and `/api/health` returned `{"status":"ok","mode":"real","router":"routellm"}`.
 - Not done: no holdout split, no repeated runs, and no real participant-style session
