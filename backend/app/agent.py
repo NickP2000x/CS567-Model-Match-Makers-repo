@@ -18,6 +18,8 @@ MAX_HISTORY_MESSAGES = 12
 EMPTY_ANSWER = "Sorry, I could not produce an answer. Please try rephrasing your question."
 CATEGORIES = ("venue", "catering", "supplies")
 TOOL_NAMES = ("search_catalog", "inspect_item", "check_plan")
+KEY_FACTS = {"venue": ("capacity", "wheelchairAccessible", "areaId"),
+             "catering": ("servings", "dietaryCoverage"), "supplies": ("provides",)}
 
 
 def is_answer(text: str | None) -> bool:
@@ -28,9 +30,9 @@ def is_answer(text: str | None) -> bool:
 TOOLS = [
     {"type": "function", "function": {
         "name": "search_catalog",
-        "description": ("Search this event's catalog. Returns item summaries (id, name, category, price in cents). "
-                        "Summaries leave out key facts such as capacity, accessibility, dietary coverage, and "
-                        "what a supplies package contains, so list a category with an empty query and inspect items."),
+        "description": ("Search this event's catalog. Returns each item's id, name, category, price in cents, and the "
+                        "facts the constraints check: venue capacity, wheelchair access and area; catering servings "
+                        "and dietary coverage; what a supplies package provides."),
         "parameters": {"type": "object", "properties": {
             "query": {"type": "string", "description": "Words to match in item names or summaries; empty for all."},
             "category": {"type": "string", "enum": ["venue", "catering", "supplies"]},
@@ -101,8 +103,8 @@ def system_prompt(context: AgentContext) -> str:
         f"Participant's current plan (item ids): {json.dumps(context.plan)}.\n"
         "Use the tools for facts; never invent items, prices, or details. Look only at the current stage's "
         "category unless the participant asks about another. Search matches only names and short summaries, "
-        "so a word missing from a summary does not mean no item has it: list the category with an empty query "
-        "and inspect only the candidates you need. Before recommending a "
+        "so list the category with an empty query: its results include the facts the constraints check. "
+        "Before recommending a "
         "combination, call check_plan and revise if a constraint fails. You cannot change the plan: "
         "tell the participant which items to add or remove. Answer in under 120 words, "
         "using item names rather than ids. Only discuss this event-planning task."
@@ -130,7 +132,12 @@ class CatalogTools:
             if not results and args.get("query"):
                 # Small models otherwise conclude that a feature found only in item details does not exist.
                 return {"results": [], "note": "No item names or summaries matched. Details are not searched: "
-                        "search this category with an empty query and inspect the items."}
+                        "search this category with an empty query."}
+            # Unlike the participant's catalog panel, the agent sees the constraint facts in search results,
+            # so it need not inspect items one by one and run out of tool steps.
+            for result in results:
+                item = catalog.get_item(self.connection, result["id"])
+                result.update({key: item[key] for key in KEY_FACTS[item["category"]] if key in item})
             return results
         if name == "inspect_item":
             item = catalog.get_item(self.connection, str(args.get("item_id", "")))

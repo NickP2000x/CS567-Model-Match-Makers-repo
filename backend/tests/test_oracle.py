@@ -94,7 +94,7 @@ def test_proposal_uses_tools_then_submit(connection):
     assert bounded.request_overrides == [{"step": 3, "messages": looping.requests[-1][0], "format": "stage-plan-json-v1"}]
     facts = json.loads(looping.requests[-1][0][1]["content"])
     assert facts["current_plan"] == GOOD
-    assert all("capacity" not in item for item in facts["observed_catalog_items"])  # No uninspected detail injection.
+    assert all("details" not in item for item in facts["observed_catalog_items"])  # No uninspected detail injection.
     bad = propose(ScriptedClient("small", [ModelReply(None, [ToolCall("x", "submit_plan", "not json")])]),
                   connection, scenario, "Venue", GOOD, 2)
     assert (bad.plan, bad.passed) == (None, False)
@@ -110,8 +110,8 @@ def test_terminal_json_collects_a_real_proposal_without_an_extra_call(connection
     assert client.requests[-1][1] is None
     facts = json.loads(client.requests[-1][0][1]["content"])
     by_id = {item["id"]: item for item in facts["observed_catalog_items"]}
-    assert by_id["A-venue-good"]["capacity"] == 40
-    assert "capacity" not in by_id["A-venue-capacity"]
+    assert by_id["A-venue-good"]["capacity"] == 40 and "details" in by_id["A-venue-good"]
+    assert by_id["A-venue-capacity"]["capacity"] == 35 and "details" not in by_id["A-venue-capacity"]
     assert "Pick Willow" not in client.requests[-1][0][0]["content"]
 
 

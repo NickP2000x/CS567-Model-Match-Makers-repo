@@ -5,7 +5,7 @@ import pytest
 
 from app import db
 from app.agent import EMPTY_ANSWER, AgentContext, AgentFailed, CatalogTools, ModelAgent, system_prompt
-from app.catalog import get_scenario
+from app.catalog import get_scenario, search
 from app.models import ModelError
 from tests.fakes import ScriptedClient, answer, tool
 
@@ -51,21 +51,29 @@ def test_agent_uses_tools_then_answers_with_locked_model(connection):
     assert [entry["id"] for entry in search] == [item["id"] for item in fixture
                                                if item["scenarioId"] == "A" and item["category"] == "venue"]
     assert len(search) == 15
-    assert "capacity" not in search[0]  # search returns summaries only
+    good = next(entry for entry in search if entry["id"] == "A-venue-good")
+    assert good["capacity"] == 40 and good["wheelchairAccessible"] is True and good["areaId"] == "north-quarter"
+    assert "details" not in good
     assert item["capacity"] == 40 and item["wheelchairAccessible"] is True
     assert check == {"totalCostCents": 80000, "allConstraintsMet": True,
                      "constraints": {"budget": True, "capacity": True, "dietary": True, "accessibility": True,
                                      "supplies": True, "location": True}}
 
 
-def test_empty_search_points_the_model_to_inspection(connection):
+def test_empty_search_points_the_model_to_listing_the_category(connection):
     # Practice "Basic Supplies" lists name cards only in its details, not its summary.
     tools = CatalogTools(connection, "practice")
     missing = tools.run("search_catalog", json.dumps({"query": "name cards", "category": "supplies"}))
-    assert missing["results"] == [] and "inspect" in missing["note"]
-    listed = tools.run("search_catalog", json.dumps({"query": "", "category": "supplies"}))
-    assert sorted(item["id"] for item in listed) == ["practice-supplies-cost", "practice-supplies-good"]
-    assert "name cards" in tools.run("inspect_item", json.dumps({"item_id": "practice-supplies-good"}))["provides"]
+    assert missing["results"] == [] and "empty query" in missing["note"]
+    listed = {item["id"]: item for item in tools.run("search_catalog", json.dumps({"query": "", "category": "supplies"}))}
+    assert sorted(listed) == ["practice-supplies-cost", "practice-supplies-good"]
+    assert "name cards" in listed["practice-supplies-good"]["provides"]
+
+
+def test_agent_search_adds_key_facts_but_catalog_panel_does_not(connection):
+    listed = CatalogTools(connection, "A").run("search_catalog", json.dumps({"category": "catering"}))
+    assert all({"servings", "dietaryCoverage"} <= item.keys() and "capacity" not in item for item in listed)
+    assert all("servings" not in item for item in search(connection, "A", "", "catering"))
 
 
 def test_search_accepts_stage_names_as_categories(connection):

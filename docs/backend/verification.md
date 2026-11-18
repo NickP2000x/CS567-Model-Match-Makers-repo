@@ -552,3 +552,33 @@ continuation:
 
 - Backend: 145 tests passed (4 new), alone and merged with the catalog-expansion branch.
 - Not done: no recorded real-model run for this change in this note.
+
+## Agent search shows the constraint facts
+
+With 15 items per category, the agent had to inspect items one by one, ran out of tool
+steps, and participants often saw "Sorry, I could not produce an answer". The agent's
+`search_catalog` tool now adds the facts the constraints check to each result: venue
+capacity, wheelchair access and area; catering servings and dietary coverage; what a
+supplies package provides. The `details` text still needs `inspect_item`. The
+participant's catalog panel (`GET /api/scenarios/{id}/catalog`) is unchanged and still hides these
+facts. The offline oracle uses the same tool, so its observed items now include these
+facts too.
+
+Open for the researchers: the agent no longer needs to inspect to spot detail-only
+distractors, which may narrow the gap between the small and large models. The
+2026-11-13 router calibration (threshold 0.515) was run before this change.
+
+### Recorded results — 2026-11-18
+
+- Backend: 148 tests passed (1 new, 3 updated).
+- Manual real-model check (Ollama `gpt-oss:20b-cloud` / `gpt-oss:120b-cloud`): "What should
+  I do?" with an empty plan at Venue, Catering and Supplies of tasks A and B, 3 times per
+  model (36 replies per row), scored against the catalog:
+
+  | Code | `AGENT_MAX_STEPS` | Useful | Names a non-qualifying item too | "Sorry" |
+  |---|---|---|---|---|
+  | `main` before this change | 8 | 32 | 0 | 4 |
+  | this change | 4 | 34 | 0 | 2 |
+  | this change | 8 | 33 | 3 (small model, in a list of options) | 0 |
+
+- Not done: multi-turn conversations, the final constraint check stage, and a browser run.
