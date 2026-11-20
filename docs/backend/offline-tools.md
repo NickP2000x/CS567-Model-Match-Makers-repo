@@ -105,7 +105,8 @@ This deliberately simulates both model outcomes and router scores. It never load
 provider settings, downloads router checkpoints, or calls models. Its threshold is
 an **illustrative test result**, not a usable research threshold. The `.7` target
 only demonstrates the report on synthetic outcomes; the default requested target
-is `.95`, and a report may legitimately have no qualifying candidate.
+is `.92` (provisional; see "gpt-oss pair calibration" in `verification.md`), and a
+report may legitimately have no qualifying candidate.
 
 ### Explicit real evaluation
 
@@ -116,7 +117,7 @@ addresses/keys as needed, and install `requirements-routellm.txt`. Then:
 # Small connectivity/evaluation sample first; not a representative calibration:
 python -m app.calibrate --real --limit 2
 # Full built-in synthetic pilot corpus:
-python -m app.calibrate --real --min-pass-rate 0.95
+python -m app.calibrate --real --min-pass-rate 0.92
 ```
 
 Both `--real` and real model configuration are required. Real runs use the existing

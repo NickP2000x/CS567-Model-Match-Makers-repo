@@ -472,7 +472,8 @@ substitute for IRB approval.
   suggests but never edits the plan.
 - **Router (#37):** which RouteLLM router (`mf` matches the paper's model pair) and the
   threshold (scores clustered in 0.38–0.50 here, so calibrate in the pilot); wording of
-  the "Router estimate" reasons.
+  the "Router estimate" reasons. A provisional `bert` router and threshold for the gpt-oss
+  pair are recorded under "gpt-oss pair calibration" below.
 - **Oracle (#40):** the per-stage pass rule, the `neither` case, and any reliance formula.
 - **Records (#38):** latency and token-accounting definitions; raw events are kept.
 - **Fifth constraint (required supplies):** whether to add it at all (the paper has four),
