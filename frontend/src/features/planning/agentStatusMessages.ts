@@ -16,7 +16,7 @@ export const AGENT_STATUS_MESSAGES = [
   'Noodling',
   'Honking',
   'Vibing',
-  'Marinating'
+  'Marinating',
   // Add custom sentences here.
   
 ];
