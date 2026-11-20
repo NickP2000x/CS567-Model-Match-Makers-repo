@@ -6,7 +6,7 @@ import { acknowledge, startTask } from './study-helpers.mjs';
 
 async function ready(service) {
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial(); await startTask(service); await service.finishTask();
   await startTask(service);

@@ -63,7 +63,7 @@ test('custom phrases are passed through unchanged, including markup-like text', 
 test('sending a message stores only the participant and agent messages', async () => {
   const service = createMockExperimentService({ sequenceId: 1 });
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial();
   await startTask(service);

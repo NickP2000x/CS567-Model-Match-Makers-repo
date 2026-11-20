@@ -6,6 +6,7 @@ Functions mutate a session's state dict (the frontend `StudyState` shape) and ra
 
 import copy
 import math
+import re
 import sqlite3
 
 from . import catalog
@@ -17,6 +18,7 @@ from .errors import ApiError
 
 PLANNING_STEPS = ("practice", "task-1", "task-2")
 SURVEY_STEP = {"task-1": "tlx-1", "task-2": "tlx-2"}
+PROLIFIC_ID = re.compile(r"[A-Za-z0-9]{1,64}")  # Provisional, pending researcher approval.
 
 
 class TaskExpired(Exception):
@@ -53,12 +55,14 @@ def record_consent(state: dict, accepted: bool) -> None:
         state["step"] = "demographics"
 
 
-def save_demographics(state: dict, age: int, gender: str, prior_llm_usage: str) -> None:
+def save_demographics(state: dict, age: int, gender: str, prior_llm_usage: str, prolific_id: str) -> None:
     if state["step"] != "demographics":
         raise invalid_step("Complete consent first.")
-    if age < 0 or not gender.strip() or not prior_llm_usage.strip():
-        raise ApiError(400, "INVALID_DEMOGRAPHICS", "Enter synthetic age, gender, and prior LLM usage.")
-    state["demographics"] = {"age": age, "gender": gender, "priorLlmUsage": prior_llm_usage}
+    prolific_id = prolific_id.strip()
+    if age < 0 or not gender.strip() or not prior_llm_usage.strip() or not PROLIFIC_ID.fullmatch(prolific_id):
+        raise ApiError(400, "INVALID_DEMOGRAPHICS",
+                       "Enter age, gender, prior LLM usage, and your Prolific ID (letters and digits).")
+    state["demographics"] = {"age": age, "gender": gender, "priorLlmUsage": prior_llm_usage, "prolificId": prolific_id}
     state["step"] = "tutorial"
 
 
@@ -119,6 +123,7 @@ def begin_task(state: dict, task_id: str, now: int) -> None:
                    "rawScore": None, "submittedAt": None},
     }
     task["decisions"]["Venue"] = new_decision(task, now)
+    task["checkpointVisits"] = [{"checkpoint": "Venue", "at": now, "direction": "start"}]
     state["tasks"][task_id] = task
 
 
@@ -264,7 +269,18 @@ def advance_checkpoint(task: dict, now: int) -> None:
     if position == len(CHECKPOINTS) - 1:
         raise ApiError(409, "FINAL_CHECKPOINT", "Submit the current plan.")
     task["checkpoint"] = CHECKPOINTS[position + 1]
-    task["decisions"][task["checkpoint"]] = new_decision(task, now)
+    # A stage reached before keeps its decision and locked model (provisional back navigation).
+    task["decisions"].setdefault(task["checkpoint"], new_decision(task, now))
+    task.setdefault("checkpointVisits", []).append({"checkpoint": task["checkpoint"], "at": now, "direction": "forward"})
+
+
+def go_back_checkpoint(task: dict, now: int) -> None:
+    """Provisional, pending researcher approval: return to the previous stage and its locked model."""
+    position = CHECKPOINTS.index(task["checkpoint"])
+    if position == 0:
+        raise ApiError(409, "FIRST_CHECKPOINT", "This is the first stage.")
+    task["checkpoint"] = CHECKPOINTS[position - 1]
+    task.setdefault("checkpointVisits", []).append({"checkpoint": task["checkpoint"], "at": now, "direction": "back"})
 
 
 # --- Workload survey and feedback -------------------------------------------------

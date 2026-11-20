@@ -39,6 +39,7 @@ class DemographicsBody(Body):
     age: int
     gender: str
     priorLlmUsage: str
+    prolificId: str
 
 
 class PreparationBody(Body):
@@ -140,7 +141,7 @@ def record_consent(request: Request, sid: str, body: ConsentBody) -> dict:
 
 @router.post("/sessions/{sid}/demographics")
 def save_demographics(request: Request, sid: str, body: DemographicsBody) -> dict:
-    return mutate(request, sid, lambda c, s, now: study.save_demographics(s, body.age, body.gender, body.priorLlmUsage))
+    return mutate(request, sid, lambda c, s, now: study.save_demographics(s, body.age, body.gender, body.priorLlmUsage, body.prolificId))
 
 
 @router.post("/sessions/{sid}/preparations/{preparation_id}")
@@ -269,6 +270,13 @@ def send_message(request: Request, sid: str, task_id: TaskId, body: MessageBody)
 def advance_checkpoint(request: Request, sid: str, task_id: TaskId, body: CheckpointBody | None = None) -> dict:
     checkpoint = body.checkpoint if body else None
     return mutate(request, sid, lambda c, s, now: study.advance_checkpoint(
+        study.planning_task(c, s, task_id, checkpoint, now), now))
+
+
+@router.post("/sessions/{sid}/tasks/{task_id}/checkpoint/back")
+def go_back_checkpoint(request: Request, sid: str, task_id: TaskId, body: CheckpointBody | None = None) -> dict:
+    checkpoint = body.checkpoint if body else None
+    return mutate(request, sid, lambda c, s, now: study.go_back_checkpoint(
         study.planning_task(c, s, task_id, checkpoint, now), now))
 
 

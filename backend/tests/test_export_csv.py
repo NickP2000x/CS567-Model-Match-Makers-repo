@@ -34,8 +34,12 @@ def recorded_database(tmp_path):
             "decisions": {"Venue": {"phase": "committed", "initialModel": "large", "recommendedModel": "small",
                 "finalModel": "small", "shownAt": 1000, "initialLockedAt": 1500,
                 "recommendationShownAt": 1700, "finalCommittedAt": 1900}},
-            "inspectedItems": ["A-venue-good"], "reopens": [{"endedAt": 4000, "reopenedAt": 4500}]}
-    state = {"step": "completion", "consent": True, "demographics": {"age": 24, "gender": "Invented — Ω", "priorLlmUsage": "weekly"},
+            "inspectedItems": ["A-venue-good"], "reopens": [{"endedAt": 4000, "reopenedAt": 4500}],
+            "checkpointVisits": [{"checkpoint": "Venue", "at": 1000, "direction": "start"},
+                                 {"checkpoint": "Catering", "at": 2500, "direction": "forward"},
+                                 {"checkpoint": "Venue", "at": 2800, "direction": "back"}]}
+    state = {"step": "completion", "consent": True, "demographics": {"age": 24, "gender": "Invented — Ω", "priorLlmUsage": "weekly",
+                                                                   "prolificId": "TESTPID01"},
              "feedback": {"interfaceComments": 'Line 1, "quoted"\n第二行', "studyComments": "", "submittedAt": 7000},
              "preparations": {"before-start": {"version": "prep-old", "statements": [{"id": "a", "text": "Original"}],
                  "acknowledgedIds": ["a"], "confirmedAt": 900}},
@@ -57,6 +61,7 @@ def test_export_preserves_raw_values_linkage_and_database_bytes(recorded_databas
     sessions = read_csv(output, "sessions")
     assert len(sessions) == 2
     assert sessions[0]["gender"] == "Invented — Ω"
+    assert sessions[0]["prolific_id"] == "TESTPID01"
     assert sessions[0]["feedback_interface_comments"] == 'Line 1, "quoted"\n第二行'
     assert sessions[0]["feedback_study_comments"] == ""
     tasks = read_csv(output, "tasks")
@@ -78,6 +83,9 @@ def test_export_preserves_raw_values_linkage_and_database_bytes(recorded_databas
     assert choices[0]["initial_choice_ms"] == "500.0"
     assert choices[0]["post_recommendation_ms"] == "200.0"
     assert len(read_csv(output, "task_reopens")) == 4
+    visits = read_csv(output, "checkpoint_visits")
+    assert len(visits) == 12 and [row["direction"] for row in visits[:3]] == ["start", "forward", "back"]
+    assert visits[2]["checkpoint"] == "Venue" and visits[2]["at_ms"] == "2800"
     assert len(read_csv(output, "inspections")) == 4
     assert read_csv(output, "model_calls")[0]["purpose"] == "oracle"
     manifest = json.loads((output / "manifest.json").read_text())

@@ -136,8 +136,9 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
     }),
     saveDemographics: values => run(draft => {
       if (draft.step !== 'demographics') fail('INVALID_STEP', 'Complete consent first.');
-      if (!Number.isInteger(values.age) || values.age < 0 || !values.gender.trim() || !values.priorLlmUsage.trim())
-        fail('INVALID_DEMOGRAPHICS', 'Enter synthetic age, gender, and prior LLM usage.');
+      if (!Number.isInteger(values.age) || values.age < 0 || !values.gender.trim() || !values.priorLlmUsage.trim()
+        || !/^[A-Za-z0-9]{1,64}$/.test(values.prolificId ?? ''))
+        fail('INVALID_DEMOGRAPHICS', 'Enter age, gender, prior LLM usage, and your Prolific ID (letters and digits).');
       draft.demographics = { ...values }; draft.step = 'tutorial';
     }),
     completeTutorial: () => run(draft => {
@@ -183,7 +184,8 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
         plan: { venue: null, catering: null, supplies: [] }, totalCostCents: 0,
         constraints: { budget: true, capacity: false, dietary: false, accessibility: false, supplies: false, location: false },
         survey: { answers: {}, metadata: id === 'practice' ? null : structuredClone(workloadSurveyDefinition), rawScore: null, submittedAt: null } };
-      task.decisions.Venue = newDecision(task, start); draft.tasks[id] = task;
+      task.decisions.Venue = newDecision(task, start);
+      task.checkpointVisits = [{ checkpoint: 'Venue', at: start, direction: 'start' }]; draft.tasks[id] = task;
     }, 'begin'),
     updatePlan: plan => run(draft => {
       const task = active(draft);
@@ -229,7 +231,16 @@ export function createMockExperimentService(options: { sequenceId?: SequenceId; 
       if (!decision(task).finalModel) fail('MODEL_REQUIRED', 'Complete routing before advancing.');
       const next = checkpoints[checkpoints.indexOf(task.checkpoint) + 1];
       if (!next) fail('FINAL_CHECKPOINT', 'Submit the current plan.');
-      task.checkpoint = next; task.decisions[next] = newDecision(task, now());
+      // A stage reached before keeps its decision and locked model (provisional back navigation).
+      const at = now(); task.checkpoint = next; task.decisions[next] ??= newDecision(task, at);
+      task.checkpointVisits = [...(task.checkpointVisits ?? []), { checkpoint: next, at, direction: 'forward' }];
+    }, 'planning'),
+    goBackCheckpoint: () => run(draft => {
+      const task = active(draft);
+      const previous = checkpoints[checkpoints.indexOf(task.checkpoint) - 1];
+      if (!previous) fail('FIRST_CHECKPOINT', 'This is the first stage.');
+      task.checkpoint = previous;
+      task.checkpointVisits = [...(task.checkpointVisits ?? []), { checkpoint: previous, at: now(), direction: 'back' }];
     }, 'planning'),
     finishTask: (reason = 'submitted') => run(draft => {
       endTask(draft, active(draft), reason, now());

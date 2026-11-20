@@ -1,49 +1,47 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import type { CatalogItem, CatalogSummary, Category, Plan } from '../../services/experiment.types';
+import { useEffect, useState } from 'react';
+import type { CatalogItem, CatalogSummary, Category, Checkpoint, Plan } from '../../services/experiment.types';
 import { money } from './format';
+import { catalogMatches, stageCategory } from './stages';
 
 interface CatalogProps {
-  results: CatalogSummary[];
+  catalog: CatalogSummary[];
+  checkpoint: Checkpoint;
   details: Record<string, CatalogItem>;
   expandedItem: string | null;
   plan: Plan;
   pending: boolean;
-  onSearch: (query: string, category: Category | '') => Promise<boolean>;
   onInspect: (id: string) => void;
   onSelect: (item: CatalogSummary) => void;
 }
 
-export function CatalogPanel({ results, details, expandedItem, plan, pending, onSearch, onInspect, onSelect }: CatalogProps) {
+export function CatalogPanel({ catalog, checkpoint, details, expandedItem, plan, pending, onInspect, onSelect }: CatalogProps) {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<Category | ''>('');
-
-  function search(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    void onSearch(query, category);
-  }
+  const [category, setCategory] = useState<Category | ''>(stageCategory(checkpoint) ?? '');
+  // Show the current stage's category; the participant can still choose another one.
+  useEffect(() => { setCategory(stageCategory(checkpoint) ?? ''); }, [checkpoint]);
+  // The full catalog summary is already loaded, so filtering is instant and needs no Search button.
+  const results = catalog.filter(item => catalogMatches(item, query, category));
 
   return (
     <section className="workspace-panel catalog-panel" aria-labelledby="catalog-title">
       <h3 id="catalog-title">Catalog</h3>
       <p className="field-help">Prices are for whole packages. Inspect details for capacity, wheelchair access, venue location, dietary coverage, and supplies provided before choosing.</p>
-      <form onSubmit={search} className="catalog-search">
+      <div className="catalog-search">
         <label htmlFor="catalog-query">Search catalog</label>
-        <input id="catalog-query" type="search" value={query} disabled={pending}
+        <input id="catalog-query" type="search" value={query}
           onChange={event => setQuery(event.target.value)} />
         <label htmlFor="catalog-category">Category</label>
-        <select id="catalog-category" value={category} disabled={pending}
+        <select id="catalog-category" value={category}
           onChange={event => setCategory(event.target.value as Category | '')}>
           <option value="">All categories</option>
           <option value="venue">Venues</option>
           <option value="catering">Catering</option>
           <option value="supplies">Supplies</option>
         </select>
-        <button type="submit" disabled={pending}>Search</button>
-      </form>
+      </div>
       <p role="status" className="catalog-count">{results.length} catalog {results.length === 1 ? 'option' : 'options'}</p>
       <div className="catalog-results">
-        {results.length === 0 && <p>No matching options. Change the search or category and try again.</p>}
+        {results.length === 0 && <p>No matching options. Change the search or category.</p>}
         {results.map(item => {
           const selected = item.category === 'supplies' ? plan.supplies.includes(item.id) : plan[item.category] === item.id;
           const expanded = expandedItem === item.id;

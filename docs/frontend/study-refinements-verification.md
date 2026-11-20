@@ -103,3 +103,23 @@ acknowledgements, preparation, tutorial, scale, and feedback need researcher rev
   Temporary fixtures/tooling stayed outside the repository. Actual Windows-browser,
   macOS, screen-reader and broader #22 smoke checks are unperformed. Approval of the
   adapted measure/materials and joint backend contract agreement remain pending.
+
+## Participant workspace changes and Prolific ID — 2026-11-19
+
+Provisional, pending researcher approval: auto-advance, Back, and the Prolific ID field.
+
+- Requirements show as bold chips. The catalog filters as the participant types or picks a
+  category, with no Search button, and its category follows the stage.
+- Adding an item that completes the current stage moves to the next stage once the stage's
+  model is committed; "Back to …" returns to the previous stage with its locked model.
+- Demographics start with a required Prolific ID, pre-filled from `?PROLIFIC_PID=`, with a
+  short help line.
+
+Results (macOS, Node 24.14.0): type-check and build passed; 95 tests, 83 passed, 11 skipped,
+1 failed (`launcher platform selection …`, which fails the same way on `origin/main`).
+Headless Chromium against a production build and a mock-mode backend with dev controls off:
+all checks passed for practice, Task 1 Automatic and Task 1 Override, including the
+pre-filled and required Prolific ID, the requirement chips, instant filtering, auto-advance
+through every stage, no auto-advance on non-qualifying items, before an Override model
+choice or at the final check, and Back keeping the stage model. Screenshots were reviewed.
+Not done: real-model run, screen reader, Windows browsers.

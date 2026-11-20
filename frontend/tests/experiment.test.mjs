@@ -8,7 +8,7 @@ import { acknowledge, finishFeedback, startTask } from './study-helpers.mjs';
 const answers = Object.fromEntries(surveyDimensions.map(key => [key, 50]));
 async function intro(service) {
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'synthetic example', priorLlmUsage: 'occasional' });
+  await service.saveDemographics({ age: 25, gender: 'synthetic example', priorLlmUsage: 'occasional', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial();
   await startTask(service);
@@ -338,4 +338,37 @@ test('concurrent automatic recommendation calls commit one decision without a pa
   await service.finishTask();
   await assert.rejects(service.requestRecommendation(), { code: 'NO_ACTIVE_TASK' });
   assert.deepEqual(service.getSnapshot().tasks['task-1'].decisions.Venue, first);
+});
+
+test('back returns to an earlier stage with its locked model; advancing again reuses the reached decision', async () => {
+  let clock = 1000;
+  const service = createMockExperimentService({ sequenceId: 3, now: () => ++clock });
+  await practice(service); await startTask(service);
+  await assert.rejects(service.goBackCheckpoint(), { code: 'FIRST_CHECKPOINT' });
+  await service.lockInitialChoice('large'); await service.requestRecommendation(); await service.confirmModel('small');
+  const venue = service.getSnapshot().tasks['task-1'].decisions.Venue;
+  await service.advanceCheckpoint();
+  const catering = service.getSnapshot().tasks['task-1'].decisions.Catering;
+  await service.goBackCheckpoint();
+  let task = service.getSnapshot().tasks['task-1'];
+  assert.equal(task.checkpoint, 'Venue');
+  assert.deepEqual(task.decisions.Venue, venue);
+  await service.sendMessage('Compare venues');
+  assert.equal(service.getSnapshot().tasks['task-1'].messages.at(-1).model, 'small');
+  await service.advanceCheckpoint();
+  task = service.getSnapshot().tasks['task-1'];
+  assert.deepEqual(task.decisions.Catering, catering);
+  assert.deepEqual(task.checkpointVisits.map(visit => [visit.checkpoint, visit.direction]),
+    [['Venue', 'start'], ['Catering', 'forward'], ['Venue', 'back'], ['Catering', 'forward']]);
+});
+
+test('demographics require a Prolific ID of letters and digits', async () => {
+  const service = createMockExperimentService();
+  await service.recordConsent(true);
+  for (const prolificId of ['', 'abc-123', 'x'.repeat(65)]) {
+    await assert.rejects(service.saveDemographics({ age: 25, gender: 'x', priorLlmUsage: 'weekly', prolificId }),
+      { code: 'INVALID_DEMOGRAPHICS' });
+  }
+  await service.saveDemographics({ age: 25, gender: 'x', priorLlmUsage: 'weekly', prolificId: '5f3c9a1b2c4d6e8f0a1b2c3d' });
+  assert.equal(service.getSnapshot().demographics.prolificId, '5f3c9a1b2c4d6e8f0a1b2c3d');
 });

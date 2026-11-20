@@ -9,7 +9,7 @@ const uniform = value => Object.fromEntries(surveyDimensions.map(key => [key, va
 const example = { mentalDemand: 25, physicalDemand: 0, temporalDemand: 50, performance: 75, effort: 25, frustration: 0 };
 async function surveyReady(service) {
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial(); await startTask(service); await service.finishTask();
   await startTask(service); await service.finishTask();

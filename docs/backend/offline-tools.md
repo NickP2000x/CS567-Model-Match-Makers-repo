@@ -50,7 +50,7 @@ commits cannot mix records from different database snapshots.
 
 | CSV | Row unit |
 |---|---|
-| `sessions.csv` | Session, with demographics, assignment, feedback, and mode flags |
+| `sessions.csv` | Session, with demographics (including `prolific_id`), assignment, feedback, and mode flags |
 | `preparations.csv` | Accepted acknowledgement/preparation record |
 | `tasks.csv` | Reached task, saved plan/cost/constraints, six raw ratings, metadata and stored score |
 | `plan_items.csv` | Selected venue/catering/supply item |
@@ -58,6 +58,7 @@ commits cannot mix records from different database snapshots.
 | `checkpoint_choices.csv` | Reached checkpoint decision, including partial choices |
 | `survey_responses.csv` | Actually answered workload dimension and its versioned metadata |
 | `task_reopens.csv` | Recorded return to a submitted task |
+| `checkpoint_visits.csv` | Each stage entry in order: start, forward, or back (provisional) |
 | `inspections.csv` | Recorded inspected item; no inspection timestamp is invented |
 | `routing_decisions.csv` | Routing attempt, including failures/unapplied decisions |
 | `model_calls.csv` | Individual call, with recorded participant/oracle purpose |

@@ -583,3 +583,21 @@ distractors, which may narrow the gap between the small and large models. The
   | this change | 8 | 33 | 3 (small model, in a list of options) | 0 |
 
 - Not done: multi-turn conversations, the final constraint check stage, and a browser run.
+
+## Stage back navigation and Prolific ID (provisional)
+
+Pending researcher approval:
+
+- `POST /sessions/{sid}/tasks/{task_id}/checkpoint/back` returns to the previous stage
+  (`FIRST_CHECKPOINT` at Venue), with the same stale-checkpoint guard as advance. A stage
+  reached before keeps its decision and locked model, and `advance` reuses it, so returning
+  never routes again. `task.checkpointVisits` records every stage entry (`start`, `forward`,
+  `back`); the export adds `checkpoint_visits.csv` (`study-csv-v4`).
+- Demographics require `prolificId` (trimmed, letters and digits, up to 64 characters);
+  `sessions.csv` adds `prolific_id`.
+
+### Recorded results — 2026-11-19
+
+- Backend: 149 tests passed on a copy without `backend/.env` (a local real-mode `.env`
+  makes mock-mode tests fail; CI has none).
+- Exported a browser-test database: `checkpoint_visits.csv` and `prolific_id` were filled.

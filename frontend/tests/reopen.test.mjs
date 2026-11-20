@@ -10,7 +10,7 @@ import { acknowledge, startTask } from './study-helpers.mjs';
 async function submittedTask1(clock) {
   const service = createMockExperimentService({ sequenceId: 1, now: () => clock.now });
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'synthetic example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'synthetic example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial();
   await startTask(service);

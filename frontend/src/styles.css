@@ -334,7 +334,23 @@ th, td {
 }
 
 .task-requirements h3 {
-  font-size: 1.05rem;
+  font-size: 1.3rem;
+}
+
+.requirement-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.requirement-list li {
+  border: 1px solid #9dc8ff;
+  padding: 0.3rem 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .time-remaining {
@@ -382,7 +398,7 @@ th, td {
   margin-top: 0.5rem;
 }
 
-.catalog-search button, .message-form button {
+.message-form button {
   margin-top: 0.5rem;
 }
 
@@ -544,6 +560,9 @@ textarea {
 }
 
 .stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 1rem;
 }
 

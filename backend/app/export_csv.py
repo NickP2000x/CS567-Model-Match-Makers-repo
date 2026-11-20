@@ -9,12 +9,12 @@ from pathlib import Path
 from .catalog import CONSTRAINTS
 from .offline import BACKEND_DIR, new_run_directory, read_snapshot, write_csv, write_json
 
-VERSION = "study-csv-v3"
+VERSION = "study-csv-v4"
 DIMENSIONS = ("mentalDemand", "physicalDemand", "temporalDemand", "performance", "effort", "frustration")
 RELATIONAL = ("routing_decisions", "model_calls", "oracle_results")
 BASE_COLUMNS = {
     "sessions": ("session_id", "participant_id", "sequence_id", "development", "step", "consent",
-        "created_at_ms", "updated_at_ms", "simulated", "router_simulated", "age", "gender", "prior_llm_usage",
+        "created_at_ms", "updated_at_ms", "simulated", "router_simulated", "age", "gender", "prior_llm_usage", "prolific_id",
         "feedback_interface_comments", "feedback_study_comments", "feedback_version", "feedback_submitted_at_ms",
         "demographics_json", "assignments_json", "feedback_json", "state_extra_json"),
     "preparations": ("session_id", "preparation_id", "version", "confirmed_at_ms", "acknowledged_ids_json", "statements_json", "preparation_json"),
@@ -31,6 +31,7 @@ BASE_COLUMNS = {
     "survey_responses": ("session_id", "task_id", "dimension", "raw_value", "version", "orientation", "submitted_at_ms",
         "min", "max", "increment", "label", "question", "left_anchor", "right_anchor", "labels_json"),
     "task_reopens": ("session_id", "task_id", "position", "ended_at_ms", "reopened_at_ms"),
+    "checkpoint_visits": ("session_id", "task_id", "position", "checkpoint", "direction", "at_ms"),
     "inspections": ("session_id", "task_id", "position", "item_id", "item_name"),
     "routing_decisions": ("id", "session_id", "task_id", "checkpoint", "router", "score", "threshold", "recommended", "ok", "error", "applied", "latency_ms", "created_at_ms"),
     "model_calls": ("id", "session_id", "task_id", "checkpoint", "purpose", "size", "provider", "model", "step", "ok", "error", "prompt_tokens", "completion_tokens", "latency_ms", "tools", "shown", "created_at_ms"),
@@ -102,7 +103,8 @@ def flatten_snapshot(connection: sqlite3.Connection, study_only=False) -> tuple[
             "created_at_ms": row.get("created_at"), "updated_at_ms": row.get("updated_at"),
             "simulated": state.get("simulated"), "router_simulated": state.get("routerSimulated"),
             "age": demographics.get("age"), "gender": demographics.get("gender"),
-            "prior_llm_usage": demographics.get("priorLlmUsage"), "demographics_json": state.get("demographics"),
+            "prior_llm_usage": demographics.get("priorLlmUsage"), "prolific_id": demographics.get("prolificId"),
+            "demographics_json": state.get("demographics"),
             "assignments_json": state.get("assignments"),
             "feedback_interface_comments": feedback.get("interfaceComments"),
             "feedback_study_comments": feedback.get("studyComments"), "feedback_version": feedback.get("version"),
@@ -151,7 +153,8 @@ def flatten_snapshot(connection: sqlite3.Connection, study_only=False) -> tuple[
                 "survey_submitted_at_ms": survey.get("submittedAt"), "survey_metadata_json": survey.get("metadata"),
                 "survey_answers_json": survey.get("answers"), **{f"survey_{k}": answers.get(k) for k in DIMENSIONS}})
             data["tasks"][-1]["task_extra_json"] = {k: v for k, v in task.items() if k not in {
-                "plan", "constraints", "messages", "survey", "decisions", "reopens", "inspectedItems"}}
+                "plan", "constraints", "messages", "survey", "decisions", "reopens", "inspectedItems",
+                "checkpointVisits"}}
             chosen = [("venue", 0, plan.get("venue")), ("catering", 0, plan.get("catering"))]
             chosen += [("supplies", index, item) for index, item in enumerate(plan.get("supplies") or [])]
             for category, position, item_id in chosen:
@@ -189,6 +192,9 @@ def flatten_snapshot(connection: sqlite3.Connection, study_only=False) -> tuple[
             for index, reopen in enumerate(task.get("reopens") or []):
                 data["task_reopens"].append({**linked, "position": index,
                     "ended_at_ms": reopen.get("endedAt"), "reopened_at_ms": reopen.get("reopenedAt")})
+            for index, visit in enumerate(task.get("checkpointVisits") or []):
+                data["checkpoint_visits"].append({**linked, "position": index, "checkpoint": visit.get("checkpoint"),
+                    "direction": visit.get("direction"), "at_ms": visit.get("at")})
             for index, item_id in enumerate(task.get("inspectedItems") or []):
                 data["inspections"].append({**linked, "position": index, "item_id": item_id,
                     "item_name": items.get(item_id, {}).get("name")})

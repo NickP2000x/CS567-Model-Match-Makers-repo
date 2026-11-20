@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { checkpoints } from '../../services/experiment.types';
 import type { CatalogItem, CatalogSummary, Category, Checkpoint, ExperimentService, Scenario, TaskId } from '../../services/experiment.types';
 import { useExperiment } from '../../services/useExperiment';
 import { RoutingPanel } from '../routing/RoutingPanel';
@@ -7,6 +8,7 @@ import { CatalogPanel } from './CatalogPanel';
 import { ConversationPanel } from './ConversationPanel';
 import { PlanPanel } from './PlanPanel';
 import { money } from './format';
+import { stageCategory, stageComplete } from './stages';
 
 interface WorkspaceProps {
   service: ExperimentService;
@@ -20,7 +22,6 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
   const state = useExperiment(service);
   const scenarioId = taskId === 'practice' ? 'practice' : state.assignments[taskId === 'task-1' ? 0 : 1].scenarioId;
   const [data, setData] = useState<{ scenario: Scenario; catalog: CatalogSummary[] } | null>(null);
-  const [results, setResults] = useState<CatalogSummary[]>([]);
   const [details, setDetails] = useState<Record<string, CatalogItem>>({});
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -42,7 +43,6 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
         const catalog = await service.searchCatalog(scenarioId);
         if (cancelled) return;
         setData({ scenario, catalog });
-        setResults(catalog);
       } catch {
         if (!cancelled) setLoadFailed(true);
       }
@@ -74,6 +74,13 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
       if (item.category === 'supplies') plan.supplies.push(item.id);
       else plan[item.category] = item.id;
       await service.updatePlan(plan);
+      // Provisional: once the added item completes this stage and its model is fixed, move on.
+      const updated = service.getSnapshot().tasks[taskId]!;
+      const hasNext = checkpoints.indexOf(updated.checkpoint) < checkpoints.length - 1;
+      if (updated.status === 'active' && hasNext && item.category === stageCategory(updated.checkpoint)
+        && stageComplete(updated.checkpoint, updated.constraints) && updated.decisions[updated.checkpoint]?.finalModel) {
+        await service.advanceCheckpoint();
+      }
     });
   }
 
@@ -103,13 +110,14 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
       <header className="task-requirements" aria-labelledby="requirements-title">
         <div>
           <h3 id="requirements-title">{data.scenario.title}</h3>
-          <p>
-            {requirements.attendees} guests · Budget {money(requirements.budgetCents)} ·
-            {' '}Dietary needs: {requirements.dietaryNeeds.join(', ')} ·
-            {' '}Wheelchair access {requirements.wheelchairRequired ? 'required' : 'not required'} ·
-            {' '}Required supplies: {requirements.requiredSupplies.join(', ')} ·
-            {' '}Venue location: {requirements.area.name}
-          </p>
+          <ul className="requirement-list" aria-label="Event requirements">
+            <li>{requirements.attendees} guests</li>
+            <li>Budget {money(requirements.budgetCents)}</li>
+            <li>Dietary needs: {requirements.dietaryNeeds.join(', ')}</li>
+            <li>Wheelchair access {requirements.wheelchairRequired ? 'required' : 'not required'}</li>
+            <li>Required supplies: {requirements.requiredSupplies.join(', ')}</li>
+            <li>Venue location: {requirements.area.name}</li>
+          </ul>
         </div>
         {task ? <TaskCountdown task={task} onTimeout={() => onFinish(taskId, 'timed-out')} />
           : <p className="time-remaining">{taskId === 'practice' ? 'Time: untimed practice' : 'Time remaining: 15:00'}</p>}
@@ -120,13 +128,8 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
           : ` Scenario ${scenarioId} · ${state.assignments[taskId === 'task-1' ? 0 : 1].condition === 'automatic' ? 'Automatic' : 'Override'} routing.`}
       </p>
       {!task ? <p role="status">Preparing the planning task…</p> : <div className="workspace-panels">
-        <CatalogPanel results={results} details={details} expandedItem={expandedItem}
-          plan={task.plan} pending={pending} onInspect={inspectItem} onSelect={selectItem}
-          onSearch={(query, category) => perform(async () => {
-            const found = await service.searchCatalog(scenarioId, query, category || undefined);
-            setResults(found);
-            setExpandedItem(null);
-          })} />
+        <CatalogPanel catalog={data.catalog} checkpoint={task.checkpoint} details={details} expandedItem={expandedItem}
+          plan={task.plan} pending={pending} onInspect={inspectItem} onSelect={selectItem} />
         <ConversationPanel task={task} pending={pending} simulated={state.simulated}
           routing={<RoutingPanel key={`${task.id}-${task.checkpoint}`} task={task}
             service={service} pending={pending} perform={perform}
@@ -143,7 +146,8 @@ export function PlanningWorkspace({ service, taskId, pending: actionPending, per
               setAgentRequest(current => current?.id === id ? null : current);
             }
           })}
-          onAdvance={() => { void perform(() => service.advanceCheckpoint()); }} />
+          onAdvance={() => { void perform(() => service.advanceCheckpoint()); }}
+          onBack={() => { void perform(() => service.goBackCheckpoint()); }} />
         <PlanPanel task={task} catalog={data.catalog} pending={pending}
           budgetCents={requirements.budgetCents} onRemove={removeItem}
           onSubmit={() => { void onFinish(taskId); }} />
