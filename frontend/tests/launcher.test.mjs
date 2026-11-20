@@ -51,7 +51,8 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, stop)
     with open(os.environ["MM_TEST_LOG"], "a") as log:
         log.write(json.dumps({"kind":"backend", "pid":os.getpid(), "worker":worker.pid,
-            "development":os.environ.get("DEV_CONTROLS"), "cors":os.environ.get("CORS_ORIGINS")}) + "\\n")
+            "development":os.environ.get("DEV_CONTROLS"), "cors":os.environ.get("CORS_ORIGINS"),
+            "reload":"--reload" in sys.argv}) + "\\n")
     if os.environ.get("MM_TEST_BACKEND_WAIT"):
         time.sleep(1000)
     class Handler(http.server.BaseHTTPRequestHandler):
@@ -66,7 +67,12 @@ if __name__ == "__main__":
   if (frontend) writeFileSync(join(root, 'frontend/node_modules/vite/bin/vite.js'), `
 const http = require('node:http');
 const fs = require('node:fs');
-fs.appendFileSync(process.env.MM_TEST_LOG, JSON.stringify({kind:'frontend',pid:process.pid,api:process.env.VITE_API_BASE_URL})+'\\n');
+const command = process.argv[2];
+if (command === 'build') {
+  fs.appendFileSync(process.env.MM_TEST_LOG, JSON.stringify({kind:'build',api:process.env.VITE_API_BASE_URL})+'\\n');
+  process.exit(0);
+}
+fs.appendFileSync(process.env.MM_TEST_LOG, JSON.stringify({kind:'frontend',pid:process.pid,api:process.env.VITE_API_BASE_URL,command})+'\\n');
 if (process.env.MM_TEST_FRONTEND_FAIL) process.exit(19);
 const port = Number(process.argv[process.argv.indexOf('--port') + 1]);
 http.createServer((req, res) => res.end('ready')).listen(port, '127.0.0.1');
@@ -204,6 +210,8 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
     assert.equal(backend.kind, 'backend');
     assert.equal(frontend.kind, 'frontend');
     assert.equal(backend.development, 'true');
+    assert.equal(backend.reload, true);
+    assert.equal(frontend.command, 'serve');
     assert.equal(backend.cors, `http://127.0.0.1:${f.env.MM_FRONTEND_PORT},http://localhost:${f.env.MM_FRONTEND_PORT}`);
     assert.equal(frontend.api, `http://127.0.0.1:${f.env.MM_BACKEND_PORT}`);
     assert.match(run.output(), /press Ctrl\+C to stop both/);
@@ -212,6 +220,23 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
     assertStopped(f);
   });
 }
+
+test('study mode builds the participant frontend and disables development controls', { skip, timeout: 20000 }, async t => {
+  const f = await fixture();
+  const run = launch(f, t, ['--study']);
+  await waitFor(async () => {
+    try { return (await fetch(`http://127.0.0.1:${f.env.MM_FRONTEND_PORT}`)).ok; } catch { return false; }
+  }, run.output);
+  const [build, backend, frontend] = events(f);
+  assert.deepEqual(build, { kind: 'build', api: `http://127.0.0.1:${f.env.MM_BACKEND_PORT}` });
+  assert.equal(backend.development, 'false');
+  assert.equal(backend.reload, false);
+  assert.equal(frontend.command, 'preview');
+  assert.match(run.output(), /Study mode/);
+  run.child.kill('SIGTERM');
+  assert.equal((await run.exited).code, 143);
+  assertStopped(f);
+});
 
 test('backend startup failure never starts the frontend', { skip, timeout: 15000 }, async t => {
   const f = await fixture({ MM_TEST_BACKEND_FAIL: '1' });

@@ -7,16 +7,32 @@ source "$(dirname "${BASH_SOURCE[0]}")/runtime.sh"
 source "$MM_ROOT/scripts/process-identity.sh"
 
 USE_TMUX=false
-if [ "$#" -eq 1 ] && [ "$1" = --tmux ]; then
-  USE_TMUX=true
-elif [ "$#" -ne 0 ]; then
-  printf 'Usage: bash scripts/run.sh [--tmux]\nOptional: MM_BACKEND_PORT=8001 MM_FRONTEND_PORT=5174 bash scripts/run.sh\n' >&2
-  exit 1
-fi
+# --study runs the participant setup: DEV_CONTROLS=false, no reload, and the production
+# frontend build (allocated sequences, no development controls). The tmux relaunch passes it on.
+STUDY="${MM_STUDY:-false}"
+for arg in "$@"; do
+  case "$arg" in
+    --tmux) USE_TMUX=true ;;
+    --study) STUDY=true ;;
+    *)
+      printf 'Usage: bash scripts/run.sh [--study] [--tmux]\nOptional: MM_BACKEND_PORT=8001 MM_FRONTEND_PORT=5174 bash scripts/run.sh\n' >&2
+      exit 1 ;;
+  esac
+done
 
 PYTHON="$MM_ROOT/backend/.venv/bin/python"
 BACKEND_PORT="${MM_BACKEND_PORT:-8000}"
-FRONTEND_PORT="${MM_FRONTEND_PORT:-5173}"
+if [ "$STUDY" = true ]; then
+  FRONTEND_PORT="${MM_FRONTEND_PORT:-4173}"
+  DEV_CONTROLS_VALUE=false
+  RELOAD_FLAG=''
+  VITE_COMMAND=preview
+else
+  FRONTEND_PORT="${MM_FRONTEND_PORT:-5173}"
+  DEV_CONTROLS_VALUE=true
+  RELOAD_FLAG=--reload
+  VITE_COMMAND=serve
+fi
 START_TIMEOUT="${MM_START_TIMEOUT_SECONDS:-180}"
 RUN_STATE="$MM_TOOLS/dev-run.state"
 
@@ -84,9 +100,10 @@ if [ "$USE_TMUX" = true ]; then
   session="model-matchmakers-$$"
   # A private tmux server inherits this invocation's environment and does not
   # interfere with other tmux sessions. No credentials enter the command string.
-  printf -v launch 'env MM_TMUX_SOCKET=%q MM_TMUX_SESSION=%q bash %q' "$session" "$session" "$MM_ROOT/scripts/run.sh"
+  printf -v launch 'env MM_TMUX_SOCKET=%q MM_TMUX_SESSION=%q MM_STUDY=%q bash %q' "$session" "$session" "$STUDY" "$MM_ROOT/scripts/run.sh"
   tmux -L "$session" new-session -d -s "$session" -c "$MM_ROOT" "$launch"
   printf 'Started tmux session %s. Backend is on the left; frontend opens on the right after readiness.\n' "$session"
+  if [ "$STUDY" = true ]; then printf 'Study mode: the frontend is built in the left pane first.\n'; fi
   printf 'Detach with Ctrl+B, then D. Stop both with bash scripts/stop.sh.\n'
   if [ -t 0 ] && [ -t 1 ] && [ -z "${TMUX:-}" ]; then
     exec tmux -L "$session" attach-session -t "$session"
@@ -147,11 +164,21 @@ trap 'exit 129' HUP
 mkdir -p "$MM_TOOLS"
 printf '%s\n%s\n' "$$" "$(process_start "$$")" > "$RUN_STATE"
 
+if [ "$STUDY" = true ]; then
+  # The API address is baked into the build, so rebuild for this backend port every launch.
+  printf 'Building the participant frontend for http://127.0.0.1:%s…\n' "$BACKEND_PORT"
+  (
+    cd "$MM_FRONTEND"
+    env VITE_API_BASE_URL="http://127.0.0.1:$BACKEND_PORT" "$MM_NODE" "$MM_FRONTEND/node_modules/vite/bin/vite.js" build
+  )
+fi
+
 printf 'Starting backend using its configured model/router settings. Waiting up to %s seconds…\n' "$START_TIMEOUT"
 (
   cd "$MM_ROOT/backend"
-  exec env DEV_CONTROLS=true CORS_ORIGINS="http://127.0.0.1:$FRONTEND_PORT,http://localhost:$FRONTEND_PORT" \
-    "$PYTHON" -m uvicorn app.main:app --reload --host 127.0.0.1 --port "$BACKEND_PORT"
+  # RELOAD_FLAG is unquoted on purpose: it is either empty or the single word --reload.
+  exec env DEV_CONTROLS="$DEV_CONTROLS_VALUE" CORS_ORIGINS="http://127.0.0.1:$FRONTEND_PORT,http://localhost:$FRONTEND_PORT" \
+    "$PYTHON" -m uvicorn app.main:app $RELOAD_FLAG --host 127.0.0.1 --port "$BACKEND_PORT"
 ) &
 backend_pid=$!
 
@@ -187,20 +214,25 @@ if [ "$ready" = false ]; then
 fi
 
 if [ -n "${MM_TMUX_SESSION:-}" ]; then
-  printf -v frontend_command 'exec env VITE_API_BASE_URL=%q %q %q --host 127.0.0.1 --port %q --strictPort' \
-    "http://127.0.0.1:$BACKEND_PORT" "$MM_NODE" "$MM_FRONTEND/node_modules/vite/bin/vite.js" "$FRONTEND_PORT"
+  printf -v frontend_command 'exec env VITE_API_BASE_URL=%q %q %q %q --host 127.0.0.1 --port %q --strictPort' \
+    "http://127.0.0.1:$BACKEND_PORT" "$MM_NODE" "$MM_FRONTEND/node_modules/vite/bin/vite.js" "$VITE_COMMAND" "$FRONTEND_PORT"
   frontend_pid="$(tmux -L "$MM_TMUX_SOCKET" split-window -h -t "$MM_TMUX_SESSION:0.0" -c "$MM_FRONTEND" -P -F '#{pane_pid}' "$frontend_command")"
   tmux -L "$MM_TMUX_SOCKET" select-layout -t "$MM_TMUX_SESSION:0" even-horizontal >/dev/null
 else
   (
     cd "$MM_FRONTEND"
     exec env VITE_API_BASE_URL="http://127.0.0.1:$BACKEND_PORT" \
-      "$MM_NODE" "$MM_FRONTEND/node_modules/vite/bin/vite.js" --host 127.0.0.1 --port "$FRONTEND_PORT" --strictPort
+      "$MM_NODE" "$MM_FRONTEND/node_modules/vite/bin/vite.js" "$VITE_COMMAND" --host 127.0.0.1 --port "$FRONTEND_PORT" --strictPort
   ) &
   frontend_pid=$!
 fi
 
-printf '\nOpen http://localhost:%s\nAPI docs: http://127.0.0.1:%s/api/docs\nDevelopment sessions enabled. Both servers log here; press Ctrl+C to stop both.\nOr run bash scripts/stop.sh from another terminal.\n' "$FRONTEND_PORT" "$BACKEND_PORT"
+if [ "$STUDY" = true ]; then
+  mode_note='Study mode: participant sessions with allocated sequences, no development controls.'
+else
+  mode_note='Development sessions enabled (always sequence 1; not for participants, use --study).'
+fi
+printf '\nOpen http://localhost:%s\nAPI docs: http://127.0.0.1:%s/api/docs\n%s Both servers log here; press Ctrl+C to stop both.\nOr run bash scripts/stop.sh from another terminal.\n' "$FRONTEND_PORT" "$BACKEND_PORT" "$mode_note"
 while mm_process_running "$backend_pid" && mm_process_running "$frontend_pid"; do
   sleep 1
 done
