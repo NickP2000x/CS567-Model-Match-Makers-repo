@@ -29,10 +29,13 @@ export function Demographics({ values, pending, onSubmit }: DemographicsProps) {
         Provisional questionnaire — wording, options, required fields, and
         eligibility rules are pending researcher approval.
       </p>
-      <p id="demographics-help">All fields are required for this demo. Enter invented answers, not your personal details.</p>
+      <p id="demographics-help">
+        All fields are required. Enter your real Prolific ID. For the other questions, invented answers
+        are accepted while this questionnaire is provisional.
+      </p>
       <form onSubmit={submit} aria-describedby="demographics-help">
         <fieldset disabled={pending}>
-          <legend>Example demographic responses</legend>
+          <legend>Prolific ID and demographic responses</legend>
           <label htmlFor="prolific-id">Prolific ID</label>
           <input id="prolific-id" name="prolificId" type="text" required maxLength={64} pattern="[A-Za-z0-9]+"
             autoComplete="off" spellCheck={false} defaultValue={values?.prolificId ?? linkedProlificId}
