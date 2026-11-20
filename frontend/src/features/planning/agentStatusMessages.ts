@@ -4,8 +4,9 @@
 // text only, not model reasoning or tool progress. Keep the wording fixed during a study and
 // record any change in docs/experiment-service-contract.md ("Agent activity phrases").
 export const AGENT_STATUS_MESSAGES = [
-  'Thinking...',
+  'Planning...',
   'Contemplating...',
   'Working on your message...',
   // Add custom sentences here.
+  
 ];
