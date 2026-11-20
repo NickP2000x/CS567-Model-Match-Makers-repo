@@ -77,6 +77,19 @@ This uses `backend/.venv` without activation, starts the backend, waits for its
 health check, and starts the API-connected frontend. Open **http://localhost:5173**.
 Both servers log in the same terminal; **Ctrl+C stops both**, including reload workers.
 It enables development sessions and sets local CORS origins to the frontend port.
+Development sessions always use sequence 1 and are excluded by `--study-only` exports.
+
+To run sessions with participants, use study mode:
+
+```bash
+bash scripts/run.sh --study
+```
+
+It builds the production frontend for the backend port, serves it with `vite preview`,
+and starts the backend with `DEV_CONTROLS=false` and no auto-reload. Sessions then use
+the allocated sequences and have no development controls. Open
+**http://localhost:4173**. `--tmux`, the port variables, and `bash scripts/stop.sh`
+work the same way. The build replaces `frontend/dist/`.
 
 For separate log panes, install tmux (`sudo apt install tmux` on Ubuntu/WSL, or
 `brew install tmux` on macOS), then use:
