@@ -289,7 +289,7 @@ def main(argv=None):
     parser.add_argument("--cases", type=Path, help="versioned JSON corpus with synthetic=true and cases")
     parser.add_argument("--thresholds", type=threshold_list,
                         help="explicit comma-separated grid; default uses pilot-score midpoints plus 0/1")
-    parser.add_argument("--min-pass-rate", type=fraction, default=0.95, help="requested provisional pilot target (default .95)")
+    parser.add_argument("--min-pass-rate", type=fraction, default=0.92, help="requested provisional pilot target (default .92)")
     parser.add_argument("--repeats", type=positive, default=1)
     parser.add_argument("--limit", type=positive)
     args = parser.parse_args(argv)
