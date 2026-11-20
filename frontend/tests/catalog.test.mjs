@@ -9,7 +9,7 @@ import { acknowledge, startTask } from './study-helpers.mjs';
 async function experimentalTask(scenarioId) {
   const service = createMockExperimentService({ sequenceId: scenarioId === 'B' ? 2 : 1 });
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial();
   await startTask(service);
@@ -67,7 +67,7 @@ test('every venue has a fictional area in its details; summaries never reveal it
 test('the practice reference plan passes all six constraints', async () => {
   const service = createMockExperimentService({ sequenceId: 1 });
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
   await acknowledge(service, 'before-start');
   await service.completeTutorial();
   await startTask(service);

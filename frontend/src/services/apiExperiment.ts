@@ -162,6 +162,7 @@ export async function createApiExperimentService(options: ApiExperimentOptions):
     confirmModel: model => planningMutation('POST', '/routing/confirm', { model }),
     sendMessage: text => planningMutation('POST', '/messages', { text }),
     advanceCheckpoint: () => planningMutation('POST', '/checkpoint/advance'),
+    goBackCheckpoint: () => planningMutation('POST', '/checkpoint/back'),
     finishTask: (reason = 'submitted') => {
       if (!PLANNING_STEPS.includes(state.step)) return fail('NO_ACTIVE_TASK', 'Start an active planning task first.');
       return mutate('POST', `/tasks/${state.step}/finish`, { reason });

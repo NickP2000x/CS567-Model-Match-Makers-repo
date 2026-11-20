@@ -61,10 +61,12 @@ export interface Task {
   survey: { answers: SurveyAnswers; metadata: SurveyMetadata | null; rawScore: number | null; submittedAt: number | null };
   // Provisional: each return from the ratings page to a submitted task (original deadline kept).
   reopens?: { endedAt: number; reopenedAt: number }[];
+  // Provisional: every stage entry, including returns to an earlier stage.
+  checkpointVisits?: { checkpoint: Checkpoint; at: number; direction: 'start' | 'forward' | 'back' }[];
 }
 export interface StudyState {
   participantId: string; sequenceId: SequenceId; assignments: [Assignment, Assignment]; step: StudyStep;
-  consent: boolean | null; demographics: { age: number; gender: string; priorLlmUsage: string } | null;
+  consent: boolean | null; demographics: { age: number; gender: string; priorLlmUsage: string; prolificId: string } | null;
   tasks: Partial<Record<TaskId, Task>>;
   preparations: Partial<Record<PreparationId, PreparationRecord>>;
   feedback: (FeedbackAnswers & { version: string; submittedAt: number }) | null;
@@ -94,6 +96,7 @@ export interface ExperimentService {
   confirmModel(model: Model): Promise<void>;
   sendMessage(text: string): Promise<void>;
   advanceCheckpoint(): Promise<void>;
+  goBackCheckpoint(): Promise<void>;
   finishTask(reason?: 'submitted' | 'timed-out'): Promise<void>;
   reopenTask(taskId: TaskId): Promise<void>;
   saveSurveyAnswers(taskId: TaskId, answers: SurveyAnswers): Promise<void>;

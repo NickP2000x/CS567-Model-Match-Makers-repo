@@ -6,7 +6,7 @@ import { acknowledge, startTask } from './study-helpers.mjs';
 
 async function demographics(service) {
   await service.recordConsent(true);
-  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly' });
+  await service.saveDemographics({ age: 25, gender: 'Invented example', priorLlmUsage: 'weekly', prolificId: 'TESTPID01' });
 }
 
 test('acknowledgements are explicit, validated, immutable, and do not create tasks/deadlines', async () => {

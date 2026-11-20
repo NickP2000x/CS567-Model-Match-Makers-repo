@@ -29,7 +29,11 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 - `lockInitialChoice` → `requestRecommendation` → `confirmModel` implements
   override. Automatic calls only `requestRecommendation`, which commits the model.
   `sendMessage` needs a committed stage model; responses are canned and labeled.
-- `advanceCheckpoint` creates a fresh decision record; previous records are kept.
+- `advanceCheckpoint` creates a fresh decision record for a stage reached for the first time;
+  previous records are kept. Provisional, pending researcher approval: `goBackCheckpoint`
+  returns to the previous stage (`FIRST_CHECKPOINT` at Venue). A stage reached before keeps
+  its decision and locked model when revisited, so it is not routed again. Every stage entry
+  is recorded in `task.checkpointVisits` (`start`, `forward`, `back`).
 - `finishTask` accepts incomplete/invalid plans. Submission at/after deadline is
   recorded as timeout; explicit timeout supports later developer controls. The
   #16 countdown triggers timeout and planning mutations reject expiry before writes;
@@ -65,7 +69,7 @@ use `useExperiment(service)` for snapshots; they never import response fixtures.
 | Topic | Current mock choice | Researcher decision |
 |---|---|---|
 | Consent | Draft demo-only consent; accept advances, decline leaves a stop message. #65 describes assistance and persistence using the active service mode, including server records and configured AI services in real mode | Approved consent wording, risks, withdrawal/data-handling and exit copy |
-| Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
+| Demographics | #5 requires a synthetic nonnegative whole-number age, free-text gender (including “Prefer not to say”), and usage selection: never / less than weekly / weekly / daily or more / prefer not to say. A required Prolific ID (letters and digits, up to 64) is pre-filled from the `PROLIFIC_PID` link parameter (provisional) | Wording, options, optionality, eligible ages; current age validation is not eligibility approval |
 | Practice | #7 uses a separate untimed lunch scenario; fixed simulated small model for each stage, no router recommendation or survey | Practice treatment/instructions |
 | Catalog | #65 catalog-v2: 8 practice options; 18 each for A/B (6 per category), multiple feasible plans and detail-only distractors. Original reference totals: practice $350, A $800, B $1,200 | Values/vendors/distractors and comparable difficulty |
 | Live constraint feedback | #7 shows four live booleans after selection, even before inspection; servings included in dietary coverage. Empty plan is within budget but misses the other three requirements. Supplies completeness is not a fifth constraint. | What to reveal, when; supplies completeness policy |
@@ -140,12 +144,18 @@ These changes do not approve consent or add demographic questions.
   Initial catalog summaries populate both search results and selected-item labels;
   hidden details are loaded only by `inspectItem`. Reopening cached details does
   not duplicate the service's inspected-item record.
-- A submitted search uses `searchCatalog`; an empty query shows the selected
-  category's full list. Filtering never removes selected items from the plan.
+- The catalog filters the loaded summaries as the participant types or changes the
+  category (same matching as `searchCatalog`); there is no Search button. The category
+  follows the current stage and shows all categories at the final check. Filtering never
+  removes selected items from the plan.
 - Venue/catering selections replace the previous item. Supplies selections add
   distinct packages. Remove actions retain other selections; the service recomputes
   integer-cent costs and the same six constraints used at submission.
 - Next-stage controls use `advanceCheckpoint`; conversation uses `sendMessage`.
+  Provisional, pending researcher approval: adding an item that completes the current
+  stage (Venue: capacity, access and location; Catering: dietary; Supplies: required
+  supplies) calls `advanceCheckpoint` automatically once that stage's model is committed.
+  The final check never advances. "Back to …" uses `goBackCheckpoint`.
   Stage-linked history and inspected items remain in service memory. Mutations are
   guarded while an operation is pending; failed messages keep the current draft.
 - Practice submission at any checkpoint uses `finishTask`, preserving incomplete

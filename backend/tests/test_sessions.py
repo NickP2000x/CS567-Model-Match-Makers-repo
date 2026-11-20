@@ -42,25 +42,33 @@ def test_resume_returns_same_session_across_app_restarts(make_client):
 
 def test_consent_comes_first_and_skips_are_rejected(client):
     participant = Participant(client)
-    participant.fail("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "weekly"},
+    participant.fail("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "weekly", "prolificId": "TESTPID01"},
                      409, "INVALID_STEP")
     participant.fail("POST", "/tutorial/complete", None, 409, "INVALID_STEP")
     participant.fail("POST", "/tasks/practice/begin", None, 409, "INVALID_STEP")
     participant.call("POST", "/consent", {"accepted": False})
     assert participant.step == "consent" and participant.state["consent"] is False
     participant.call("POST", "/consent", {"accepted": True})
-    participant.fail("POST", "/demographics", {"age": -1, "gender": "x", "priorLlmUsage": "weekly"},
+    participant.fail("POST", "/demographics", {"age": -1, "gender": "x", "priorLlmUsage": "weekly", "prolificId": "TESTPID01"},
                      400, "INVALID_DEMOGRAPHICS")
-    participant.fail("POST", "/demographics", {"age": 25, "gender": "  ", "priorLlmUsage": "weekly"},
+    participant.fail("POST", "/demographics", {"age": 25, "gender": "  ", "priorLlmUsage": "weekly", "prolificId": "TESTPID01"},
                      400, "INVALID_DEMOGRAPHICS")
     participant.fail("POST", "/demographics", {"age": 25, "gender": "x"}, 400, "INVALID_REQUEST")
+    for prolific_id in ("", "  ", "abc-123", "x" * 65):
+        participant.fail("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "weekly",
+                         "prolificId": prolific_id}, 400, "INVALID_DEMOGRAPHICS")
+    participant.fail("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "weekly"},
+                     400, "INVALID_REQUEST")
     assert participant.state["demographics"] is None
+    participant.call("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "weekly",
+                     "prolificId": " 5f3c9a1b2c4d6e8f0a1b2c3d "})
+    assert participant.state["demographics"]["prolificId"] == "5f3c9a1b2c4d6e8f0a1b2c3d"
 
 
 def test_preparations_gate_tutorial_and_tasks(client, clock):
     participant = Participant(client)
     participant.call("POST", "/consent", {"accepted": True})
-    participant.call("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "never"})
+    participant.call("POST", "/demographics", {"age": 25, "gender": "x", "priorLlmUsage": "never", "prolificId": "TESTPID01"})
     participant.fail("POST", "/tutorial/complete", None, 409, "INVALID_PREPARATION")
     participant.fail("POST", "/preparations/before-start", {"acknowledgedIds": ["no-refresh"]},
                      400, "INVALID_PREPARATION")

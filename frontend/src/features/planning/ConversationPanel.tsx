@@ -13,15 +13,17 @@ interface ConversationProps {
   agentWorking: number | null;
   onSend: (text: string) => Promise<boolean>;
   onAdvance: () => void;
+  onBack: () => void;
 }
 
-export function ConversationPanel({ task, pending, routing, simulated, agentWorking, onSend, onAdvance }: ConversationProps) {
+export function ConversationPanel({ task, pending, routing, simulated, agentWorking, onSend, onAdvance, onBack }: ConversationProps) {
   const [message, setMessage] = useState('');
   const checkpointTitle = useRef<HTMLHeadingElement>(null);
   const previousCheckpoint = useRef(task.checkpoint);
   const log = useRef<HTMLDivElement>(null);
   const currentIndex = checkpoints.indexOf(task.checkpoint);
   const next = checkpoints[currentIndex + 1];
+  const previous = checkpoints[currentIndex - 1];
   const model = task.decisions[task.checkpoint]?.finalModel;
 
   useEffect(() => {
@@ -45,12 +47,12 @@ export function ConversationPanel({ task, pending, routing, simulated, agentWork
         {checkpoints.map((checkpoint, index) => (
           <li key={checkpoint} aria-current={checkpoint === task.checkpoint ? 'step' : undefined}
             className={checkpoint === task.checkpoint ? 'current-checkpoint' : undefined}>
-            {checkpoint}{index < currentIndex ? ' — completed' : ''}
+            {checkpoint}{index < currentIndex ? ' — completed' : index > currentIndex && task.decisions[checkpoint] ? ' — visited' : ''}
           </li>
         ))}
       </ol>
       <h4 id="checkpoint-title" ref={checkpointTitle} tabIndex={-1}>Stage {currentIndex + 1} of 4: {task.checkpoint}</h4>
-      <p className="field-help">Move forward through stages; stage models stay locked. The agent suggests changes, but you add or remove catalog items yourself.</p>
+      <p className="field-help">A stage moves on by itself once the item you add meets its constraints; you can go back. Each stage keeps its model. The agent suggests changes, but you add or remove catalog items yourself.</p>
       {routing}
       <h4>Conversation</h4>
       <div ref={log} className="conversation-log" role="log" aria-label={simulated ? 'Simulated conversation' : 'Conversation'} aria-live="polite" aria-relevant="additions">
@@ -70,6 +72,9 @@ export function ConversationPanel({ task, pending, routing, simulated, agentWork
       </form>
       {agentWorking !== null && <AgentActivity key={agentWorking} />}
       <div className="stage-actions">
+        {previous && (
+          <button type="button" className="secondary" disabled={pending} onClick={onBack}>Back to {previous}</button>
+        )}
         {next ? (
           <button type="button" className="secondary" disabled={pending || !model} onClick={onAdvance}>Continue to {next}</button>
         ) : <p>Final checkpoint reached. Submit your current plan when ready.</p>}

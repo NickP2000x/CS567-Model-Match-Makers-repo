@@ -95,6 +95,27 @@ def test_stale_checkpoint_requests_are_rejected(dev_client):
     assert participant.client.get(f"/api/sessions/{participant.sid}").json()["tasks"]["task-1"] == before
 
 
+def test_back_returns_to_an_earlier_stage_with_its_locked_model(dev_client):
+    participant = Participant(dev_client, 3)  # task 1: scenario A, Override
+    participant.through_practice()
+    participant.start()
+    participant.fail("POST", "/tasks/task-1/checkpoint/back", {"checkpoint": "Venue"}, 409, "FIRST_CHECKPOINT")
+    venue = participant.route("task-1", initial="large", final="small")
+    participant.call("POST", "/tasks/task-1/checkpoint/advance", {"checkpoint": "Venue"})
+    catering = participant.task()["decisions"]["Catering"]
+    assert catering["phase"] == "choose"
+    participant.call("POST", "/tasks/task-1/checkpoint/back", {"checkpoint": "Catering"})
+    task = participant.task()
+    assert task["checkpoint"] == "Venue" and task["decisions"]["Venue"] == venue  # no new routing
+    participant.call("POST", "/tasks/task-1/messages", {"checkpoint": "Venue", "text": "Compare venues"})
+    assert participant.task()["messages"][-1]["model"] == "small"
+    participant.call("POST", "/tasks/task-1/checkpoint/advance", {"checkpoint": "Venue"})
+    assert participant.task()["decisions"]["Catering"] == catering  # the reached stage keeps its decision
+    visits = [(visit["checkpoint"], visit["direction"]) for visit in participant.task()["checkpointVisits"]]
+    assert visits == [("Venue", "start"), ("Catering", "forward"), ("Venue", "back"), ("Catering", "forward")]
+    participant.fail("POST", "/tasks/task-1/checkpoint/back", {"checkpoint": "Venue"}, 409, "STALE_OPERATION")
+
+
 def test_invalid_and_incomplete_plans_can_be_submitted(dev_client):
     participant = Participant(dev_client, 1)
     participant.through_practice()

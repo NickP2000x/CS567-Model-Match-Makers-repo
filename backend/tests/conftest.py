@@ -87,7 +87,7 @@ class Participant:
 
     def introduction(self) -> None:
         self.call("POST", "/consent", {"accepted": True})
-        self.call("POST", "/demographics", {"age": 25, "gender": "synthetic example", "priorLlmUsage": "weekly"})
+        self.call("POST", "/demographics", {"age": 25, "gender": "synthetic example", "priorLlmUsage": "weekly", "prolificId": "TESTPID01"})
         self.acknowledge("before-start")
         self.call("POST", "/tutorial/complete")
 
