@@ -554,56 +554,32 @@ continuation:
 - Backend: 145 tests passed (4 new), alone and merged with the catalog-expansion branch.
 - Not done: no recorded real-model run for this change in this note.
 
-## gpt-oss pair calibration (provisional)
+## Agent search shows the constraint facts
 
-The backend owner calibrated the Ollama Cloud pair on the merged #72 catalog
-(`catalog-v4`, six constraints). The model pair, router, and threshold below are
-substitutions for the paper's setup. They need researcher approval before participant
-collection.
+With 15 items per category, the agent had to inspect items one by one, ran out of tool
+steps, and participants often saw "Sorry, I could not produce an answer". The agent's
+`search_catalog` tool now adds the facts the constraints check to each result: venue
+capacity, wheelchair access and area; catering servings and dietary coverage; what a
+supplies package provides. The `details` text still needs `inspect_item`. The
+participant's catalog panel (`GET /api/scenarios/{id}/catalog`) is unchanged and still hides these
+facts. The offline oracle uses the same tool, so its observed items now include these
+facts too.
 
-- Models: small `ollama:gpt-oss:20b-cloud`, large `ollama:gpt-oss:120b-cloud`, instead of
-  Mixtral 8x7B and GPT-4 Turbo (see the model pair decision above). Ollama does not report
-  an immutable revision for these cloud aliases, so the manifest stores null. Record the
-  run date with any result.
-- Router: RouteLLM `bert`. It needs no OpenAI key. `mf`, which the paper's model pair
-  matches, needs OpenAI embeddings and was not used.
-- Pilot target: the backend owner set the pass-rate target to 0.92, down from 0.95,
-  because no threshold reached 0.95 with this pair. `app.calibrate` now defaults to
-  `--min-pass-rate 0.92`. The target is provisional, pending researcher approval.
-- Provisional live configuration in `backend/.env`: `ROUTER_MODE=routellm`,
-  `ROUTELLM_ROUTER=bert`, `ROUTER_THRESHOLD=0.515`, `DEV_CONTROLS=false`.
+Open for the researchers: the agent no longer needs to inspect to spot detail-only
+distractors, which may narrow the gap between the small and large models. The
+2026-11-13 router calibration (threshold 0.515) was run before this change.
 
-### Recorded results — 2026-11-13
+### Recorded results — 2026-11-18
 
-- Command: `ROUTELLM_ROUTER=bert bash scripts/calibrate.sh --real --min-pass-rate 0.95`
-  (default corpus `synthetic-stage-contexts-v3-location`, 26 pilot contexts, one repeat,
-  `AGENT_MAX_STEPS=4`). Report `calibration-20261113T192817.371432Z` (ignored local
-  artifacts under `backend/data/calibration/`). Status complete, 0 error contexts,
-  258 model calls. A `--limit 2` check ran first with no errors.
-- Router scores fell between 0.40 and 0.53.
+- Backend: 148 tests passed (1 new, 3 updated).
+- Manual real-model check (Ollama `gpt-oss:20b-cloud` / `gpt-oss:120b-cloud`): "What should
+  I do?" with an empty plan at Venue, Catering and Supplies of tasks A and B, 3 times per
+  model (36 replies per row), scored against the catalog:
 
-| Policy | Pass rate | Routed large |
-|---|---|---|
-| Always small (20b) | 88% (23/26) | 0% |
-| Always large (120b) | 77% (20/26) | 100% |
-| Threshold 0.515 | 92% (24/26) | 15% |
-| Oracle (either model passes) | 96% (25/26) | — |
+  | Code | `AGENT_MAX_STEPS` | Useful | Names a non-qualifying item too | "Sorry" |
+  |---|---|---|---|---|
+  | `main` before this change | 8 | 32 | 0 | 4 |
+  | this change | 4 | 34 | 0 | 2 |
+  | this change | 8 | 33 | 3 (small model, in a list of options) | 0 |
 
-- The run requested 0.95, and no threshold met it. Recomputed from the same evaluations
-  at the 0.92 target (no new model calls), the tool's rule recommends 0.5154: 92% pass,
-  15% routed large. `ROUTER_THRESHOLD=0.515` routes every pilot context the same way.
-  It is a provisional choice from 26 synthetic contexts, not a validated threshold.
-- The large model passed fewer contexts than the small model. Large failures: dietary
-  coverage (2, B Catering), accessibility (2, Final), capacity (1, A Final repair), and a
-  removed venue (1, A Venue location repair). Small failures: no venue submitted (1,
-  A Venue) and the dietary distractor `B-food-diet` (2, B Final). Both models failed only
-  B Final review. This weakens the premise that the large model is the better choice and
-  needs researcher review.
-- 50 of the 52 proposals used all four tool steps and then the forced final answer.
-  With 15 options per category, `AGENT_MAX_STEPS=4` may be too few for the models to
-  inspect the candidates. A run with eight steps was started and stopped before it
-  finished, so its effect is unknown. The live agent uses the same step limit.
-- Live check: with these settings the backend started on a spare port with a temporary
-  database, and `/api/health` returned `{"status":"ok","mode":"real","router":"routellm"}`.
-- Not done: no holdout split, no repeated runs, and no real participant-style session
-  through the routed app.
+- Not done: multi-turn conversations, the final constraint check stage, and a browser run.
