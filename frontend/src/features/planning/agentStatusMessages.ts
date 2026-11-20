@@ -7,6 +7,16 @@ export const AGENT_STATUS_MESSAGES = [
   'Planning...',
   'Contemplating...',
   'Working on your message...',
+  'Booping',
+  'Canoodling',
+  'Dilly-dallying',
+  'Lollygagging',
+  'Flibbertigibbeting',
+  'Discombobulating',
+  'Noodling',
+  'Honking',
+  'Vibing',
+  'Marinating'
   // Add custom sentences here.
   
 ];
