@@ -103,6 +103,30 @@ def test_study_filter_is_explicit_and_preserves_oracle_usage_separation(recorded
     assert {row["practice"] for row in read_csv(output, "messages")} == {"0"}
 
 
+def test_standalone_analysis_accepts_actual_export_and_preserves_source(recorded_database, tmp_path):
+    from pathlib import Path
+
+    export = export_database(recorded_database, tmp_path / "exports")
+    before = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in export.iterdir()}
+    script = Path(__file__).resolve().parents[2] / "scripts/analyze_csv.py"
+    process = subprocess.run([sys.executable, "-B", "-I", str(script), "--input", str(export),
+                              "--output", str(tmp_path / "analysis")], capture_output=True, text=True,
+                             env={**os.environ, "MODEL_MODE": "invalid", "DATABASE_PATH": "must-not-open.sqlite3"})
+    assert process.returncode == 0, process.stderr
+    result = next((tmp_path / "analysis").iterdir())
+    report = json.loads((result / "data_quality_report.json").read_text())
+    assert report["export_version"] == "study-csv-v4"
+    assert report["counts"]["included_ended_tasks"] == 1
+    assert report["exclusions"]["development_sessions"] == 1
+    assert report["exclusions"]["practice_tasks"] == 1
+    assert report["warnings"]["workload_score_or_metadata_mismatch"] == 1
+    assert report["constraint_definitions"] == {"budget+capacity+dietary+accessibility": 1}
+    assert report["call_accounting_for_included_ended_tasks"]["oracle_calls"] == 1
+    assert report["input_sha256"]["tasks.csv"] == before["tasks.csv"]
+    assert before == {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in export.iterdir()}
+    assert "TESTPID01" not in "".join(path.read_text(encoding="utf-8-sig") for path in result.iterdir())
+
+
 def test_earlier_optional_schema_and_unfinished_tasks_are_not_fabricated(tmp_path):
     path = tmp_path / "old.sqlite3"
     with sqlite3.connect(path) as c:
