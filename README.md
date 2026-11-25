@@ -76,6 +76,14 @@ See [RUNNING.md](RUNNING.md) for detailed startup/native Windows instructions an
 and CSV formats. These shell scripts target WSL/Linux/macOS; native PowerShell can
 use the documented Python commands directly.
 
+### 5. Analyze exported data locally
+
+For local descriptive analysis after collection, run
+`python3 scripts/analyze_csv.py --input "/path/to/export-folder" --output "/path/to/private-results"`.
+This creates condition summaries, paired differences, data-quality checks and LaTeX
+tables without loading the app or calling models. See the
+[CSV analysis guide](docs/backend/csv-analysis.md) for inclusion rules and limitations.
+
 ## Manual commands (without helper scripts)
 
 These are the WSL/Linux/macOS equivalents. Python 3.12 and **native Node 24.14.0

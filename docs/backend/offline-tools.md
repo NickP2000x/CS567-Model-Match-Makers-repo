@@ -1,5 +1,10 @@
 # Offline calibration and CSV export (#67–#68)
 
+For the separately requested, local descriptive analysis of an existing export,
+see [CSV analysis](csv-analysis.md). It reads private CSVs without app/provider
+settings and creates paper-ready tables. Calibration and export do not analyze
+participant outcomes themselves.
+
 These are local researcher tools, not participant-facing endpoints or a statistical pipeline.
 They use the same six constraints as the app (the fifth, required supplies, and sixth, venue location, are provisional) and do not approve participant collection.
 

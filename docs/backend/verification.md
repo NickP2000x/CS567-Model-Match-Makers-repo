@@ -1,5 +1,34 @@
 # Backend verification
 
+## Local CSV descriptive analysis (2026-11-25)
+
+- Added the explicitly requested standalone `scripts/analyze_csv.py`. It reads one
+  CSV export, uses only the Python standard library, and writes aggregate condition
+  summaries, paired differences, routing counts, a quality report, LaTeX tables,
+  and draft Results prose. It does not open SQLite, load `.env`, run calibration,
+  make model calls, or alter the application protocol.
+- **12 standard-library synthetic checks passed**. Coverage includes known paired
+  differences and quartiles, development/practice/unfinished exclusions, timeouts,
+  legacy constraint and survey versions, workload orientation, unknown token usage,
+  oracle joins and neither outcomes, duplicate participants/rows, source preservation,
+  omission of private identifiers/text, and the isolated CLI with invalid provider
+  settings. All records were invented; no collected participant files were read.
+- The focused export suite passed **8 tests**, including an actual `study-csv-v4`
+  exporter-to-analysis subprocess check. The full key-free backend suite passed
+  **150 tests**. The analysis tests also run independently without backend packages:
+
+  ```bash
+  # Repository root:
+  python3 -B -m unittest discover -s scripts/tests -p 'test_analyze_csv.py' -v
+  ```
+
+- The output is descriptive, not a significance-testing or validated reliance
+  pipeline. Available-case condition summaries and metric-specific paired sample
+  sizes are explicit. No actual study findings or paper edits were produced.
+  A local LaTeX engine was unavailable, so generated tables were checked as text
+  (including escaping), not compiled in Overleaf. See the
+  [CSV analysis guide](csv-analysis.md) for commands, definitions, and limitations.
+
 ## #67 — GPT-OSS/Ollama and BERT follow-up (2026-11-02–03 UTC)
 
 - Verified Windows Ollama `0.40.3` from WSL using the existing Windows host endpoint,
